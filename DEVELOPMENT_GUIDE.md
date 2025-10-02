@@ -6,30 +6,27 @@ Your travel planner now uses a modern **JavaScript frontend** with a **Rails API
 
 ## 📋 **Team Ruby Version Setup**
 
-### Current Setup
-- **Specified Ruby Version**: 3.4.6 (in `.ruby-version` and `Gemfile`)
-- **Compatibility**: Team members using 3.4.1 should upgrade for consistency
+### Current Setup - Flexible Approach ✅
+- **Supported Ruby Versions**: 3.4.1, 3.4.6, and other Ruby 3.4.x versions
+- **No version enforcement**: Team members can use their existing Ruby installation
+- **Gemfile.lock compatibility**: Works across different 3.4.x versions
 
-### For Team Members with Ruby 3.4.1:
+### Ruby Version Compatibility
+Your team can continue using their current Ruby versions:
+- ✅ **Ruby 3.4.1** - Fully supported
+- ✅ **Ruby 3.4.6** - Fully supported  
+- ✅ **Ruby 3.4.x** - Any 3.4.x version should work
 
-1. **Using rbenv:**
-```bash
-rbenv install 3.4.6
-rbenv global 3.4.6
-# or for project-specific:
-rbenv local 3.4.6
-```
+### No Action Required!
+Team members with Ruby 3.4.1 or 3.4.6 can proceed without any Ruby version changes.
 
-2. **Using RVM:**
-```bash
-rvm install 3.4.6
-rvm use 3.4.6 --default
-```
-
-3. **Verify version:**
+### Verify Your Setup:
 ```bash
 ruby -v
-# Should show: ruby 3.4.6
+# Should show Ruby 3.4.x (any patch version is fine)
+
+bundle install
+# Should complete successfully regardless of 3.4.x version
 ```
 
 ## 🎯 **Frontend Architecture**
