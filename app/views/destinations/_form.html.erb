@@ -1,0 +1,62 @@
+<%= form_with(model: destination) do |form| %>
+  <% if destination.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(destination.errors.count, "error") %> prohibited this destination from being saved:</h2>
+
+      <ul>
+        <% destination.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :name, style: "display: block" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :country, style: "display: block" %>
+    <%= form.text_field :country %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.textarea :description %>
+  </div>
+
+  <div>
+    <%= form.label :visa_required, style: "display: block" %>
+    <%= form.checkbox :visa_required %>
+  </div>
+
+  <div>
+    <%= form.label :safety_score, style: "display: block" %>
+    <%= form.number_field :safety_score %>
+  </div>
+
+  <div>
+    <%= form.label :best_season, style: "display: block" %>
+    <%= form.text_field :best_season %>
+  </div>
+
+  <div>
+    <%= form.label :average_cost, style: "display: block" %>
+    <%= form.text_field :average_cost %>
+  </div>
+
+  <div>
+    <%= form.label :latitude, style: "display: block" %>
+    <%= form.text_field :latitude %>
+  </div>
+
+  <div>
+    <%= form.label :longitude, style: "display: block" %>
+    <%= form.text_field :longitude %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

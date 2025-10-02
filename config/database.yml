@@ -1,0 +1,43 @@
+# PostgreSQL for production (Heroku), SQLite for development/test
+# This setup allows easy local development while being production-ready
+
+# SQLite default for development and test
+sqlite: &sqlite
+  adapter: sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+
+# PostgreSQL default for production
+postgresql: &postgresql
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *sqlite
+  database: storage/development.sqlite3
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *sqlite
+  database: storage/test.sqlite3
+
+# Production configuration for Heroku and other PostgreSQL deployments
+production:
+  primary:
+    <<: *postgresql
+    url: <%= ENV['DATABASE_URL'] %>
+  cache:
+    <<: *postgresql
+    database: <%= ENV.fetch("RAILS_CACHE_DATABASE_NAME", "travel_planner_cache") %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *postgresql
+    database: <%= ENV.fetch("RAILS_QUEUE_DATABASE_NAME", "travel_planner_queue") %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *postgresql
+    database: <%= ENV.fetch("RAILS_CABLE_DATABASE_NAME", "travel_planner_cable") %>
+    migrations_paths: db/cable_migrate

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Planner - JavaScript Frontend</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .hero-section {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .user-card, .destination-card, .recommendation-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .recommendation-card {
+            border-left: 4px solid #667eea;
+        }
+        
+        .score {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .reasons {
+            font-style: italic;
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .destination-details {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .destination-details span {
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="location.reload()">🌍 Travel Planner (JavaScript)</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text">Powered by JavaScript & Rails API</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Alerts Container -->
+        <div class="alerts-container"></div>
+        
+        <!-- Loading Indicator -->
+        <div id="loading">Loading...</div>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>🌍 Travel Planner</h1>
+            <p class="lead">Discover your perfect destination with AI-powered recommendations</p>
+            <p><strong>JavaScript Frontend + Rails API Backend</strong></p>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">Users</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="destinations-tab" data-bs-toggle="tab" data-bs-target="#destinations" type="button" role="tab">Destinations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="recommendations-tab" data-bs-toggle="tab" data-bs-target="#recommendations" type="button" role="tab">Get Recommendations</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabsContent">
+            <!-- Users Tab -->
+            <div class="tab-pane fade show active" id="users" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Create New User</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="user-form">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="passport_country" class="form-label">Passport Country</label>
+                                        <input type="text" class="form-control" id="passport_country" name="passport_country" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="budget_min" class="form-label">Min Budget ($)</label>
+                                                <input type="number" class="form-control" id="budget_min" name="budget_min" min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="budget_max" class="form-label">Max Budget ($)</label>
+                                                <input type="number" class="form-control" id="budget_max" name="budget_max" min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="preferred_travel_season" class="form-label">Preferred Season</label>
+                                        <select class="form-control" id="preferred_travel_season" name="preferred_travel_season">
+                                            <option value="">Select Season</option>
+                                            <option value="Spring">Spring</option>
+                                            <option value="Summer">Summer</option>
+                                            <option value="Fall">Fall</option>
+                                            <option value="Winter">Winter</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="safety_preference" class="form-label">Safety Preference (1-10)</label>
+                                        <input type="range" class="form-control" id="safety_preference" name="safety_preference" min="1" max="10" value="5" oninput="document.getElementById('safety-value').textContent = this.value">
+                                        <small>Current: <span id="safety-value">5</span></small>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Create User</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Existing Users</h5>
+                            </div>
+                            <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                                <div id="users-list">
+                                    <!-- Users will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destinations Tab -->
+            <div class="tab-pane fade" id="destinations" role="tabpanel">
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5>Available Destinations</h5>
+                        <button class="btn btn-primary" id="load-destinations">Refresh</button>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        <div id="destinations-list">
+                            <!-- Destinations will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Tab -->
+            <div class="tab-pane fade" id="recommendations" role="tabpanel">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Get Travel Recommendations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="user-select" class="form-label">Select User</label>
+                                <select class="form-control" id="user-select">
+                                    <option value="">Select a user...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button class="btn btn-primary" id="get-recommendations">Get Recommendations</button>
+                            </div>
+                        </div>
+                        
+                        <div id="recommendations-list">
+                            <!-- Recommendations will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Travel Planner JavaScript -->
+    <script src="/js/travel-planner.js"></script>
+</body>
+</html>

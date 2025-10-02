@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+# Script to setup database for different environments
+
+require 'fileutils'
+
+def setup_sqlite
+  puts "Setting up SQLite for development..."
+  system("rails db:drop db:create db:migrate")
+  puts "✅ SQLite database setup complete!"
+end
+
+def setup_postgresql
+  puts "Setting up PostgreSQL for production testing..."
+  
+  # Create a local PostgreSQL database for testing production setup
+  database_name = "travel_planner_development_pg"
+  
+  # Add PostgreSQL to PATH temporarily
+  ENV['PATH'] = "/opt/homebrew/opt/postgresql@15/bin:#{ENV['PATH']}"
+  
+  # Create user and database
+  system("createdb #{database_name} 2>/dev/null || true")
+  
+  # Create a temporary database.yml for PostgreSQL testing
+  pg_config = <<~YAML
+    development:
+      adapter: postgresql
+      encoding: unicode
+      database: #{database_name}
+      pool: 5
+      username: #{ENV['USER']}
+      password:
+      host: localhost
+      port: 5432
+  YAML
+  
+  # Backup current database.yml
+  FileUtils.cp('config/database.yml', 'config/database.yml.backup')
+  
+  # Write PostgreSQL config
+  File.write('config/database.yml.pg', pg_config)
+  
+  puts "PostgreSQL database setup complete!"
+  puts "To test with PostgreSQL, run: cp config/database.yml.pg config/database.yml"
+  puts "To switch back to SQLite, run: cp config/database.yml.backup config/database.yml"
+end
+
+case ARGV[0]
+when 'sqlite'
+  setup_sqlite
+when 'postgresql', 'pg'
+  setup_postgresql
+else
+  puts "Usage: ruby bin/setup_database [sqlite|postgresql]"
+  puts "  sqlite     - Setup SQLite for development (default)"
+  puts "  postgresql - Setup PostgreSQL for production testing"
+end
