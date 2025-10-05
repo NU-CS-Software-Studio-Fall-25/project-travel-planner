@@ -1,0 +1,12 @@
+<% content_for :title, "Editing travel plan" %>
+
+<h1>Editing travel plan</h1>
+
+<%= render "form", travel_plan: @travel_plan %>
+
+<br>
+
+<div>
+  <%= link_to "Show this travel plan", @travel_plan %> |
+  <%= link_to "Back to travel plans", travel_plans_path %>
+</div>

@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Travel plans" %>
+
+<h1>Travel plans</h1>
+
+<div id="travel_plans">
+  <% @travel_plans.each do |travel_plan| %>
+    <%= render travel_plan %>
+    <p>
+      <%= link_to "Show this travel plan", travel_plan %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New travel plan", new_travel_plan_path %>

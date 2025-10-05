@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  country: MyString
+  description: MyText
+  visa_required: false
+  safety_score: 1
+  best_season: MyString
+  average_cost: 9.99
+  latitude: 9.99
+  longitude: 9.99
+
+two:
+  name: MyString
+  country: MyString
+  description: MyText
+  visa_required: false
+  safety_score: 1
+  best_season: MyString
+  average_cost: 9.99
+  latitude: 9.99
+  longitude: 9.99

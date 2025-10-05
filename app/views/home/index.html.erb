@@ -1,0 +1,41 @@
+<div class="hero-section">
+  <h1>🌍 Travel Planner</h1>
+  <p class="lead">Discover your perfect destination with personalized, safe, and practical travel recommendations</p>
+  
+  <div class="cta-buttons">
+    <%= link_to "Get Travel Recommendations", new_travel_recommendation_path, class: "btn btn-primary btn-lg" %>
+    <%= link_to "View All Destinations", destinations_path, class: "btn btn-outline-secondary btn-lg" %>
+  </div>
+</div>
+
+<div class="features-section">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="feature-card">
+        <h3>🛂 Visa & Safety Check</h3>
+        <p>We consider your passport and check visa requirements plus safety conditions for each destination.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-card">
+        <h3>🤖 AI-Powered Recommendations</h3>
+        <p>OpenAI integration provides personalized suggestions based on your preferences and constraints.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-card">
+        <h3>🗺️ Integrated Planning</h3>
+        <p>Google Maps and TripAdvisor integration for distance, attractions, and comprehensive travel info.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <h2>Quick Actions</h2>
+  <div class="action-links">
+    <%= link_to "Create Profile", new_user_path, class: "btn btn-success" %>
+    <%= link_to "Browse Destinations", destinations_path, class: "btn btn-info" %>
+    <%= link_to "My Travel Plans", travel_plans_path, class: "btn btn-warning" %>
+  </div>
+</div>

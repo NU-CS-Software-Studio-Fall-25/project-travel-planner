@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  email: MyString
+  passport_country: MyString
+  budget_min: 9.99
+  budget_max: 9.99
+  preferred_travel_season: MyString
+  safety_preference: 1
+
+two:
+  name: MyString
+  email: MyString
+  passport_country: MyString
+  budget_min: 9.99
+  budget_max: 9.99
+  preferred_travel_season: MyString
+  safety_preference: 1
