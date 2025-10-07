@@ -38,7 +38,11 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <%= link_to "Home", root_path, class: "nav-link" %>
+              <% if logged_in? %>
+                <%= link_to "My Profile", current_user, class: "nav-link" %>
+              <% else %>
+                <%= link_to "Home", root_path, class: "nav-link" %>
+              <% end %>
             </li>
             <% if logged_in? %>
               <li class="nav-item">
