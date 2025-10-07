@@ -1,10 +1,111 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "My Profile - Travel Planner" %>
 
-<%= render @user %>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <!-- Get Recommendations CTA -->
+      <div class="alert alert-success text-center mb-4">
+        <h4 class="mb-3">🎯 Ready to Explore?</h4>
+        <p class="mb-3">Your travel profile is set up! Get personalized destination recommendations based on your preferences.</p>
+        <%= link_to "🚀 Get Travel Recommendations", new_travel_recommendation_path, class: "btn btn-success btn-lg" %>
+      </div>
+      
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h1 class="mb-0">My Travel Profile</h1>
+          <%= link_to "Edit Profile", edit_user_path(@user), class: "btn btn-outline-primary" %>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h5>Personal Information</h5>
+              <dl class="row">
+                <dt class="col-sm-4">Name:</dt>
+                <dd class="col-sm-8"><%= @user.name %></dd>
+                
+                <dt class="col-sm-4">Email:</dt>
+                <dd class="col-sm-8"><%= @user.email %></dd>
+                
+                <dt class="col-sm-4">Passport Country:</dt>
+                <dd class="col-sm-8"><%= @user.passport_country %></dd>
+              </dl>
+            </div>
+            
+            <div class="col-md-6">
+              <h5>Travel Preferences</h5>
+              <dl class="row">
+                <dt class="col-sm-5">Budget Range:</dt>
+                <dd class="col-sm-7">$<%= number_with_delimiter(@user.budget_min) %> - $<%= number_with_delimiter(@user.budget_max) %></dd>
+                
+                <dt class="col-sm-5">Preferred Season:</dt>
+                <dd class="col-sm-7"><%= @user.preferred_travel_season %></dd>
+                
+                <dt class="col-sm-5">Safety Preference:</dt>
+                <dd class="col-sm-7">
+                  <%= @user.safety_preference %>/10
+                  <div class="progress" style="height: 10px;">
+                    <div class="progress-bar" role="progressbar" style="width: <%= @user.safety_preference * 10 %>%"></div>
+                  </div>
+                </dd>
+              </dl>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h5>Quick Stats</h5>
+              <div class="row text-center">
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h3 class="text-primary"><%= @user.travel_plans.count %></h3>
+                      <p class="mb-0">Travel Plans</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h3 class="text-success"><%= @user.destinations.count %></h3>
+                      <p class="mb-0">Destinations</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h3 class="text-info"><%= @user.recommendations.count %></h3>
+                      <p class="mb-0">Recommendations</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-<div>
-  <%= link_to "Edit this user", edit_user_path(@user) %> |
-  <%= link_to "Back to users", users_path %>
-
-  <%= button_to "Destroy this user", @user, method: :delete %>
+          <!-- Action Buttons -->
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h5>Quick Actions</h5>
+              <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <%= link_to "📍 Browse Destinations", destinations_path, class: "btn btn-info" %>
+                <%= link_to "🗺️ My Travel Plans", travel_plans_path, class: "btn btn-warning" %>
+                <%= link_to "🏠 Back to Home", root_path, class: "btn btn-secondary" %>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-footer">
+          <div class="d-flex justify-content-end">
+            <%= button_to "Delete Account", @user, method: :delete, 
+                confirm: "Are you sure? This action cannot be undone and will delete all your travel plans and data.", 
+                class: "btn btn-outline-danger btn-sm" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

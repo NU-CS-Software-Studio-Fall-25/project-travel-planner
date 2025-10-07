@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
   before_action :set_user, only: %i[ show edit update destroy ]
+  before_action :require_login, except: %i[ new create ]
+  before_action :correct_user, only: %i[ show edit update destroy ]
 
   # GET /users or /users.json
   def index
@@ -25,7 +27,8 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        format.html { redirect_to @user, notice: "User was successfully created." }
+        session[:user_id] = @user.id  # Auto login after signup
+        format.html { redirect_to @user, notice: "Welcome to Travel Planner! Your account was successfully created. Ready to get some recommendations?" }
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -38,7 +41,7 @@ class UsersController < ApplicationController
   def update
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to @user, notice: "User was successfully updated.", status: :see_other }
+        format.html { redirect_to @user, notice: "Your profile was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -52,7 +55,7 @@ class UsersController < ApplicationController
     @user.destroy!
 
     respond_to do |format|
-      format.html { redirect_to users_path, notice: "User was successfully destroyed.", status: :see_other }
+      format.html { redirect_to root_path, notice: "Your account was successfully deleted.", status: :see_other }
       format.json { head :no_content }
     end
   end
@@ -65,6 +68,11 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.expect(user: [ :name, :email, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference ])
+      params.expect(user: [ :name, :email, :password, :password_confirmation, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference ])
+    end
+    
+    # Ensure users can only access their own profile
+    def correct_user
+      redirect_to root_path unless @user == current_user
     end
 end

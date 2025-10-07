@@ -1,9 +1,8 @@
-<%= form_with(model: user) do |form| %>
+<%= form_with(model: user, local: true) do |form| %>
   <% if user.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h2>
-
-      <ul>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h4>
+      <ul class="mb-0">
         <% user.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,42 +10,71 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="mb-3">
+    <%= form.label :name, "Full Name", class: "form-label" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Enter your full name" %>
   </div>
 
-  <div>
-    <%= form.label :email, style: "display: block" %>
-    <%= form.text_field :email %>
+  <div class="mb-3">
+    <%= form.label :email, "Email Address", class: "form-label" %>
+    <%= form.email_field :email, class: "form-control", placeholder: "Enter your email address" %>
   </div>
 
-  <div>
-    <%= form.label :passport_country, style: "display: block" %>
-    <%= form.text_field :passport_country %>
+  <% if user.new_record? %>
+    <div class="mb-3">
+      <%= form.label :password, class: "form-label" %>
+      <%= form.password_field :password, class: "form-control", placeholder: "Create a password (minimum 6 characters)" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
+      <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password" %>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :passport_country, "Passport Country", class: "form-label" %>
+    <%= form.text_field :passport_country, class: "form-control", placeholder: "e.g., United States, Canada, United Kingdom" %>
   </div>
 
-  <div>
-    <%= form.label :budget_min, style: "display: block" %>
-    <%= form.text_field :budget_min %>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <%= form.label :budget_min, "Minimum Budget ($)", class: "form-label" %>
+        <%= form.number_field :budget_min, class: "form-control", placeholder: "e.g., 1000", step: 0.01 %>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mb-3">
+        <%= form.label :budget_max, "Maximum Budget ($)", class: "form-label" %>
+        <%= form.number_field :budget_max, class: "form-control", placeholder: "e.g., 5000", step: 0.01 %>
+      </div>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :budget_max, style: "display: block" %>
-    <%= form.text_field :budget_max %>
+  <div class="mb-3">
+    <%= form.label :preferred_travel_season, "Preferred Travel Season", class: "form-label" %>
+    <%= form.select :preferred_travel_season, 
+        options_for_select([
+          ['Spring', 'Spring'],
+          ['Summer', 'Summer'],
+          ['Fall', 'Fall'],
+          ['Winter', 'Winter']
+        ], user.preferred_travel_season), 
+        { prompt: "Select your preferred season" }, 
+        { class: "form-select" } %>
   </div>
 
-  <div>
-    <%= form.label :preferred_travel_season, style: "display: block" %>
-    <%= form.text_field :preferred_travel_season %>
+  <div class="mb-3">
+    <%= form.label :safety_preference, "Safety Preference (1-10, where 10 is safest)", class: "form-label" %>
+    <%= form.range_field :safety_preference, in: 1..10, class: "form-range", value: user.safety_preference || 5 %>
+    <div class="d-flex justify-content-between">
+      <small class="text-muted">1 (Adventure)</small>
+      <small class="text-muted">10 (Very Safe)</small>
+    </div>
   </div>
 
-  <div>
-    <%= form.label :safety_preference, style: "display: block" %>
-    <%= form.number_field :safety_preference %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+  <div class="d-grid">
+    <%= form.submit user.new_record? ? "Create Account" : "Update Profile", class: "btn btn-primary" %>
   </div>
 <% end %>

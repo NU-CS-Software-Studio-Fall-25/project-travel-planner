@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="text-center">Login to Travel Planner</h2>
+        </div>
+        <div class="card-body">
+          <%= form_with url: login_path, method: :post, local: true do |form| %>
+            <div class="mb-3">
+              <%= form.label :email, class: "form-label" %>
+              <%= form.email_field :email, class: "form-control", placeholder: "Enter your email" %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :password, class: "form-label" %>
+              <%= form.password_field :password, class: "form-control", placeholder: "Enter your password" %>
+            </div>
+
+            <div class="d-grid">
+              <%= form.submit "Login", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+          
+          <div class="text-center mt-3">
+            <p>Don't have an account? <%= link_to "Sign up here", signup_path, class: "text-decoration-none" %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

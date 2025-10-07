@@ -47,6 +47,6 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def user_params
-    params.require(:user).permit(:name, :email, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference)
   end
 end
