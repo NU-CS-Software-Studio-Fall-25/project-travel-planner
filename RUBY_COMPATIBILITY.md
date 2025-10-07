@@ -50,6 +50,7 @@ open http://localhost:3000/index.html
 - **Gem dependencies**: All gems support Ruby 3.4.x range
 - **No version lock**: Removed strict version requirements
 - **JavaScript frontend**: Ruby version has minimal impact on frontend
+- **CI/CD**: GitHub Actions uses Ruby 3.4 (latest patch version automatically)
 
 ## 🎉 **Benefits**
 
@@ -57,6 +58,7 @@ open http://localhost:3000/index.html
 - ✅ **Faster onboarding for new team members**  
 - ✅ **Works with existing development environments**
 - ✅ **Focus on building features, not version management**
+- ✅ **CI/CD works without version conflicts**
 
 ## 🚨 **Only Requirement**
 
