@@ -4,6 +4,12 @@ Rails.application.routes.draw do
   
   get "home/index"
   
+  # Authentication routes
+  get "/signup", to: "users#new"
+  get "/login", to: "sessions#new"
+  post "/login", to: "sessions#create"
+  delete "/logout", to: "sessions#destroy"
+  
   # API routes
   namespace :api do
     namespace :v1 do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_02_161944) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_07_191901) do
   create_table "destinations", force: :cascade do |t|
     t.string "name"
     t.string "country"
@@ -60,6 +60,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_02_161944) do
     t.integer "safety_preference"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "password_digest"
   end
 
   add_foreign_key "recommendations", "destinations"

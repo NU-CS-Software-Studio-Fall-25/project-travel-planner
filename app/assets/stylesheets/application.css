@@ -95,3 +95,33 @@ body {
   transform: translateY(-1px);
   transition: all 0.2s ease;
 }
+
+.jumbotron {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.jumbotron .btn {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-weight: 600;
+}
+
+.feature-card {
+  transition: transform 0.3s ease;
+  padding: 1.5rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+  border: none;
+  color: white;
+}
+
+.progress-bar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
