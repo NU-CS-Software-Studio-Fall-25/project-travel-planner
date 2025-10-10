@@ -1,8 +1,7 @@
 source "https://rubygems.org"
 
-# Allow flexibility for team members using different Ruby 3.4.x versions
-# Compatible with Ruby 3.4.1, 3.4.6, and other 3.4.x versions
-# ruby "3.4.6"  # Commented out to allow version flexibility
+# Specify Ruby version - using 3.4.6 to match local development
+ruby "3.4.6"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.3"
@@ -23,7 +22,6 @@ gem "jbuilder"
 
 gem "openai"
 gem "openai-ruby"
-gem 'dotenv-rails'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
