@@ -72,7 +72,6 @@ destinations = [
     latitude: 52.3676,
     longitude: 4.9041
   },
-  ,
   {
     name: "Bangkok",
     country: "Thailand",
