@@ -71,6 +71,183 @@ destinations = [
     average_cost: 110.0,
     latitude: 52.3676,
     longitude: 4.9041
+  },
+  ,
+  {
+    name: "Bangkok",
+    country: "Thailand",
+    description: "Bustling capital known for ornate shrines, vibrant street markets, and incredible street food.",
+    visa_required: true,
+    safety_score: 6,
+    best_season: "Winter",
+    average_cost: 60.0,
+    latitude: 13.7563,
+    longitude: 100.5018
+  },
+  {
+    name: "Sydney",
+    country: "Australia",
+    description: "Harbor city famous for its Opera House, beautiful beaches, and laid-back lifestyle.",
+    visa_required: true,
+    safety_score: 9,
+    best_season: "Summer",
+    average_cost: 170.0,
+    latitude: -33.8688,
+    longitude: 151.2093
+  },
+  {
+    name: "Barcelona",
+    country: "Spain",
+    description: "Cosmopolitan city renowned for art, architecture, and Mediterranean cuisine.",
+    visa_required: false,
+    safety_score: 7,
+    best_season: "Spring",
+    average_cost: 95.0,
+    latitude: 41.3851,
+    longitude: 2.1734
+  },
+  {
+    name: "Marrakech",
+    country: "Morocco",
+    description: "Imperial city with bustling souks, stunning palaces, and rich Berber culture.",
+    visa_required: false,
+    safety_score: 6,
+    best_season: "Spring",
+    average_cost: 70.0,
+    latitude: 31.6295,
+    longitude: -7.9811
+  },
+  {
+    name: "Rio de Janeiro",
+    country: "Brazil",
+    description: "Vibrant city known for Carnival, beautiful beaches, and the iconic Christ the Redeemer statue.",
+    visa_required: true,
+    safety_score: 5,
+    best_season: "Summer",
+    average_cost: 85.0,
+    latitude: -22.9068,
+    longitude: -43.1729
+  },
+  {
+    name: "Prague",
+    country: "Czech Republic",
+    description: "Fairy-tale city with medieval architecture, historic castles, and famous Czech beer.",
+    visa_required: false,
+    safety_score: 8,
+    best_season: "Spring",
+    average_cost: 65.0,
+    latitude: 50.0755,
+    longitude: 14.4378
+  },
+  {
+    name: "Dubai",
+    country: "UAE",
+    description: "Ultra-modern city with luxury shopping, futuristic architecture, and desert adventures.",
+    visa_required: true,
+    safety_score: 9,
+    best_season: "Winter",
+    average_cost: 140.0,
+    latitude: 25.2048,
+    longitude: 55.2708
+  },
+  {
+    name: "Edinburgh",
+    country: "Scotland",
+    description: "Historic capital with medieval Old Town, elegant Georgian New Town, and famous festivals.",
+    visa_required: false,
+    safety_score: 9,
+    best_season: "Summer",
+    average_cost: 130.0,
+    latitude: 55.9533,
+    longitude: -3.1883
+  },
+  {
+    name: "Cape Town",
+    country: "South Africa",
+    description: "Stunning coastal city with Table Mountain, wine regions, and rich cultural heritage.",
+    visa_required: false,
+    safety_score: 6,
+    best_season: "Summer",
+    average_cost: 75.0,
+    latitude: -33.9249,
+    longitude: 18.4241
+  },
+  {
+    name: "Seoul",
+    country: "South Korea",
+    description: "Dynamic capital blending ancient traditions with modern technology and K-pop culture.",
+    visa_required: false,
+    safety_score: 8,
+    best_season: "Spring",
+    average_cost: 90.0,
+    latitude: 37.5665,
+    longitude: 126.9780
+  },
+  {
+    name: "Istanbul",
+    country: "Turkey",
+    description: "Transcontinental city bridging Europe and Asia with rich Byzantine and Ottoman history.",
+    visa_required: true,
+    safety_score: 6,
+    best_season: "Spring",
+    average_cost: 55.0,
+    latitude: 41.0082,
+    longitude: 28.9784
+  },
+  {
+    name: "Vancouver",
+    country: "Canada",
+    description: "Pacific coastal city surrounded by mountains, known for outdoor activities and multiculturalism.",
+    visa_required: false,
+    safety_score: 9,
+    best_season: "Summer",
+    average_cost: 125.0,
+    latitude: 49.2827,
+    longitude: -123.1207
+  },
+  {
+    name: "Buenos Aires",
+    country: "Argentina",
+    description: "Passionate city famous for tango, European architecture, and incredible steakhouses.",
+    visa_required: false,
+    safety_score: 6,
+    best_season: "Spring",
+    average_cost: 70.0,
+    latitude: -34.6037,
+    longitude: -58.3816
+  },
+  {
+    name: "Bali",
+    country: "Indonesia",
+    description: "Tropical island paradise with ancient temples, rice terraces, and world-class surfing.",
+    visa_required: true,
+    safety_score: 7,
+    best_season: "Summer",
+    average_cost: 50.0,
+    latitude: -8.3405,
+    longitude: 115.0920
+  },
+  {
+    name: "Vienna",
+    country: "Austria",
+    description: "Imperial capital renowned for classical music, grand palaces, and coffeehouse culture.",
+    visa_required: false,
+    safety_score: 9,
+    best_season: "Spring",
+    average_cost: 105.0,
+    latitude: 48.2082,
+    longitude: 16.3738
+  },
+  {
+    name: "Stockholm",
+    country: "Sweden",
+    description: "Scandinavian capital built on 14 islands, famous for design, innovation, and archipelago beauty.",
+    visa_required: false,
+    safety_score: 9,
+    best_season: "Summer",
+    average_cost: 160.0,
+    latitude: 59.3293,
+    longitude: 18.0686
   }
 ]
 
@@ -109,6 +286,24 @@ users = [
     budget_min: 80.0,
     budget_max: 150.0,
     preferred_travel_season: "Winter",
+    safety_preference: 9
+  },
+  {
+    name: "Emma Wilson",
+    email: "emma@example.com",
+    passport_country: "UK",
+    budget_min: 90.0,
+    budget_max: 180.0,
+    preferred_travel_season: "Spring",
+    safety_preference: 8
+  },
+  {
+    name: "Yuki Tanaka",
+    email: "yuki@example.com",
+    passport_country: "Japan",
+    budget_min: 120.0,
+    budget_max: 250.0,
+    preferred_travel_season: "Summer",
     safety_preference: 9
   }
 ]
