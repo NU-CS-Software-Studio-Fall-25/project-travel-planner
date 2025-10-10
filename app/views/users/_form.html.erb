@@ -1,3 +1,4 @@
+<%# app/views/users/_form.html.erb %>
 <%= form_with(model: user, local: true) do |form| %>
   <% if user.errors.any? %>
     <div class="alert alert-danger">
@@ -12,67 +13,26 @@
 
   <div class="mb-3">
     <%= form.label :name, "Full Name", class: "form-label" %>
-    <%= form.text_field :name, class: "form-control", placeholder: "Enter your full name" %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Enter your full name", required: true %>
   </div>
 
   <div class="mb-3">
     <%= form.label :email, "Email Address", class: "form-label" %>
-    <%= form.email_field :email, class: "form-control", placeholder: "Enter your email address" %>
+    <%= form.email_field :email, class: "form-control", placeholder: "Enter your email address", required: true %>
   </div>
 
+  <%# Password fields are only shown for new user creation %>
   <% if user.new_record? %>
     <div class="mb-3">
       <%= form.label :password, class: "form-label" %>
-      <%= form.password_field :password, class: "form-control", placeholder: "Create a password (minimum 6 characters)" %>
+      <%= form.password_field :password, class: "form-control", placeholder: "Create a password (minimum 6 characters)", required: true %>
     </div>
 
     <div class="mb-3">
       <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
-      <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password" %>
+      <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password", required: true %>
     </div>
   <% end %>
-
-  <div class="mb-3">
-    <%= form.label :passport_country, "Passport Country", class: "form-label" %>
-    <%= form.text_field :passport_country, class: "form-control", placeholder: "e.g., United States, Canada, United Kingdom" %>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6">
-      <div class="mb-3">
-        <%= form.label :budget_min, "Minimum Budget ($)", class: "form-label" %>
-        <%= form.number_field :budget_min, class: "form-control", placeholder: "e.g., 1000", step: 0.01 %>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="mb-3">
-        <%= form.label :budget_max, "Maximum Budget ($)", class: "form-label" %>
-        <%= form.number_field :budget_max, class: "form-control", placeholder: "e.g., 5000", step: 0.01 %>
-      </div>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :preferred_travel_season, "Preferred Travel Season", class: "form-label" %>
-    <%= form.select :preferred_travel_season, 
-        options_for_select([
-          ['Spring', 'Spring'],
-          ['Summer', 'Summer'],
-          ['Fall', 'Fall'],
-          ['Winter', 'Winter']
-        ], user.preferred_travel_season), 
-        { prompt: "Select your preferred season" }, 
-        { class: "form-select" } %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :safety_preference, "Safety Preference (1-10, where 10 is safest)", class: "form-label" %>
-    <%= form.range_field :safety_preference, in: 1..10, class: "form-range", value: user.safety_preference || 5 %>
-    <div class="d-flex justify-content-between">
-      <small class="text-muted">1 (Adventure)</small>
-      <small class="text-muted">10 (Very Safe)</small>
-    </div>
-  </div>
 
   <div class="d-grid">
     <%= form.submit user.new_record? ? "Create Account" : "Update Profile", class: "btn btn-primary" %>

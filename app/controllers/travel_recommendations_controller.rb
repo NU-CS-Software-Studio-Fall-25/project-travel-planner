@@ -1,13 +1,62 @@
+# app/controllers/travel_recommendations_controller.rb
 class TravelRecommendationsController < ApplicationController
+  before_action :require_login
+
   def index
-  end
-
-  def show
-  end
-
-  def new
+    @travel_plan = TravelPlan.new(session.fetch(:last_preferences, {}))
+    # Load recommendations from the session, or initialize as an empty array
+    @recommendations = session.fetch(:recommendations, [])
   end
 
   def create
+    preferences = travel_plan_params
+    session[:last_preferences] = preferences.to_h
+
+    @recommendations = OpenaiService.new(preferences).get_recommendations
+    # Store the new recommendations in the session
+    session[:recommendations] = @recommendations
+    @travel_plan = TravelPlan.new(preferences)
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "recommendations_list",
+          partial: "travel_recommendations/recommendations_list",
+          locals: { recommendations: @recommendations }
+        )
+      end
+      format.html { render :index }
+    end
+  end
+
+  def destroy
+    # Remove the recommendation from the session by its index
+    index_to_delete = params[:id].to_i
+    if session[:recommendations] && session[:recommendations][index_to_delete]
+      session[:recommendations].delete_at(index_to_delete)
+    end
+
+    # Respond to the Turbo Stream request by removing the element from the page
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove("recommendation-#{params[:id]}") }
+      format.html { redirect_to travel_recommendations_path, notice: "Recommendation deleted." }
+    end
+  end
+
+  private
+
+  def travel_plan_params
+    params.require(:travel_plan).permit(
+      :name, :passport_country, :budget_min, :budget_max, :safety_preference,
+      :length_of_stay, :travel_style, :travel_month, :trip_scope, :trip_type,
+      :general_purpose
+    )
+  end
+
+  def require_login
+    unless logged_in?
+      flash[:alert] = "You must be logged in to access this section."
+      redirect_to login_path
+    end
   end
 end

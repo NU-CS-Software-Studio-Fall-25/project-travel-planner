@@ -1,2 +1,112 @@
-<h1>TravelRecommendations#index</h1>
-<p>Find me in app/views/travel_recommendations/index.html.erb</p>
+<%# app/views/travel_recommendations/index.html.erb %>
+<% content_for :title, "Get Travel Recommendations" %>
+
+<div class="container my-4">
+  <h1 class="mb-4">Plan a New Trip</h1>
+
+  <%# Form for submitting travel preferences %>
+  <div class="card mb-5 shadow-sm">
+    <div class="card-header">
+      <h5 class="mb-0">Your Trip Preferences</h5>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @travel_plan || TravelPlan.new, url: travel_recommendations_path, method: :post, id: "recommendation-form") do |f| %>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <%= f.label :name, "Trip Name", class: "form-label" %>
+            <%= f.text_field :name, class: "form-control", placeholder: "e.g., Summer Vacation" %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :passport_country, class: "form-label" %>
+            <%= f.text_field :passport_country, class: "form-control", placeholder: "e.g., United States" %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :budget_min, "Min Budget ($)", class: "form-label" %>
+            <%= f.number_field :budget_min, class: "form-control", step: 100 %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :budget_max, "Max Budget ($)", class: "form-label" %>
+            <%= f.number_field :budget_max, class: "form-control", step: 100 %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :safety_preference, "Safety (1-10)", class: "form-label" %>
+            <%= f.number_field :safety_preference, class: "form-control", min: 1, max: 10 %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :length_of_stay, "Stay (days)", class: "form-label" %>
+            <%= f.number_field :length_of_stay, class: "form-control", min: 1 %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :travel_style, class: "form-label" %>
+            <%= f.select :travel_style, ["Adventure", "Leisure", "Luxury", "Backpacking"], {}, class: "form-select" %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :travel_month, class: "form-label" %>
+            <%= f.select :travel_month, Date::MONTHNAMES.compact, { include_blank: 'Any Month' }, class: "form-select" %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :trip_scope, class: "form-label" %>
+            <%= f.select :trip_scope, ["International", "Domestic"], {}, class: "form-select" %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :trip_type, class: "form-label" %>
+            <%= f.select :trip_type, ["Solo", "Couple", "Family", "Group"], {}, class: "form-select" %>
+          </div>
+          <div class="col-12">
+            <%= f.label :general_purpose, "Purpose of Trip", class: "form-label" %>
+            <%= f.text_field :general_purpose, class: "form-control", placeholder: "e.g., Relaxation, Sightseeing, Business" %>
+          </div>
+        </div>
+        <div class="mt-4 text-center">
+          <%= f.submit "Get Recommendations", class: "btn btn-success btn-lg" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Render the recommendations partial inside the Turbo Frame %>
+  <%= render 'recommendations_list', recommendations: @recommendations %>
+</div>
+
+<%# The JavaScript for saving form state remains the same %>
+<script>
+    document.addEventListener('turbo:load', () => {
+        const form = document.getElementById('recommendation-form');
+        if (!form) return;
+
+        const storageKey = 'recommendationFormData';
+
+        const loadFormData = () => {
+            const savedData = localStorage.getItem(storageKey);
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                for (const key in data) {
+                    const field = form.querySelector(`[name="travel_plan[${key}]"]`);
+                    if (field) {
+                        field.value = data[key];
+                    }
+                }
+            }
+        };
+
+        const saveFormData = () => {
+            const formData = new FormData(form);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                const match = key.match(/\[(.*?)\]/);
+                if (match) {
+                    data[match[1]] = value;
+                }
+            }
+            localStorage.setItem(storageKey, JSON.stringify(data));
+        };
+
+        const clearFormDataOnSubmit = (event) => {
+            localStorage.removeItem(storageKey);
+        };
+
+        loadFormData();
+        form.addEventListener('input', saveFormData);
+        form.addEventListener('submit', clearFormDataOnSubmit);
+    });
+</script>

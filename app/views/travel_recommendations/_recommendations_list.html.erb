@@ -1,0 +1,84 @@
+<%# app/views/travel_recommendations/_recommendations_list.html.erb %>
+<%= turbo_frame_tag "recommendations_list" do %>
+  <% if recommendations.present? %>
+    <h2 class="mb-4">Your AI-Powered Recommendations</h2>
+    <div class="row">
+      <% recommendations.each_with_index do |rec, index| %>
+        <div class="col-12 mb-4" id="recommendation-<%= index %>">
+          <div class="card h-100 shadow">
+            <div class="card-header">
+              <h4 class="card-title mb-0"><%= rec[:name] %> - <%= rec[:destination_country] %></h4>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <p><strong>Description:</strong> <%= rec[:description] %></p>
+                  <p><strong>Details:</strong> <%= rec[:details] %></p>
+
+                  <%# Itinerary Accordion %>
+                  <% if rec[:itinerary].is_a?(Hash) && rec[:itinerary].present? %>
+                    <div class="accordion" id="accordion-itinerary-<%= index %>">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-itinerary-<%= index %>">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-itinerary-<%= index %>">
+                            View Detailed Itinerary
+                          </button>
+                        </h2>
+                        <div id="collapse-itinerary-<%= index %>" class="accordion-collapse collapse">
+                          <div class="accordion-body">
+                            <% rec[:itinerary].each do |day, description| %>
+                              <div class="mb-3">
+                                <strong><%= day.to_s.humanize %>:</strong>
+                                <p><%= description %></p>
+                              </div>
+                            <% end %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="col-md-4">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Budget:</strong> $<%= number_with_delimiter(rec[:budget_min]) %> - $<%= number_with_delimiter(rec[:budget_max]) %></li>
+                    <li class="list-group-item"><strong>Safety Score:</strong> <%= rec[:safety_score] %>/10</li>
+                    <li class="list-group-item"><strong>Travel Style:</strong> <%= rec[:travel_style] %></li>
+                    <li class="list-group-item"><strong>Visa Info:</strong> <%= rec[:visa_info] %></li>
+                  </ul>
+
+                  <%# Budget Breakdown Accordion %>
+                  <% if rec[:budget_breakdown].present? %>
+                    <div class="accordion mt-3" id="accordion-budget-<%= index %>">
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-budget-<%= index %>">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= index %>">
+                            View Budget Breakdown
+                          </button>
+                        </h2>
+                        <div id="collapse-budget-<%= index %>" class="accordion-collapse collapse" data-bs-parent="#accordion-budget-<%= index %>">
+                          <div class="accordion-body">
+                            <ul class="list-unstyled">
+                              <% rec[:budget_breakdown].each do |item, cost| %>
+                                <li><strong><%= item.to_s.humanize %>:</strong> $<%= number_with_delimiter(cost) %></li>
+                              <% end %>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-end gap-2">
+              <%= button_to "Save to My Plans", travel_plans_path(travel_plan: rec), method: :post, class: "btn btn-primary" %>
+              <button type="button" class="btn btn-outline-danger" onclick="this.closest('.col-12').remove();">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

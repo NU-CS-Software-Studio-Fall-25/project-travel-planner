@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_07_191901) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_09_200013) do
   create_table "destinations", force: :cascade do |t|
     t.string "name"
     t.string "country"
@@ -46,6 +46,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_07_191901) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "passport_country"
+    t.decimal "budget_min"
+    t.decimal "budget_max"
+    t.integer "safety_preference"
+    t.string "travel_style"
+    t.integer "length_of_stay"
+    t.string "travel_month"
+    t.string "general_purpose"
+    t.string "trip_scope"
+    t.string "trip_type"
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
   end
@@ -53,11 +64,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_07_191901) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.string "passport_country"
-    t.decimal "budget_min"
-    t.decimal "budget_max"
-    t.string "preferred_travel_season"
-    t.integer "safety_preference"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "password_digest"
