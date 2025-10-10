@@ -1,3 +1,4 @@
+# app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
   def new
     # Login form
@@ -7,7 +8,8 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:email].downcase)
     if user && user.authenticate(params[:password])
       log_in user
-      redirect_to user, notice: "Welcome back, #{user.name}! Ready to explore?"
+      # Redirect to the travel plans index to create a new trip
+      redirect_to travel_plans_path, notice: "Welcome back, #{user.name}! Let's plan a new trip."
     else
       flash.now[:alert] = 'Invalid email or password'
       render :new, status: :unprocessable_entity
