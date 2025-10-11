@@ -258,58 +258,39 @@ destinations.each do |dest_attrs|
   puts "Created/Found destination: #{destination.name}, #{destination.country}"
 end
 
-# Create sample users
+# Create sample users (simplified to match User model attributes)
 users = [
   {
     name: "Alex Chen",
     email: "alex@example.com",
-    passport_country: "USA",
-    budget_min: 100.0,
-    budget_max: 200.0,
-    preferred_travel_season: "Spring",
-    safety_preference: 8
+    password: "password123"
   },
   {
     name: "Maria Garcia",
     email: "maria@example.com",
-    passport_country: "Spain",
-    budget_min: 50.0,
-    budget_max: 120.0,
-    preferred_travel_season: "Summer",
-    safety_preference: 7
+    password: "password123"
   },
   {
     name: "John Smith",
     email: "john@example.com",
-    passport_country: "Canada",
-    budget_min: 80.0,
-    budget_max: 150.0,
-    preferred_travel_season: "Winter",
-    safety_preference: 9
+    password: "password123"
   },
   {
     name: "Emma Wilson",
     email: "emma@example.com",
-    passport_country: "UK",
-    budget_min: 90.0,
-    budget_max: 180.0,
-    preferred_travel_season: "Spring",
-    safety_preference: 8
+    password: "password123"
   },
   {
     name: "Yuki Tanaka",
     email: "yuki@example.com",
-    passport_country: "Japan",
-    budget_min: 120.0,
-    budget_max: 250.0,
-    preferred_travel_season: "Summer",
-    safety_preference: 9
+    password: "password123"
   }
 ]
 
 users.each do |user_attrs|
   user = User.find_or_create_by(email: user_attrs[:email]) do |u|
-    u.assign_attributes(user_attrs)
+    u.name = user_attrs[:name]
+    u.password = user_attrs[:password]
   end
   puts "Created/Found user: #{user.name} (#{user.email})"
 end
