@@ -24,7 +24,14 @@ test:
   <<: *sqlite
   database: storage/test.sqlite3
 
-# Production configuration for Heroku - simplified for single database
+# Production configuration for Heroku - use single database for all purposes
 production:
-  <<: *postgresql
-  url: <%= ENV['DATABASE_URL'] %>
+  primary: &production_primary
+    <<: *postgresql
+    url: <%= ENV['DATABASE_URL'] %>
+  cache:
+    <<: *production_primary
+  queue:
+    <<: *production_primary  
+  cable:
+    <<: *production_primary
