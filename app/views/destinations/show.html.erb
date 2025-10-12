@@ -1,10 +1,22 @@
-<p style="color: green"><%= notice %></p>
+<p class="mt-2 text-success"><%= notice %></p>
 
-<%= render @destination %>
-
-<div>
-  <%= link_to "Edit this destination", edit_destination_path(@destination) %> |
-  <%= link_to "Back to destinations", destinations_path %>
-
-  <%= button_to "Destroy this destination", @destination, method: :delete %>
+<div class="container my-4">
+  <div class="card shadow">
+    <div class="card-header">
+      <h2><%= @destination.name %> (<%= @destination.country %>)</h2>
+    </div>
+    <div class="card-body">
+      <p><strong>Description:</strong> <%= @destination.description %></p>
+      <p><strong>Visa Required:</strong> <%= @destination.visa_required ? "Yes" : "No" %></p>
+      <p><strong>Safety Score:</strong> <span class="badge bg-info text-dark"><%= @destination.safety_score %>/10</span></p>
+      <p><strong>Best Season:</strong> <%= @destination.best_season %></p>
+      <p><strong>Average Cost:</strong> <%= number_to_currency(@destination.average_cost) %></p>
+      <p><strong>Coordinates:</strong> <%= @destination.latitude %>, <%= @destination.longitude %></p>
+    </div>
+    <div class="card-footer">
+      <%= link_to "Edit", edit_destination_path(@destination), class: "btn btn-outline-warning" %>
+      <%= button_to "Delete", @destination, method: :delete, class: "btn btn-outline-danger", data: { confirm: "Are you sure?" } %>
+      <%= link_to "Back to All Destinations", destinations_path, class: "btn btn-outline-primary" %>
+    </div>
+  </div>
 </div>

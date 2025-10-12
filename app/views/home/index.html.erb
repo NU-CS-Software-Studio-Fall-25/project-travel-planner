@@ -1,50 +1,55 @@
-<div class="hero-section text-center">
+<div class="hero-section text-center py-5">
   <h1>🌍 Travel Planner</h1>
-  <p class="lead">Discover your perfect destination with personalized, safe, and practical travel recommendations</p>
+  <p class="lead">Discover your perfect destination with <span class="text-success">personalized</span>, <span class="text-info">safe</span>, and <span class="text-primary">practical</span> travel recommendations!</p>
   
   <% if logged_in? %>
-    <div class="alert alert-success">
+    <div class="alert alert-success mb-4 rounded shadow">
       <h4>Welcome back, <%= current_user.name %>! 👋</h4>
-      <p>You're all set to explore the world. Let's plan your next adventure!</p>
+      <p>Let's plan your next adventure—explore new places now.</p>
     </div>
-    
-    <div class="cta-buttons">
-      <%= link_to "View My Profile & Get Recommendations", current_user, class: "btn btn-primary btn-lg" %>
-      <%= link_to "Browse Destinations", destinations_path, class: "btn btn-outline-secondary btn-lg" %>
+    <div class="cta-buttons d-flex justify-content-center gap-3 mb-4">
+      <%= link_to "Get AI Recommendations", recommendations_path, class: "btn btn-primary btn-lg" %>
+      <%= link_to "My Profile", current_user, class: "btn btn-outline-secondary btn-lg" %>
+      <%= link_to "Browse Destinations", destinations_path, class: "btn btn-outline-info btn-lg" %>
     </div>
   <% else %>
-    <div class="jumbotron bg-light p-5 rounded">
-      <h2 class="display-6">Create a User Account to Get Personalized Travel Recommendations! ✈️</h2>
-      <p class="lead">Tell us about your travel preferences, budget, and passport country to receive AI-powered destination suggestions tailored just for you.</p>
-      
-      <div class="mt-4">
-        <%= link_to "Create Account", signup_path, class: "btn btn-success btn-lg me-3" %>
-        <%= link_to "Already have an account? Login", login_path, class: "btn btn-outline-primary btn-lg" %>
+    <div class="jumbotron bg-light p-4 rounded shadow mb-4">
+      <h2 class="display-6">Create Your Account and Get Personalized Suggestions! ✈️</h2>
+      <p class="lead">Enter your preferences, budget, and passport country for AI-powered destination tips.</p>
+      <div class="mt-4 d-flex flex-wrap justify-content-center gap-3">
+        <%= link_to "Create Account", signup_path, class: "btn btn-success btn-lg" %>
+        <%= link_to "Login", login_path, class: "btn btn-outline-primary btn-lg" %>
       </div>
     </div>
   <% end %>
 </div>
 
 <% unless logged_in? %>
-  <div class="features-section mt-5">
+  <div class="features-section mt-5 container">
     <h2 class="text-center mb-4">Why Use Travel Planner?</h2>
     <div class="row">
-      <div class="col-md-4">
-        <div class="feature-card text-center">
-          <h3>🛂 Visa & Safety Check</h3>
-          <p>We consider your passport and check visa requirements plus safety conditions for each destination.</p>
+      <div class="col-md-4 mb-3">
+        <div class="card h-100 text-center border-primary shadow feature-card">
+          <div class="card-body">
+            <h3>🛂 Visa & Safety Check</h3>
+            <p>Your passport, visa needs, and latest safety info for every destination.Please let us know if you have any suggestions or feedback.</p>
+          </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="feature-card text-center">
-          <h3>🤖 AI-Powered Recommendations</h3>
-          <p>OpenAI integration provides personalized suggestions based on your preferences and constraints.</p>
+      <div class="col-md-4 mb-3">
+        <div class="card h-100 text-center border-success shadow feature-card">
+          <div class="card-body">
+            <h3>🤖 AI Recommendations</h3>
+            <p>OpenAI finds destinations matching your preferences, budget, and travel goals. Quick and easy to use. We are working on more features to make it even better.</p>
+          </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="feature-card text-center">
-          <h3>🗺️ Integrated Planning</h3>
-          <p>Google Maps and TripAdvisor integration for distance, attractions, and comprehensive travel info.</p>
+      <div class="col-md-4 mb-3">
+        <div class="card h-100 text-center border-info shadow feature-card">
+          <div class="card-body">
+            <h3>🗺️ Integrated Planning</h3>
+            <p>Google Maps and TripAdvisor: get flight, hotel, and activity info instantly. Quick and easy to use.</p>
+          </div>
         </div>
       </div>
     </div>
