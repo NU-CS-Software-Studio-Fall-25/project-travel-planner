@@ -2,6 +2,23 @@
 
 A personalized travel recommendation application built with Ruby on Rails and JavaScript. Users can create profiles with their travel preferences, budget, and passport country to receive AI-powered destination suggestions tailored specifically for them.
 
+
+## 🌍 MVP Overview
+
+A single integrated travel platform that combines **OpenAI**, **Google Maps/Flights**, and **TripAdvisor** APIs to provide a **feasible**, **safety-aware**, and **visa-friendly** travel experience.
+
+---
+
+## 🚀 Core Features
+
+- **User Input** – Collect user data such as nationality, budget, travel dates, and interests.  
+- **Filtering** – Automatically filter destinations based on **visa requirements**, **safety**, and **seasonal conditions**.  
+- **AI Recommendations** – Use **OpenAI API** with prompt engineering to generate **personalized**, **accessible** travel suggestions.  
+- **Data Integration** –  
+  - *Google Maps/Flights:* distance, flight options, hotels  
+  - *TripAdvisor:* attractions and local activities  
+- **Output** – Display a list of feasible destinations with **visa info**, **safety level**, and **top activities**.
+
 ## ✨ Features
 
 - **User Authentication**: Secure signup/login with password encryption
