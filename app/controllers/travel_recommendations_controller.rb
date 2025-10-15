@@ -3,11 +3,23 @@ class TravelRecommendationsController < ApplicationController
   before_action :require_login
 
   def index
-    # Load last preferences from user's recommendations_json or from a smaller session variable
+    # Load last recommendations from the current user's database record
+    # Convert string keys to symbol keys for view compatibility
+    stored_recommendations = current_user.recommendations_json || []
+    @recommendations = stored_recommendations.map { |rec| rec.deep_symbolize_keys }
+    
+    # Load last preferences from session to pre-fill the form
     last_prefs = session[:last_preferences] || {}
     @travel_plan = TravelPlan.new(last_prefs)
-    # Load recommendations from the current user's database record
-    @recommendations = current_user.recommendations_json || []
+    
+    # If we have recommendations, show a helpful message
+    if @recommendations.present?
+      if last_prefs.present?
+        flash.now[:info] = "Showing your recent recommendations. You can save multiple plans or generate new ones below!"
+      else
+        flash.now[:info] = "Welcome back! These are your last generated recommendations. Fill out the form below to get new ones!"
+      end
+    end
   end
 
   def create
