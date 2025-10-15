@@ -27,7 +27,21 @@ class TravelPlansController < ApplicationController
     destination = find_or_create_destination_from_params
     
     # Build travel plan with the destination
-    @travel_plan = current_user.travel_plans.build(travel_plan_params)
+    plan_params = travel_plan_params
+    
+    # Convert safety_level to safety_score if present
+    if plan_params[:safety_level].present?
+      plan_params[:safety_score] = case plan_params[:safety_level]
+      when "level_1" then 9
+      when "level_2" then 7
+      when "level_3" then 4
+      when "level_4" then 2
+      else 5
+      end
+      plan_params.delete(:safety_level)
+    end
+    
+    @travel_plan = current_user.travel_plans.build(plan_params)
     @travel_plan.destination = destination if destination
     
     # Set default dates if not provided
@@ -96,11 +110,11 @@ class TravelPlansController < ApplicationController
     # Note: destination_name is excluded here because it's only used to find/create destinations
     params.require(:travel_plan).permit(
       :name, :description, :details, :budget_min, :budget_max,
-      :safety_score, :travel_style, :length_of_stay, :travel_month,
+      :safety_score, :safety_level, :travel_style, :length_of_stay, :travel_month,
       :trip_scope, :trip_type, :general_purpose, :status, :notes,
       :visa_info, :safety_preference, :start_date, :end_date, 
-      :passport_country, :destination_country,
-      itinerary: {}, budget_breakdown: {}
+      :passport_country, :current_location, :destination_country,
+      itinerary: {}, budget_breakdown: {}, safety_levels: []
     )
   end
 
@@ -126,11 +140,24 @@ class TravelPlansController < ApplicationController
     
     # Create new destination if not found
     unless destination
+      # Convert safety_level to numeric safety_score for backward compatibility
+      safety_score_value = if params[:travel_plan][:safety_level].present?
+        case params[:travel_plan][:safety_level]
+        when "level_1" then 9
+        when "level_2" then 7
+        when "level_3" then 4
+        when "level_4" then 2
+        else 5
+        end
+      else
+        params[:travel_plan][:safety_score]&.to_i
+      end
+      
       destination = Destination.create(
         name: destination_name,
         country: destination_country,
         description: params[:travel_plan][:description],
-        safety_score: params[:travel_plan][:safety_score]&.to_i,
+        safety_score: safety_score_value,
         visa_required: params[:travel_plan][:visa_info]&.downcase&.include?('required')
       )
     end

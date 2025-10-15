@@ -61,7 +61,13 @@
                     <% end %>
                     
                     <% if travel_plan.safety_score.present? %>
-                      <li class="list-group-item"><strong>Safety Score:</strong> <%= travel_plan.safety_score %>/10</li>
+                      <% safety_level = safety_score_to_level(travel_plan.safety_score) %>
+                      <li class="list-group-item">
+                        <strong>Safety Level:</strong>
+                        <span class="badge <%= safety_level_badge_class(safety_level) %>">
+                          <%= safety_level_text(safety_level) %>
+                        </span>
+                      </li>
                     <% end %>
                     
                     <% if travel_plan.travel_style.present? %>
