@@ -5,8 +5,7 @@ class Destination < ApplicationRecord
   
   validates :name, presence: true
   validates :country, presence: true
-  validates :safety_score, inclusion: { in: 1..10 }
-  validates :latitude, :longitude, presence: true
+  validates :safety_score, inclusion: { in: 1..10 }, allow_nil: true
   
   scope :safe_destinations, ->(min_safety) { where('safety_score >= ?', min_safety) }
   scope :visa_not_required, -> { where(visa_required: false) }

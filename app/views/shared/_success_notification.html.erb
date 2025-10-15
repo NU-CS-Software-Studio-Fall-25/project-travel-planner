@@ -1,0 +1,22 @@
+<%# app/views/shared/_success_notification.html.erb %>
+<div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" 
+     style="z-index: 9999; min-width: 400px;" 
+     role="alert"
+     data-controller="auto-dismiss"
+     data-auto-dismiss-delay-value="10000">
+  <div class="d-flex align-items-center">
+    <svg class="me-2" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>
+    <div class="flex-grow-1">
+      <strong><%= message %></strong>
+      <% if defined?(travel_plan) && travel_plan %>
+        <div class="mt-2">
+          <%= link_to "View Travel Plan", travel_plan_path(travel_plan), class: "btn btn-sm btn-success me-2" %>
+          <%= link_to "My Travel Plans", travel_plans_path, class: "btn btn-sm btn-outline-success" %>
+        </div>
+      <% end %>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+</div>

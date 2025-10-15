@@ -1,7 +1,15 @@
 <%# app/views/travel_recommendations/_recommendations_list.html.erb %>
 <%= turbo_frame_tag "recommendations_list" do %>
   <% if recommendations.present? %>
-    <h2 class="mb-4">Your AI-Powered Recommendations</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0">Your AI-Powered Recommendations</h2>
+      <span class="badge bg-success fs-6">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </svg>
+        These recommendations are saved and will remain visible when you return
+      </span>
+    </div>
     <div class="row">
       <% recommendations.each_with_index do |rec, index| %>
         <div class="col-12 mb-4" id="recommendation-<%= index %>">
@@ -71,7 +79,42 @@
               </div>
             </div>
             <div class="card-footer bg-white d-flex justify-content-end gap-2">
-              <%= button_to "Save to My Plans", travel_plans_path(travel_plan: rec), method: :post, class: "btn btn-primary" %>
+              <form action="<%= travel_plans_path %>" method="post" data-turbo-stream="true" 
+                    onsubmit="event.target.querySelector('button[type=submit]').disabled = true; 
+                              event.target.querySelector('button[type=submit]').classList.remove('btn-primary'); 
+                              event.target.querySelector('button[type=submit]').classList.add('btn-success'); 
+                              event.target.querySelector('button[type=submit]').innerHTML = '✓ Saved';">
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <%= hidden_field_tag 'travel_plan[name]', rec[:name] %>
+                <%= hidden_field_tag 'travel_plan[destination_name]', rec[:name] %>
+                <%= hidden_field_tag 'travel_plan[destination_country]', rec[:destination_country] %>
+                <%= hidden_field_tag 'travel_plan[description]', rec[:description] %>
+                <%= hidden_field_tag 'travel_plan[details]', rec[:details] %>
+                <%= hidden_field_tag 'travel_plan[budget_min]', rec[:budget_min] %>
+                <%= hidden_field_tag 'travel_plan[budget_max]', rec[:budget_max] %>
+                <%= hidden_field_tag 'travel_plan[safety_score]', rec[:safety_score] %>
+                <%= hidden_field_tag 'travel_plan[travel_style]', rec[:travel_style] %>
+                <%= hidden_field_tag 'travel_plan[length_of_stay]', rec[:length_of_stay] %>
+                <%= hidden_field_tag 'travel_plan[travel_month]', rec[:travel_month] %>
+                <%= hidden_field_tag 'travel_plan[trip_scope]', rec[:trip_scope] %>
+                <%= hidden_field_tag 'travel_plan[trip_type]', rec[:trip_type] %>
+                <%= hidden_field_tag 'travel_plan[general_purpose]', rec[:general_purpose] %>
+                <%= hidden_field_tag 'travel_plan[visa_info]', rec[:visa_info] %>
+                <%= hidden_field_tag 'travel_plan[status]', 'planned' %>
+                <%= hidden_field_tag 'travel_plan[start_date]', rec[:start_date] if rec[:start_date].present? %>
+                <%= hidden_field_tag 'travel_plan[end_date]', rec[:end_date] if rec[:end_date].present? %>
+                <% if rec[:itinerary].is_a?(Hash) %>
+                  <% rec[:itinerary].each do |day, description| %>
+                    <%= hidden_field_tag "travel_plan[itinerary][#{day}]", description %>
+                  <% end %>
+                <% end %>
+                <% if rec[:budget_breakdown].is_a?(Hash) %>
+                  <% rec[:budget_breakdown].each do |item, cost| %>
+                    <%= hidden_field_tag "travel_plan[budget_breakdown][#{item}]", cost %>
+                  <% end %>
+                <% end %>
+                <button type="submit" class="btn btn-primary">Save to My Plans</button>
+              </form>
               <button type="button" class="btn btn-outline-danger" onclick="this.closest('.col-12').remove();">
                 Delete
               </button>

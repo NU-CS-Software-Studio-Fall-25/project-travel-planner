@@ -1,47 +1,66 @@
 <%= form_with(model: travel_plan) do |form| %>
   <% if travel_plan.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(travel_plan.errors.count, "error") %> prohibited this travel_plan from being saved:</h2>
-
-      <ul>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <h5 class="alert-heading">
+        <svg class="me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+        <%= pluralize(travel_plan.errors.count, "error") %> prohibited this travel plan from being saved:
+      </h5>
+      <ul class="mb-0">
         <% travel_plan.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
       </ul>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :user_id, style: "display: block" %>
-    <%= form.text_field :user_id %>
-  </div>
+  <div class="row g-3">
+    <%# Hide user_id field as it should be set automatically %>
+    <%= form.hidden_field :user_id, value: current_user&.id %>
 
-  <div>
-    <%= form.label :destination_id, style: "display: block" %>
-    <%= form.text_field :destination_id %>
-  </div>
+    <div class="col-md-6">
+      <%= form.label :destination_id, "Destination", class: "form-label" %>
+      <%= form.select :destination_id, 
+          options_from_collection_for_select(Destination.all, :id, :name, travel_plan.destination_id),
+          { include_blank: "Select a destination" },
+          class: "form-select" %>
+      <small class="text-muted">Choose from existing destinations or create a new one below</small>
+    </div>
 
-  <div>
-    <%= form.label :start_date, style: "display: block" %>
-    <%= form.date_field :start_date %>
-  </div>
+    <div class="col-md-6">
+      <%= form.label :status, class: "form-label" %>
+      <%= form.select :status, 
+          ["planned", "booked", "completed", "cancelled"],
+          { selected: travel_plan.status || "planned" },
+          class: "form-select" %>
+    </div>
 
-  <div>
-    <%= form.label :end_date, style: "display: block" %>
-    <%= form.date_field :end_date %>
-  </div>
+    <div class="col-md-6">
+      <%= form.label :start_date, "Trip Start Date", class: "form-label" %>
+      <%= form.date_field :start_date, class: "form-control", min: Date.today, required: true %>
+      <small class="text-muted">When does your trip start?</small>
+    </div>
 
-  <div>
-    <%= form.label :status, style: "display: block" %>
-    <%= form.text_field :status %>
-  </div>
+    <div class="col-md-6">
+      <%= form.label :end_date, "Trip End Date", class: "form-label" %>
+      <%= form.date_field :end_date, class: "form-control", min: Date.today, required: true %>
+      <small class="text-muted">When does your trip end?</small>
+    </div>
 
-  <div>
-    <%= form.label :notes, style: "display: block" %>
-    <%= form.textarea :notes %>
-  </div>
+    <div class="col-12">
+      <%= form.label :notes, "Trip Notes", class: "form-label" %>
+      <%= form.text_area :notes, 
+          class: "form-control", 
+          rows: 5,
+          placeholder: "Add any notes, reminders, or special requirements for this trip..." %>
+      <small class="text-muted">Optional: Add details about accommodations, activities, or anything you want to remember</small>
+    </div>
 
-  <div>
-    <%= form.submit %>
+    <div class="col-12 mt-4">
+      <%= form.submit class: "btn btn-success btn-lg" %>
+      <%= link_to "Cancel", travel_plans_path, class: "btn btn-outline-secondary btn-lg ms-2" %>
+    </div>
   </div>
 <% end %>
