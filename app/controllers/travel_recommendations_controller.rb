@@ -82,8 +82,7 @@ class TravelRecommendationsController < ApplicationController
     params.require(:travel_plan).permit(
       :name, :passport_country, :current_location, :budget_min, :budget_max,
       :length_of_stay, :travel_style, :travel_month, :trip_scope, :trip_type,
-      :general_purpose, :start_date, :end_date,
-      safety_levels: []
+      :general_purpose, :start_date, :end_date, :safety_preference
     )
   end
 

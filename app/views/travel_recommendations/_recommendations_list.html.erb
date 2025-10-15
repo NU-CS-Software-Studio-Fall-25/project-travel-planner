@@ -50,25 +50,40 @@
                   <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>Budget:</strong> $<%= number_with_delimiter(rec[:budget_min]) %> - $<%= number_with_delimiter(rec[:budget_max]) %></li>
                     <li class="list-group-item">
-                      <strong>Safety Level:</strong>
+                      <strong>Safety:</strong>
                       <%
-                        safety_level = rec[:safety_level] || "level_1"
-                        badge_class = case safety_level
-                        when "level_1" then "bg-success"
-                        when "level_2" then "bg-warning"
-                        when "level_3" then "bg-orange text-dark"
-                        when "level_4" then "bg-danger"
-                        else "bg-secondary"
-                        end
-                        level_text = case safety_level
-                        when "level_1" then "Level 1: Safe"
-                        when "level_2" then "Level 2: Moderate"
-                        when "level_3" then "Level 3: High Risk"
-                        when "level_4" then "Level 4: Extreme Risk"
-                        else "Unknown"
+                        # Look up GPI data for this country
+                        country_safety = CountrySafetyScore.find_by(country_name: rec[:destination_country], year: 2025)
+                        
+                        if country_safety
+                          safety_level = country_safety.safety_level
+                          badge_class = "badge bg-#{country_safety.badge_color}"
+                        else
+                          # Fallback to numeric score if available
+                          safety_score = rec[:safety_score] || 5
+                          safety_level = safety_score_to_level(safety_score)
+                          badge_class = case safety_score.to_i
+                                       when 0..3 then "badge bg-danger"
+                                       when 4..5 then "badge bg-warning"
+                                       when 6..7 then "badge bg-info"
+                                       else "badge bg-success"
+                                       end
                         end
                       %>
-                      <span class="badge <%= badge_class %>"><%= level_text %></span>
+                      <span class="<%= badge_class %>"><%= safety_level %></span>
+                      <% if country_safety %>
+                        <br>
+                        <small class="text-muted">
+                          GPI Score: <%= country_safety.gpi_score %> 
+                          (Rank #<%= country_safety.gpi_rank %>/163)
+                        </small>
+                        <br>
+                        <small class="text-muted">
+                          <em>Source: 2025 Global Peace Index</em>
+                        </small>
+                      <% elsif rec[:safety_score] %>
+                        <span class="text-muted">(<%= rec[:safety_score] %>/10)</span>
+                      <% end %>
                     </li>
                     <li class="list-group-item"><strong>Travel Style:</strong> <%= rec[:travel_style] %></li>
                     <li class="list-group-item"><strong>Visa Info:</strong> <%= rec[:visa_info] %></li>
