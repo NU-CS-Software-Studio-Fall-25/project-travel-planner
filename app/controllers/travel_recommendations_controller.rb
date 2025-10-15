@@ -3,9 +3,11 @@ class TravelRecommendationsController < ApplicationController
   before_action :require_login
 
   def index
-    @travel_plan = TravelPlan.new(session.fetch(:last_preferences, {}))
-    # Load recommendations from the session, or initialize as an empty array
-    @recommendations = session.fetch(:recommendations, [])
+    # Load last preferences from user's recommendations_json or from a smaller session variable
+    last_prefs = session[:last_preferences] || {}
+    @travel_plan = TravelPlan.new(last_prefs)
+    # Load recommendations from the current user's database record
+    @recommendations = current_user.recommendations_json || []
   end
 
   def create
@@ -13,8 +15,8 @@ class TravelRecommendationsController < ApplicationController
     session[:last_preferences] = preferences.to_h
 
     @recommendations = OpenaiService.new(preferences).get_recommendations
-    # Store the new recommendations in the session
-    session[:recommendations] = @recommendations
+    # Store the new recommendations in the user's database record instead of session
+    current_user.update(recommendations_json: @recommendations)
     @travel_plan = TravelPlan.new(preferences)
 
     respond_to do |format|
@@ -30,10 +32,12 @@ class TravelRecommendationsController < ApplicationController
   end
 
   def destroy
-    # Remove the recommendation from the session by its index
+    # Remove the recommendation from the user's stored recommendations by its index
     index_to_delete = params[:id].to_i
-    if session[:recommendations] && session[:recommendations][index_to_delete]
-      session[:recommendations].delete_at(index_to_delete)
+    recommendations = current_user.recommendations_json || []
+    if recommendations[index_to_delete]
+      recommendations.delete_at(index_to_delete)
+      current_user.update(recommendations_json: recommendations)
     end
 
     # Respond to the Turbo Stream request by removing the element from the page
