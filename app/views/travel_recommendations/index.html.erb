@@ -14,12 +14,25 @@
         <div class="row g-3">
           <div class="col-md-6">
             <%= f.label :name, "Trip Name", class: "form-label" %>
-            <%= f.text_field :name, class: "form-control", placeholder: "e.g., Summer Vacation" %>
+            <%= f.text_field :name, class: "form-control", placeholder: "e.g., Thanksgiving Getaway" %>
           </div>
           <div class="col-md-6">
             <%= f.label :passport_country, class: "form-label" %>
             <%= f.text_field :passport_country, class: "form-control", placeholder: "e.g., United States" %>
           </div>
+          
+          <!-- Date Range Fields -->
+          <div class="col-md-6">
+            <%= f.label :start_date, "Start Date", class: "form-label" %>
+            <%= f.date_field :start_date, class: "form-control", min: Date.today, required: true %>
+            <small class="text-muted">When does your trip start?</small>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :end_date, "End Date", class: "form-label" %>
+            <%= f.date_field :end_date, class: "form-control", min: Date.today, required: true %>
+            <small class="text-muted">When does your trip end?</small>
+          </div>
+          
           <div class="col-md-3">
             <%= f.label :budget_min, "Min Budget ($)", class: "form-label" %>
             <%= f.number_field :budget_min, class: "form-control", step: 100 %>
@@ -33,16 +46,8 @@
             <%= f.number_field :safety_preference, class: "form-control", min: 1, max: 10 %>
           </div>
           <div class="col-md-3">
-            <%= f.label :length_of_stay, "Stay (days)", class: "form-label" %>
-            <%= f.number_field :length_of_stay, class: "form-control", min: 1 %>
-          </div>
-          <div class="col-md-3">
             <%= f.label :travel_style, class: "form-label" %>
             <%= f.select :travel_style, ["Adventure", "Leisure", "Luxury", "Backpacking"], {}, class: "form-select" %>
-          </div>
-          <div class="col-md-3">
-            <%= f.label :travel_month, class: "form-label" %>
-            <%= f.select :travel_month, Date::MONTHNAMES.compact, { include_blank: 'Any Month' }, class: "form-select" %>
           </div>
           <div class="col-md-3">
             <%= f.label :trip_scope, class: "form-label" %>
@@ -54,7 +59,7 @@
           </div>
           <div class="col-12">
             <%= f.label :general_purpose, "Purpose of Trip", class: "form-label" %>
-            <%= f.text_field :general_purpose, class: "form-control", placeholder: "e.g., Relaxation, Sightseeing, Business" %>
+            <%= f.text_field :general_purpose, class: "form-control", placeholder: "e.g., Thanksgiving relaxation, Beach vacation" %>
           </div>
         </div>
         <div class="mt-4 text-center">

@@ -1,12 +1,39 @@
-<% content_for :title, "Editing travel plan" %>
+<% content_for :title, "Edit Travel Plan" %>
 
-<h1>Editing travel plan</h1>
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">
+          <svg class="me-2" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+          </svg>
+          Edit Travel Plan
+        </h1>
+        <div class="btn-group">
+          <%= link_to @travel_plan, class: "btn btn-outline-secondary" do %>
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+              <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 7 8.5v5.306l2-.666V8.5a.5.5 0 0 1 .128-.334L13.5 3.308V2h-11z"/>
+            </svg>
+            View Plan
+          <% end %>
+          <%= link_to travel_plans_path, class: "btn btn-outline-secondary" do %>
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+              <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            All Plans
+          <% end %>
+        </div>
+      </div>
 
-<%= render "form", travel_plan: @travel_plan %>
-
-<br>
-
-<div>
-  <%= link_to "Show this travel plan", @travel_plan %> |
-  <%= link_to "Back to travel plans", travel_plans_path %>
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Update Plan Details</h5>
+        </div>
+        <div class="card-body">
+          <%= render "form", travel_plan: @travel_plan %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -12,6 +12,19 @@ class TravelRecommendationsController < ApplicationController
 
   def create
     preferences = travel_plan_params
+    
+    # Calculate length of stay from dates
+    if preferences[:start_date].present? && preferences[:end_date].present?
+      start_date = Date.parse(preferences[:start_date]) rescue nil
+      end_date = Date.parse(preferences[:end_date]) rescue nil
+      
+      if start_date && end_date && end_date >= start_date
+        preferences[:length_of_stay] = (end_date - start_date).to_i + 1
+        # Derive the travel month from start_date
+        preferences[:travel_month] = start_date.strftime("%B") # e.g., "November"
+      end
+    end
+    
     session[:last_preferences] = preferences.to_h
 
     @recommendations = OpenaiService.new(preferences).get_recommendations
@@ -53,7 +66,7 @@ class TravelRecommendationsController < ApplicationController
     params.require(:travel_plan).permit(
       :name, :passport_country, :budget_min, :budget_max, :safety_preference,
       :length_of_stay, :travel_style, :travel_month, :trip_scope, :trip_type,
-      :general_purpose
+      :general_purpose, :start_date, :end_date
     )
   end
 
