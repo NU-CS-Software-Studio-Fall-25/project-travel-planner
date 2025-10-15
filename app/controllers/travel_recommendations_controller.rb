@@ -37,12 +37,16 @@ class TravelRecommendationsController < ApplicationController
       end
     end
     
-    session[:last_preferences] = preferences.to_h
+    # Store preferences in session for form pre-filling, but exclude safety_levels (not a TravelPlan attribute)
+    session_prefs = preferences.to_h.except(:safety_levels)
+    session[:last_preferences] = session_prefs
 
     @recommendations = OpenaiService.new(preferences).get_recommendations
     # Store the new recommendations in the user's database record instead of session
     current_user.update(recommendations_json: @recommendations)
-    @travel_plan = TravelPlan.new(preferences)
+    
+    # Create TravelPlan object for form display (without safety_levels attribute)
+    @travel_plan = TravelPlan.new(session_prefs)
 
     respond_to do |format|
       format.turbo_stream do
@@ -76,9 +80,10 @@ class TravelRecommendationsController < ApplicationController
 
   def travel_plan_params
     params.require(:travel_plan).permit(
-      :name, :passport_country, :budget_min, :budget_max, :safety_preference,
+      :name, :passport_country, :current_location, :budget_min, :budget_max,
       :length_of_stay, :travel_style, :travel_month, :trip_scope, :trip_type,
-      :general_purpose, :start_date, :end_date
+      :general_purpose, :start_date, :end_date,
+      safety_levels: []
     )
   end
 

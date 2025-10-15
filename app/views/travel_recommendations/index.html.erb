@@ -28,20 +28,29 @@
             <%= f.text_field :name, class: "form-control", placeholder: "e.g., Thanksgiving Getaway" %>
           </div>
           <div class="col-md-6">
-            <%= f.label :passport_country, class: "form-label" %>
+            <%= f.label :passport_country, "Passport/Citizenship Country", class: "form-label" %>
             <%= f.text_field :passport_country, class: "form-control", placeholder: "e.g., United States" %>
           </div>
           
-          <!-- Date Range Fields -->
           <div class="col-md-6">
-            <%= f.label :start_date, "Start Date", class: "form-label" %>
-            <%= f.date_field :start_date, class: "form-control", min: Date.today, required: true %>
-            <small class="text-muted">When does your trip start?</small>
+            <%= f.label :current_location, "Current Location", class: "form-label" %>
+            <span class="text-danger">*</span>
+            <%= f.text_field :current_location, class: "form-control", placeholder: "e.g., Chicago, Illinois", required: true %>
+            <small class="text-muted">Where are you traveling from?</small>
           </div>
-          <div class="col-md-6">
+          
+          <!-- Date Range Fields -->
+          <div class="col-md-3">
+            <%= f.label :start_date, "Start Date", class: "form-label" %>
+            <span class="text-danger">*</span>
+            <%= f.date_field :start_date, class: "form-control", id: "start_date", min: Date.today, required: true %>
+            <small class="text-muted">Trip start date</small>
+          </div>
+          <div class="col-md-3">
             <%= f.label :end_date, "End Date", class: "form-label" %>
-            <%= f.date_field :end_date, class: "form-control", min: Date.today, required: true %>
-            <small class="text-muted">When does your trip end?</small>
+            <span class="text-danger">*</span>
+            <%= f.date_field :end_date, class: "form-control", id: "end_date", min: Date.today, required: true %>
+            <small class="text-muted">Trip end date</small>
           </div>
           
           <div class="col-md-3">
@@ -52,25 +61,63 @@
             <%= f.label :budget_max, "Max Budget ($)", class: "form-label" %>
             <%= f.number_field :budget_max, class: "form-control", step: 100 %>
           </div>
-          <div class="col-md-3">
-            <%= f.label :safety_preference, "Safety (1-10)", class: "form-label" %>
-            <%= f.number_field :safety_preference, class: "form-control", min: 1, max: 10 %>
-          </div>
-          <div class="col-md-3">
+          
+          <div class="col-md-6">
             <%= f.label :travel_style, class: "form-label" %>
-            <%= f.select :travel_style, ["Adventure", "Leisure", "Luxury", "Backpacking"], {}, class: "form-select" %>
+            <%= f.select :travel_style, ["Adventure", "Leisure", "Luxury", "Backpacking"], {}, class: "form-select", id: "travel_style" %>
           </div>
-          <div class="col-md-3">
+          
+          <!-- Safety Preference - Multiple Select -->
+          <div class="col-md-6">
+            <%= f.label :safety_levels, "Acceptable Safety Levels", class: "form-label" %>
+            <span class="text-danger">*</span>
+            <div class="border rounded p-3" style="background-color: #f8f9fa;">
+              <div class="form-check">
+                <%= check_box_tag 'travel_plan[safety_levels][]', 'level_1', false, class: 'form-check-input safety-checkbox', id: 'safety_level_1' %>
+                <%= label_tag 'safety_level_1', class: 'form-check-label' do %>
+                  <strong>Level 1 - Safe Destinations</strong>
+                  <small class="d-block text-muted">Exercise normal precautions</small>
+                <% end %>
+              </div>
+              <div class="form-check">
+                <%= check_box_tag 'travel_plan[safety_levels][]', 'level_2', false, class: 'form-check-input safety-checkbox', id: 'safety_level_2' %>
+                <%= label_tag 'safety_level_2', class: 'form-check-label' do %>
+                  <strong>Level 2 - Moderate Caution</strong>
+                  <small class="d-block text-muted">Exercise increased caution</small>
+                <% end %>
+              </div>
+              <div class="form-check">
+                <%= check_box_tag 'travel_plan[safety_levels][]', 'level_3', false, class: 'form-check-input safety-checkbox', id: 'safety_level_3' %>
+                <%= label_tag 'safety_level_3', class: 'form-check-label' do %>
+                  <strong>Level 3 - High Risk</strong>
+                  <small class="d-block text-muted">Reconsider travel</small>
+                <% end %>
+              </div>
+              <div class="form-check">
+                <%= check_box_tag 'travel_plan[safety_levels][]', 'level_4', false, class: 'form-check-input safety-checkbox', id: 'safety_level_4' %>
+                <%= label_tag 'safety_level_4', class: 'form-check-label' do %>
+                  <strong>Level 4 - Extreme Risk</strong>
+                  <small class="d-block text-muted">Do not travel (Adventure style only)</small>
+                <% end %>
+              </div>
+            </div>
+            <small class="text-muted">Select all levels you're comfortable with</small>
+          </div>
+          
+          <div class="col-md-6">
             <%= f.label :trip_scope, class: "form-label" %>
             <%= f.select :trip_scope, ["International", "Domestic"], {}, class: "form-select" %>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-6">
             <%= f.label :trip_type, class: "form-label" %>
             <%= f.select :trip_type, ["Solo", "Couple", "Family", "Group"], {}, class: "form-select" %>
           </div>
+          
           <div class="col-12">
-            <%= f.label :general_purpose, "Purpose of Trip", class: "form-label" %>
-            <%= f.text_field :general_purpose, class: "form-control", placeholder: "e.g., Thanksgiving relaxation, Beach vacation" %>
+            <%= f.label :general_purpose, "Purpose of Trip (Important!)", class: "form-label" %>
+            <span class="text-danger">*</span>
+            <%= f.text_area :general_purpose, class: "form-control", rows: 3, required: true, placeholder: "e.g., I want to relax during Thanksgiving break, preferably somewhere in Japan or South Korea. I love hot springs and nature." %>
+            <small class="text-muted"><strong>Be specific!</strong> Mention any countries, cities, activities, or experiences you're interested in. This is the most important field for getting personalized recommendations.</small>
           </div>
         </div>
         <div class="mt-4 text-center">
@@ -84,45 +131,135 @@
   <%= render 'recommendations_list', recommendations: @recommendations %>
 </div>
 
-<%# The JavaScript for saving form state remains the same %>
+<%# The JavaScript for saving form state and validation logic %>
 <script>
     document.addEventListener('turbo:load', () => {
         const form = document.getElementById('recommendation-form');
         if (!form) return;
 
         const storageKey = 'recommendationFormData';
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        const travelStyleSelect = document.getElementById('travel_style');
+        const level4Checkbox = document.getElementById('safety_level_4');
+        const safetyCheckboxes = document.querySelectorAll('.safety-checkbox');
 
+        // Date validation logic
+        if (startDateInput && endDateInput) {
+            startDateInput.addEventListener('change', function() {
+                const startDate = new Date(this.value);
+                if (this.value) {
+                    // Set minimum end date to the day after start date
+                    const minEndDate = new Date(startDate);
+                    minEndDate.setDate(minEndDate.getDate() + 1);
+                    endDateInput.min = minEndDate.toISOString().split('T')[0];
+                    
+                    // If end date is before start date, clear it
+                    if (endDateInput.value && new Date(endDateInput.value) <= startDate) {
+                        endDateInput.value = '';
+                    }
+                }
+            });
+
+            endDateInput.addEventListener('change', function() {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(this.value);
+                
+                if (startDateInput.value && endDate <= startDate) {
+                    alert('End date must be after start date!');
+                    this.value = '';
+                }
+            });
+        }
+
+        // Safety Level 4 restriction logic
+        function checkLevel4Permission() {
+            const travelStyle = travelStyleSelect ? travelStyleSelect.value : '';
+            
+            if (level4Checkbox && level4Checkbox.checked && travelStyle !== 'Adventure') {
+                alert('⚠️ Level 4 - Extreme Risk destinations are only available for "Adventure" travel style.\n\nThese destinations involve significant safety concerns and are recommended only for experienced adventure travelers.\n\nPlease either:\n1. Change your travel style to "Adventure", or\n2. Uncheck Level 4 destinations');
+                level4Checkbox.checked = false;
+            }
+        }
+
+        if (level4Checkbox) {
+            level4Checkbox.addEventListener('change', checkLevel4Permission);
+        }
+
+        if (travelStyleSelect) {
+            travelStyleSelect.addEventListener('change', function() {
+                // If changing away from Adventure and Level 4 is checked, uncheck it
+                if (this.value !== 'Adventure' && level4Checkbox && level4Checkbox.checked) {
+                    level4Checkbox.checked = false;
+                    alert('Level 4 - Extreme Risk destinations have been deselected because they require "Adventure" travel style.');
+                }
+            });
+        }
+
+        // Form submission validation - ensure at least one safety level is selected
+        form.addEventListener('submit', function(event) {
+            const checkedBoxes = Array.from(safetyCheckboxes).filter(cb => cb.checked);
+            
+            if (checkedBoxes.length === 0) {
+                event.preventDefault();
+                alert('Please select at least one safety level you\'re comfortable with.');
+                return false;
+            }
+
+            // Clear localStorage on successful submit
+            localStorage.removeItem(storageKey);
+        });
+
+        // Load saved form data from localStorage
         const loadFormData = () => {
             const savedData = localStorage.getItem(storageKey);
             if (savedData) {
                 const data = JSON.parse(savedData);
                 for (const key in data) {
-                    const field = form.querySelector(`[name="travel_plan[${key}]"]`);
-                    if (field) {
-                        field.value = data[key];
+                    if (key === 'safety_levels') {
+                        // Handle checkbox array
+                        if (Array.isArray(data[key])) {
+                            data[key].forEach(level => {
+                                const checkbox = document.getElementById(`safety_${level}`);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        }
+                    } else {
+                        const field = form.querySelector(`[name="travel_plan[${key}]"]`);
+                        if (field) {
+                            field.value = data[key];
+                        }
                     }
                 }
             }
         };
 
+        // Save form data to localStorage
         const saveFormData = () => {
             const formData = new FormData(form);
             const data = {};
             for (let [key, value] of formData.entries()) {
                 const match = key.match(/\[(.*?)\]/);
                 if (match) {
-                    data[match[1]] = value;
+                    const fieldName = match[1];
+                    // Handle checkbox arrays
+                    if (fieldName === 'safety_levels') {
+                        if (!data[fieldName]) data[fieldName] = [];
+                        data[fieldName].push(value);
+                    } else {
+                        data[fieldName] = value;
+                    }
                 }
             }
             localStorage.setItem(storageKey, JSON.stringify(data));
         };
 
-        const clearFormDataOnSubmit = (event) => {
-            localStorage.removeItem(storageKey);
-        };
-
         loadFormData();
         form.addEventListener('input', saveFormData);
-        form.addEventListener('submit', clearFormDataOnSubmit);
+        
+        // Also save on checkbox change
+        safetyCheckboxes.forEach(cb => {
+            cb.addEventListener('change', saveFormData);
+        });
     });
 </script>
