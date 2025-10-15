@@ -114,10 +114,9 @@
           </div>
           
           <div class="col-12">
-            <%= f.label :general_purpose, "Purpose of Trip (Important!)", class: "form-label" %>
-            <span class="text-danger">*</span>
-            <%= f.text_area :general_purpose, class: "form-control", rows: 3, required: true, placeholder: "e.g., I want to relax during Thanksgiving break, preferably somewhere in Japan or South Korea. I love hot springs and nature." %>
-            <small class="text-muted"><strong>Be specific!</strong> Mention any countries, cities, activities, or experiences you're interested in. This is the most important field for getting personalized recommendations.</small>
+            <%= f.label :general_purpose, "Purpose of Trip (Optional)", class: "form-label" %>
+            <%= f.text_area :general_purpose, class: "form-control", rows: 3, placeholder: "e.g., I want to relax during Thanksgiving break, preferably somewhere in Japan or South Korea. I love hot springs and nature." %>
+            <small class="text-muted"><strong>Optional but recommended:</strong> Mention any countries, cities, activities, or experiences you're interested in. This helps us provide better personalized recommendations.</small>
           </div>
         </div>
         <div class="mt-4 text-center">
