@@ -204,7 +204,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-gnu)
       racc (~> 1.4)
-    openai (0.31.0)
+    openai (0.33.0)
       connection_pool
     openai-ruby (0.1.0)
       json
