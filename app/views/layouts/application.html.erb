@@ -29,13 +29,7 @@
   </head>
 
   <body>
-    <%# Development-only visual indicator for Google Maps key presence %>
-    <% if Rails.env.development? %>
-      <div style="position:fixed;right:12px;bottom:12px;z-index:2000;background:#0d6efd;color:white;padding:6px 10px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.2);font-size:13px">
-        <% key = (Rails.application.credentials.dig(:google, :maps_api_key) || ENV['GOOGLE_MAPS_API_KEY']) %>
-        <strong>Google Maps</strong> — key: <%= key.present? ? 'present' : 'missing' %>
-      </div>
-    <% end %>
+    <%# (Development-only badge removed) %>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container">
