@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_09_200013) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_15_145029) do
   create_table "destinations", force: :cascade do |t|
     t.string "name"
     t.string "country"
@@ -60,6 +60,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_200013) do
     t.text "itinerary"
     t.text "details"
     t.text "description"
+    t.integer "safety_score"
+    t.string "visa_info"
+    t.text "budget_breakdown"
+    t.string "destination_country"
+    t.string "current_location"
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
   end
@@ -67,10 +72,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_200013) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.string "password_digest"
+    t.text "recommendations_json"
   end
 
   add_foreign_key "recommendations", "destinations"

@@ -14,14 +14,10 @@
             <dd class="col-sm-9"><%= @user.name %></dd>
             <dt class="col-sm-3">Email:</dt>
             <dd class="col-sm-9"><%= @user.email %></dd>
-            <dt class="col-sm-3">Country:</dt>
-            <dd class="col-sm-9"><%= @user.passport_country %></dd>
-            <dt class="col-sm-3">Budget:</dt>
-            <dd class="col-sm-9"><%= @user.budget_min %> - <%= @user.budget_max %></dd>
-            <dt class="col-sm-3">Preferred Season:</dt>
-            <dd class="col-sm-9"><%= @user.preferred_travel_season %></dd>
-            <dt class="col-sm-3">Safety Preference:</dt>
-            <dd class="col-sm-9"><%= @user.safety_preference %>/10</dd>
+            <dt class="col-sm-3">Member Since:</dt>
+            <dd class="col-sm-9"><%= @user.created_at.strftime("%B %d, %Y") %></dd>
+            <dt class="col-sm-3">Total Travel Plans:</dt>
+            <dd class="col-sm-9"><%= @user.travel_plans.count %></dd>
           </dl>
           <hr>
           <div class="mt-4">
