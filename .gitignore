@@ -36,3 +36,6 @@
 # Ignore database configuration backups
 /config/database.yml.backup
 /config/database.yml.pg
+
+# Local environment file for secrets (do NOT commit)
+/config/local_env.yml

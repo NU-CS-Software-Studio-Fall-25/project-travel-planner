@@ -38,6 +38,7 @@ gem "solid_cable"
 gem "httparty"                    # For making HTTP requests to external APIs
 gem "dotenv-rails"                # For managing environment variables
 gem "image_processing", "~> 1.2"  # For handling images from APIs
+gem "geocoder"
 
 # CORS support for frontend integration
 gem "rack-cors"

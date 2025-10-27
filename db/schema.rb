@@ -85,9 +85,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_191125) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "password_digest"
     t.text "recommendations_json"
     t.index ["email"], name: "index_users_on_email", unique: true
   end

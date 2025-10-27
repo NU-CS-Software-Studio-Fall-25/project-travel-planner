@@ -15,4 +15,13 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 6 }, if: -> { new_record? || !password.nil? }
 
   before_save { self.email = email.downcase }
+
+  # Helper methods for managing recommendations stored as JSON
+  def cached_recommendations
+    recommendations_json ? JSON.parse(recommendations_json) : []
+  end
+
+  def cache_recommendations(recommendations_array)
+    update(recommendations_json: recommendations_array.to_json)
+  end
 end
