@@ -1,7 +1,8 @@
+# app/controllers/users_controller.rb
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[ show edit update destroy ]
-  before_action :require_login, except: %i[ new create ]
-  before_action :correct_user, only: %i[ show edit update destroy ]
+  before_action :require_login, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :redirect_if_logged_in, only: [:new, :create]
 
   # GET /users or /users.json
   def index
@@ -27,8 +28,8 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        session[:user_id] = @user.id  # Auto login after signup
-        format.html { redirect_to @user, notice: "Welcome to Travel Planner! Your account was successfully created. Ready to get some recommendations?" }
+        log_in @user # Log in the user after successful signup
+        format.html { redirect_to travel_plans_path, notice: "Welcome! Your account was successfully created." }
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -41,7 +42,7 @@ class UsersController < ApplicationController
   def update
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to @user, notice: "Your profile was successfully updated.", status: :see_other }
+        format.html { redirect_to user_url(@user), notice: "User was successfully updated." }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -55,24 +56,29 @@ class UsersController < ApplicationController
     @user.destroy!
 
     respond_to do |format|
-      format.html { redirect_to root_path, notice: "Your account was successfully deleted.", status: :see_other }
+      format.html { redirect_to users_url, notice: "User was successfully destroyed." }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params.expect(:id))
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+  end
 
-    # Only allow a list of trusted parameters through.
-    def user_params
-      params.expect(user: [ :name, :email, :password, :password_confirmation, :current_country, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference ])
+  # Only allow a list of trusted parameters through.
+  def user_params
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :passport_country)
+  end
+
+  def log_in(user)
+    session[:user_id] = user.id
+  end
+
+  def redirect_if_logged_in
+    if logged_in?
+      redirect_to travel_plans_path, notice: "You are already logged in."
     end
-    
-    # Ensure users can only access their own profile
-    def correct_user
-      redirect_to root_path unless @user == current_user
-    end
+  end
 end

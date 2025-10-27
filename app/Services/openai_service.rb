@@ -1,5 +1,4 @@
 # app/Services/openai_service.rb
-require 'openai'
 
 class OpenaiService
   def initialize(preferences)
@@ -9,12 +8,13 @@ class OpenaiService
 
   def get_recommendations
     prompt = build_prompt
+    Rails.logger.info prompt
 
     begin
       Rails.logger.info "=== OpenAI API Call Starting ==="
       Rails.logger.info "API Key present: #{ENV['OPENAI_API_KEY'].present?}"
       Rails.logger.info "API Key length: #{ENV['OPENAI_API_KEY']&.length}"
-      
+
       response = @client.chat.completions.create(
         model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
@@ -25,7 +25,7 @@ class OpenaiService
 
       Rails.logger.info "=== OpenAI Response Received ==="
       Rails.logger.info "Response: #{response.inspect}"
-      
+
       # Parse the response and return it
       parse_response(response)
     rescue => e
@@ -33,7 +33,7 @@ class OpenaiService
       Rails.logger.error "Error class: #{e.class}"
       Rails.logger.error "Error message: #{e.message}"
       Rails.logger.error "Backtrace: #{e.backtrace.first(5).join("\n")}"
-      
+
       # Return an error recommendation
       [{
         name: "API Error",
@@ -63,14 +63,14 @@ class OpenaiService
   # Get eligible countries based on user's safety preference from GPI database
   def get_safe_countries(safety_preference)
     return CountrySafetyScore.all if safety_preference.blank?
-    
+
     countries = CountrySafetyScore.for_safety_level(safety_preference)
-    
+
     # Filter by trip scope if needed
     if @preferences[:trip_scope] == "Domestic" && @preferences[:passport_country].present?
       # For domestic trips, check if home country meets safety criteria
       home_country = CountrySafetyScore.find_by(country_name: @preferences[:passport_country], year: 2025)
-      
+
       if home_country && countries.exists?(country_name: @preferences[:passport_country])
         # Home country meets the safety criteria
         countries = countries.where(country_name: @preferences[:passport_country])
@@ -87,14 +87,14 @@ class OpenaiService
       # For international trips, exclude the user's home country
       countries = countries.where.not(country_name: @preferences[:passport_country])
     end
-    
+
     countries
   end
-  
+
   # Build detailed safety context with GPI data for the LLM
   def build_safety_context(safety_preference)
     countries = get_safe_countries(safety_preference)
-    
+
     if countries.empty?
       return {
         country_list: "No countries available",
@@ -104,16 +104,16 @@ class OpenaiService
         safety_level: safety_preference
       }
     end
-    
+
     # Get country names for the restriction
     country_names = countries.pluck(:country_name).sort
-    
+
     # Get detailed info for top countries (to give LLM context)
     top_countries = countries.order(:gpi_rank).limit(10)
     country_details = top_countries.map do |c|
       "#{c.country_name} (GPI: #{c.gpi_score}, Rank: ##{c.gpi_rank}/163, #{c.safety_level})"
     end.join("\n       ")
-    
+
     # Check if this is a domestic trip where home country doesn't meet preferred safety level
     safety_note = "Based on 2025 Global Peace Index data"
     if @preferences[:trip_scope] == "Domestic" && countries.count == 1
@@ -122,7 +122,7 @@ class OpenaiService
         safety_note = "NOTE: #{home_country.country_name} is classified as '#{home_country.safety_level}' (GPI: #{home_country.gpi_score}), which is different from your '#{safety_preference}' preference. For domestic travel, recommendations will be provided within your home country."
       end
     end
-    
+
     {
       country_list: country_names.join(", "),
       country_count: countries.count,
@@ -137,10 +137,10 @@ class OpenaiService
     # Calculate date information
     start_date = @preferences[:start_date].present? ? Date.parse(@preferences[:start_date].to_s) : nil
     end_date = @preferences[:end_date].present? ? Date.parse(@preferences[:end_date].to_s) : nil
-    length_of_stay = @preferences[:length_of_stay] || 
+    length_of_stay = @preferences[:length_of_stay] ||
                      (start_date && end_date ? (end_date - start_date).to_i + 1 : 4)
     travel_month = @preferences[:travel_month] || (start_date ? start_date.strftime("%B") : "")
-    
+
     # Format dates for the prompt
     date_range = if start_date && end_date
                    "#{start_date.strftime('%B %d, %Y')} to #{end_date.strftime('%B %d, %Y')}"
@@ -149,11 +149,11 @@ class OpenaiService
                  else
                    "within the next few months"
                  end
-    
+
     # Get safety context from GPI database
     safety_preference = @preferences[:safety_preference]
     safety_context = build_safety_context(safety_preference)
-    
+
     <<~PROMPT
       You are a professional travel planner. Based on the following travel preferences, suggest 5 travel destinations that STRICTLY match ALL the user's requirements.
 
@@ -164,22 +164,22 @@ class OpenaiService
       4. Match the #{@preferences[:trip_scope]} scope (only suggest #{@preferences[:trip_scope]} destinations)
       5. Be appropriate for #{@preferences[:trip_type]} travelers
       6. Follow the #{@preferences[:travel_style]} travel style
-      
+
       ⚠️ CRITICAL SAFETY REQUIREMENT - YOU MUST FOLLOW THIS STRICTLY:
-      
+
       User's Safety Preference: "#{safety_preference || 'Generally Safe'}"
       #{safety_context[:restriction_note]}
-      
+
       YOU CAN ONLY RECOMMEND DESTINATIONS FROM THE FOLLOWING #{safety_context[:country_count]} COUNTRIES:
       #{safety_context[:country_list]}
-      
+
       DO NOT recommend any country that is NOT in the above list. These countries have been pre-screened based on the 2025 Global Peace Index (GPI) to meet the user's safety requirements.
-      
+
       Top countries by safety (for your reference):
        #{safety_context[:country_details]}
-      
+
       The user selected "#{safety_preference}" which means they want destinations that are #{safety_context[:top_country]&.safety_description&.downcase || 'safe for travel'}.
-      
+
       Return the response as a valid JSON object with a single key "destinations" that is an array where each object has the following keys:
 
       - "name": A creative name for this specific trip (e.g., "Costa Rican Jungle Adventure").
@@ -212,26 +212,26 @@ class OpenaiService
       - Safety Requirement: #{safety_preference} (only from pre-approved country list)
       - Scope: #{@preferences[:trip_scope]}
 
-      IMPORTANT: 
+      IMPORTANT:#{' '}
       - The itinerary MUST have exactly #{length_of_stay} days
       - All destinations MUST be suitable for travel #{date_range}
       - Consider any holidays, festivals, or special events during this time period
       - Budget estimates MUST fall within $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
       - Only suggest #{@preferences[:trip_scope]} destinations
       - ONLY recommend countries from the provided safety-approved list above
-      
+
       Return ONLY the JSON object, with no other text before or after it.
     PROMPT
   end
 
   def parse_response(response)
     raw_content = response.choices.first&.message&.content
-    
+
     Rails.logger.info "=== Parsing OpenAI Response ==="
     Rails.logger.info "Raw content present: #{raw_content.present?}"
     Rails.logger.info "Raw content length: #{raw_content&.length}"
     Rails.logger.info "Raw content (first 500 chars): #{raw_content&.slice(0, 500)}"
-    
+
     return [] unless raw_content
 
     begin
@@ -239,10 +239,10 @@ class OpenaiService
       # We parse it and return the array inside that key.
       parsed_json = JSON.parse(raw_content, symbolize_names: true)
       destinations = parsed_json[:destinations] || []
-      
+
       Rails.logger.info "=== Parsed JSON Successfully ==="
       Rails.logger.info "Number of destinations: #{destinations.length}"
-      
+
       # Ensure all required fields are present with defaults if missing
       destinations.map do |dest|
         {
@@ -271,7 +271,7 @@ class OpenaiService
       Rails.logger.error "=== JSON Parse Error ==="
       Rails.logger.error "Error: #{e.message}"
       Rails.logger.error "Raw content: #{raw_content}"
-      
+
       # Return an error object that can be displayed in the view
       [{
          name: "Error Generating Recommendations",
