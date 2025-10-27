@@ -1,48 +1,151 @@
-<% content_for :title, "My Profile - Travel Planner" %>
-
 <div class="container my-4">
   <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card shadow">
-        <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="col-md-8 col-lg-7">
+      <div class="card profile-card">
+        <div class="card-header profile-header d-flex justify-content-between align-items-center">
           <h1 class="mb-0">My Account</h1>
-          <%= link_to "Edit Profile", edit_user_path(@user), class: "btn btn-outline-primary" %>
+          <%= link_to "Edit Profile", edit_user_path(@user), class: "btn btn-outline-light btn-sm" %>
         </div>
-        <div class="card-body">
+        <div class="card-body profile-info">
           <dl class="row">
-            <dt class="col-sm-3">Name:</dt>
+            <dt class="col-sm-3">Full Name</dt>
             <dd class="col-sm-9"><%= @user.name %></dd>
-            <dt class="col-sm-3">Email:</dt>
+
+            <dt class="col-sm-3">Email Address</dt>
             <dd class="col-sm-9"><%= @user.email %></dd>
-            <dt class="col-sm-3">Current Country:</dt>
-            <dd class="col-sm-9">
-              <span class="badge bg-primary">
-                <%= @user.current_country || 'United States' %>
-              </span>
-            </dd>
-            <dt class="col-sm-3">Member Since:</dt>
+
+            <div class="col-12 d-flex align-items-center mb-3">
+              <dt class="me-2 mb-0" style="width:auto;">Current Location:</dt>
+              <dd class="mb-0" style="margin-left:0;">
+                <span class="badge bg-primary country-badge">
+                  <%= @user.current_country || 'United States' %>
+                </span>
+              </dd>
+            </div>
+
+            <dt class="col-sm-3">Member Since</dt>
             <dd class="col-sm-9"><%= @user.created_at.strftime("%B %d, %Y") %></dd>
-            <dt class="col-sm-3">Total Travel Plans:</dt>
+
+            <dt class="col-sm-3">Total Plans</dt>
             <dd class="col-sm-9"><%= @user.travel_plans.count %></dd>
           </dl>
-          <hr>
-          <div class="mt-4">
-            <h5>Quick Actions</h5>
-            <p>Manage your trips or create a new one.</p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-              <%= link_to "🗺️ My Travel Plans", travel_plans_path, class: "btn btn-primary" %>
-              <%= link_to "✈️ Plan a New Trip", travel_recommendations_path, class: "btn btn-success" %>
-            </div>
+        </div>
+
+        <div class="actions-section">
+          <h5>Quick Actions</h5>
+          <p>Manage your trips or start planning your next adventure.</p>
+          <div class="quick-actions d-grid gap-2 d-md-flex justify-content-md-start">
+            <%= link_to "🗺️ View My Plans", travel_plans_path, class: "btn btn-primary" %>
+            <%= link_to "✈️ Plan New Trip", travel_recommendations_path, class: "btn btn-success" %>
           </div>
         </div>
-        <div class="card-footer">
+
+        <div class="card-footer footer-actions">
           <div class="d-flex justify-content-end">
             <%= button_to "Delete Account", @user, method: :delete,
-                  data: { confirm: "Are you sure? This will delete all your travel plans and data." },
-                  class: "btn btn-outline-danger btn-sm" %>
+                          data: { confirm: "Are you sure? This action cannot be undone and will permanently delete all your travel plans and data." },
+                          class: "btn btn-outline-danger delete-btn",
+                          style: "transition: all 0.2s ease-in-out;" %>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<% content_for :title, "My Profile - Travel Planner" %>
+
+<style>
+    .profile-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+    .profile-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 1.5rem;
+    }
+    .profile-header h1 {
+        font-weight: 600;
+        margin-bottom: 0;
+        font-size: 1.75rem;
+    }
+    .profile-info {
+        padding: 2rem;
+    }
+    .profile-info dl {
+        margin-bottom: 0;
+    }
+    .profile-info dt {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .profile-info dd {
+        color: #212529;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    .country-badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+    .actions-section {
+        padding: 1.5rem 2rem 1rem;
+        border-top: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+    }
+    .actions-section h5 {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .actions-section p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    .quick-actions .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+    .quick-actions .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .footer-actions {
+        padding: 1rem 2rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        border-radius: 0 0 12px 12px;
+    }
+    .delete-btn {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+    }
+    @media (max-width: 768px) {
+        .profile-info {
+            padding: 1.5rem;
+        }
+        .actions-section,
+        .footer-actions {
+            padding: 1rem 1.5rem;
+        }
+        .quick-actions .btn {
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>

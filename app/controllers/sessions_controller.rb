@@ -1,7 +1,9 @@
 # app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
+  before_action :redirect_if_logged_in, only: [:new, :create]
+
   def new
-    # Login form
+    # Login form is now protected by the before_action
   end
 
   def create
@@ -30,5 +32,11 @@ class SessionsController < ApplicationController
   def log_out
     session.delete(:user_id)
     @current_user = nil
+  end
+
+  def redirect_if_logged_in
+    if logged_in?
+      redirect_to travel_plans_path, notice: "You are already logged in."
+    end
   end
 end

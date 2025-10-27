@@ -1,43 +1,44 @@
 <%# app/views/travel_recommendations/_recommendations_list.html.erb %>
 <%= turbo_frame_tag "recommendations_list" do %>
   <% if recommendations.present? %>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="mb-0">Your AI-Powered Recommendations</h2>
-      <span class="badge bg-success fs-6">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
-          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-        </svg>
-        These recommendations are saved and will remain visible when you return
+    <div class="mb-5 d-flex justify-content-between align-items-center">
+      <h2 class="display-6 fw-bold text-gradient mb-0">AI-Powered Travel Recommendations</h2>
+      <span class="badge bg-success py-2 px-3 fs-6 d-flex align-items-center gap-2 shadow-sm">
+        <i class="bi bi-check-circle-fill"></i>
+        Saved & will remain visible
       </span>
     </div>
-    <div class="row">
+
+    <div class="row g-4">
       <% recommendations.each_with_index do |rec, index| %>
-        <div class="col-12 mb-4" id="recommendation-<%= index %>">
-          <div class="card h-100 shadow">
-            <div class="card-header">
-              <h4 class="card-title mb-0"><%= rec[:name] %> - <%= rec[:destination_country] %></h4>
+        <div class="col-12">
+          <div class="card border-0 shadow-lg rounded-5 overflow-hidden hover-zoom">
+
+            <div class="card-header p-4 text-white" style="background: linear-gradient(135deg, #3B82F6 0%, #1E3A8A 100%);">
+              <h4 class="mb-1 fw-bold"><%= rec[:name] %></h4>
+              <small class="text-white-50"><%= rec[:destination_country] %></small>
             </div>
-            <div class="card-body">
+
+            <div class="card-body p-4">
               <div class="row">
                 <div class="col-md-8">
-                  <p><strong>Description:</strong> <%= rec[:description] %></p>
-                  <p><strong>Details:</strong> <%= rec[:details] %></p>
+                  <p class="mb-3"><strong>Description:</strong> <%= rec[:description] %></p>
+                  <p class="mb-3"><strong>Details:</strong> <%= rec[:details] %></p>
 
-                  <%# Itinerary Accordion %>
                   <% if rec[:itinerary].is_a?(Hash) && rec[:itinerary].present? %>
-                    <div class="accordion" id="accordion-itinerary-<%= index %>">
-                      <div class="accordion-item">
+                    <div class="accordion mb-3" id="accordion-itinerary-<%= index %>">
+                      <div class="accordion-item border-0 rounded-3 shadow-sm">
                         <h2 class="accordion-header" id="heading-itinerary-<%= index %>">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-itinerary-<%= index %>">
-                            View Detailed Itinerary
+                          <button class="accordion-button fw-semibold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-itinerary-<%= index %>">
+                            <i class="bi bi-journal-text me-2"></i> View Detailed Itinerary
                           </button>
                         </h2>
                         <div id="collapse-itinerary-<%= index %>" class="accordion-collapse collapse">
                           <div class="accordion-body">
                             <% rec[:itinerary].each do |day, description| %>
-                              <div class="mb-3">
+                              <div class="mb-2">
                                 <strong><%= day.to_s.humanize %>:</strong>
-                                <p><%= description %></p>
+                                <p class="mb-1 text-muted"><%= description %></p>
                               </div>
                             <% end %>
                           </div>
@@ -46,63 +47,52 @@
                     </div>
                   <% end %>
                 </div>
+
                 <div class="col-md-4">
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Budget:</strong> $<%= number_with_delimiter(rec[:budget_min]) %> - $<%= number_with_delimiter(rec[:budget_max]) %></li>
-                    <li class="list-group-item">
-                      <strong>Safety:</strong>
+                  <ul class="list-group list-group-flush rounded-4 shadow-sm">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span><i class="bi bi-currency-dollar me-1 text-success"></i><strong>Budget</strong></span>
+                      <span class="badge bg-success rounded-pill">$<%= number_with_delimiter(rec[:budget_min]) %> - $<%= number_with_delimiter(rec[:budget_max]) %></span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span><i class="bi bi-shield-check me-1 text-warning"></i><strong>Safety</strong></span>
                       <%
-                        # Look up GPI data for this country
                         country_safety = CountrySafetyScore.find_by(country_name: rec[:destination_country], year: 2025)
-                        
                         if country_safety
                           safety_level = country_safety.safety_level
                           badge_class = "badge bg-#{country_safety.badge_color}"
                         else
-                          # Fallback to numeric score if available
                           safety_score = rec[:safety_score] || 5
                           safety_level = safety_score_to_level(safety_score)
                           badge_class = case safety_score.to_i
-                                       when 0..3 then "badge bg-danger"
-                                       when 4..5 then "badge bg-warning"
-                                       when 6..7 then "badge bg-info"
-                                       else "badge bg-success"
-                                       end
+                                        when 0..3 then "badge bg-danger"
+                                        when 4..5 then "badge bg-warning"
+                                        when 6..7 then "badge bg-info"
+                                        else "badge bg-success"
+                                        end
                         end
                       %>
                       <span class="<%= badge_class %>"><%= safety_level %></span>
-                      <% if country_safety %>
-                        <br>
-                        <small class="text-muted">
-                          GPI Score: <%= country_safety.gpi_score %> 
-                          (Rank #<%= country_safety.gpi_rank %>/163)
-                        </small>
-                        <br>
-                        <small class="text-muted">
-                          <em>Source: 2025 Global Peace Index</em>
-                        </small>
-                      <% elsif rec[:safety_score] %>
-                        <span class="text-muted">(<%= rec[:safety_score] %>/10)</span>
-                      <% end %>
                     </li>
-                    <li class="list-group-item"><strong>Travel Style:</strong> <%= rec[:travel_style] %></li>
-                    <li class="list-group-item"><strong>Visa Info:</strong> <%= rec[:visa_info] %></li>
+
+                    <li class="list-group-item"><i class="bi bi-geo-alt me-1 text-info"></i><strong>Travel Style:</strong> <%= rec[:travel_style] %></li>
+                    <li class="list-group-item"><i class="bi bi-pass me-1 text-primary"></i><strong>Visa Info:</strong> <%= rec[:visa_info] %></li>
                   </ul>
 
-                  <%# Budget Breakdown Accordion %>
                   <% if rec[:budget_breakdown].present? %>
                     <div class="accordion mt-3" id="accordion-budget-<%= index %>">
-                      <div class="accordion-item">
+                      <div class="accordion-item border-0 shadow-sm rounded-3">
                         <h2 class="accordion-header" id="heading-budget-<%= index %>">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= index %>">
-                            View Budget Breakdown
+                          <button class="accordion-button fw-semibold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= index %>">
+                            <i class="bi bi-wallet2 me-2"></i> Budget Breakdown
                           </button>
                         </h2>
-                        <div id="collapse-budget-<%= index %>" class="accordion-collapse collapse" data-bs-parent="#accordion-budget-<%= index %>">
+                        <div id="collapse-budget-<%= index %>" class="accordion-collapse collapse">
                           <div class="accordion-body">
-                            <ul class="list-unstyled">
+                            <ul class="list-unstyled mb-0">
                               <% rec[:budget_breakdown].each do |item, cost| %>
-                                <li><strong><%= item.to_s.humanize %>:</strong> $<%= number_with_delimiter(cost) %></li>
+                                <li class="mb-1"><strong><%= item.to_s.humanize %>:</strong> $<%= number_with_delimiter(cost) %></li>
                               <% end %>
                             </ul>
                           </div>
@@ -113,51 +103,45 @@
                 </div>
               </div>
             </div>
-            <div class="card-footer bg-white d-flex justify-content-end gap-2">
-              <form action="<%= travel_plans_path %>" method="post" data-turbo-stream="true" 
-                    onsubmit="event.target.querySelector('button[type=submit]').disabled = true; 
-                              event.target.querySelector('button[type=submit]').classList.remove('btn-primary'); 
-                              event.target.querySelector('button[type=submit]').classList.add('btn-success'); 
-                              event.target.querySelector('button[type=submit]').innerHTML = '✓ Saved';">
+
+            <div class="card-footer bg-light d-flex justify-content-end gap-2">
+              <form action="<%= travel_plans_path %>" method="post" data-turbo-stream="true"
+                    onsubmit="event.target.querySelector('button[type=submit]').disabled = true;
+                      event.target.querySelector('button[type=submit]').classList.replace('btn-primary', 'btn-success');
+                      event.target.querySelector('button[type=submit]').innerHTML = '✓ Saved';">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                <%= hidden_field_tag 'travel_plan[name]', rec[:name] %>
-                <%= hidden_field_tag 'travel_plan[destination_name]', rec[:name] %>
-                <%= hidden_field_tag 'travel_plan[destination_city]', rec[:destination_city] %>
-                <%= hidden_field_tag 'travel_plan[destination_country]', rec[:destination_country] %>
-                <%= hidden_field_tag 'travel_plan[description]', rec[:description] %>
-                <%= hidden_field_tag 'travel_plan[details]', rec[:details] %>
-                <%= hidden_field_tag 'travel_plan[budget_min]', rec[:budget_min] %>
-                <%= hidden_field_tag 'travel_plan[budget_max]', rec[:budget_max] %>
-                <%= hidden_field_tag 'travel_plan[safety_level]', rec[:safety_level] %>
-                <%= hidden_field_tag 'travel_plan[travel_style]', rec[:travel_style] %>
-                <%= hidden_field_tag 'travel_plan[length_of_stay]', rec[:length_of_stay] %>
-                <%= hidden_field_tag 'travel_plan[travel_month]', rec[:travel_month] %>
-                <%= hidden_field_tag 'travel_plan[trip_scope]', rec[:trip_scope] %>
-                <%= hidden_field_tag 'travel_plan[trip_type]', rec[:trip_type] %>
-                <%= hidden_field_tag 'travel_plan[general_purpose]', rec[:general_purpose] %>
-                <%= hidden_field_tag 'travel_plan[visa_info]', rec[:visa_info] %>
-                <%= hidden_field_tag 'travel_plan[status]', 'planned' %>
-                <%= hidden_field_tag 'travel_plan[start_date]', rec[:start_date] if rec[:start_date].present? %>
-                <%= hidden_field_tag 'travel_plan[end_date]', rec[:end_date] if rec[:end_date].present? %>
-                <% if rec[:itinerary].is_a?(Hash) %>
-                  <% rec[:itinerary].each do |day, description| %>
-                    <%= hidden_field_tag "travel_plan[itinerary][#{day}]", description %>
-                  <% end %>
-                <% end %>
-                <% if rec[:budget_breakdown].is_a?(Hash) %>
-                  <% rec[:budget_breakdown].each do |item, cost| %>
-                    <%= hidden_field_tag "travel_plan[budget_breakdown][#{item}]", cost %>
-                  <% end %>
-                <% end %>
-                <button type="submit" class="btn btn-primary">Save to My Plans</button>
+                <button type="submit" class="btn btn-primary btn-sm">
+                  <i class="bi bi-bookmark-plus me-1"></i> Save
+                </button>
               </form>
-              <button type="button" class="btn btn-outline-danger" onclick="this.closest('.col-12').remove();">
-                Delete
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.col-12').remove();">
+                <i class="bi bi-trash me-1"></i> Delete
               </button>
             </div>
+
           </div>
         </div>
       <% end %>
     </div>
   <% end %>
 <% end %>
+
+<style>
+    .hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-zoom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #6A82FB 0%, #FC5C7D 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .accordion-button {
+        border-radius: 0.5rem;
+    }
+</style>
