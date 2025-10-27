@@ -1,0 +1,73 @@
+<% content_for :title, "Internal Server Error - Travel Planner" %>
+
+<div class="container">
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-8 text-center">
+      <div class="error-container py-5">
+        <!-- Error Icon -->
+        <div class="mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="currentColor" class="bi bi-exclamation-triangle text-danger" viewBox="0 0 16 16">
+            <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+            <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+          </svg>
+        </div>
+
+        <!-- Error Message -->
+        <h1 class="display-1 fw-bold text-danger">500</h1>
+        <h2 class="mb-4">Something Went Wrong</h2>
+        <p class="lead text-muted mb-4">
+          We're sorry, but something went wrong on our end.
+          <br>Our team has been notified and we're working on fixing it.
+        </p>
+
+        <!-- Helpful Actions -->
+        <div class="d-grid gap-3 d-sm-flex justify-content-center mt-5">
+          <% if logged_in? %>
+            <%= link_to "Go to My Profile", current_user, class: "btn btn-primary btn-lg px-4" %>
+            <%= link_to "Browse Destinations", destinations_path, class: "btn btn-outline-primary btn-lg px-4" %>
+          <% else %>
+            <%= link_to "Go Home", root_path, class: "btn btn-primary btn-lg px-4" %>
+            <%= link_to "Login", login_path, class: "btn btn-outline-primary btn-lg px-4" %>
+          <% end %>
+        </div>
+
+        <!-- Additional Help -->
+        <div class="mt-5">
+          <p class="text-muted small">
+            Please try again in a few moments or contact support if the problem persists.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-container {
+    animation: fadeIn 0.5s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .error-container svg {
+    animation: pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+</style>

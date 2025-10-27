@@ -38,4 +38,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  
+  # Catch all unmatched routes and show custom 404 page (must be last)
+  match '*path', to: 'errors#not_found', via: :all
 end

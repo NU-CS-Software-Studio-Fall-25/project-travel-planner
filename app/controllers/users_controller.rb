@@ -2,6 +2,7 @@
 class UsersController < ApplicationController
   before_action :require_login, only: [:show, :edit, :update, :destroy]
   before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :authorize_user, only: [:show, :edit, :update, :destroy]
   before_action :redirect_if_logged_in, only: [:new, :create]
 
   # GET /users or /users.json
@@ -79,6 +80,14 @@ class UsersController < ApplicationController
   def redirect_if_logged_in
     if logged_in?
       redirect_to travel_plans_path, notice: "You are already logged in."
+    end
+  end
+
+  # Ensure users can only access their own profile
+  def authorize_user
+    unless @user == current_user
+      flash[:alert] = "You are not authorized to access this page."
+      redirect_to travel_plans_path
     end
   end
 end

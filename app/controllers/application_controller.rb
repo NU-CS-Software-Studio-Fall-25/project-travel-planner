@@ -4,10 +4,15 @@ class ApplicationController < ActionController::Base
   
   before_action :current_user
   
+  # Handle common errors with custom error pages
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+  rescue_from ActionController::RoutingError, with: :render_not_found
+  rescue_from StandardError, with: :render_internal_server_error if Rails.env.production?
+  
   private
   
   def current_user
-    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
   end
   
   def logged_in?
@@ -19,6 +24,14 @@ class ApplicationController < ActionController::Base
       flash[:alert] = "Please log in to access this page"
       redirect_to login_path
     end
+  end
+  
+  def render_not_found
+    render template: "errors/not_found", status: :not_found
+  end
+  
+  def render_internal_server_error
+    render template: "errors/internal_server_error", status: :internal_server_error
   end
   
   helper_method :current_user, :logged_in?
