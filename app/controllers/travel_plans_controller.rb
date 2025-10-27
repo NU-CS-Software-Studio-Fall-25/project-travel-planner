@@ -23,6 +23,20 @@ class TravelPlansController < ApplicationController
 
   # POST /travel_plans or /travel_plans.json
   def create
+    # Check if travel_plan params exist
+    unless params[:travel_plan].present?
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.prepend("notifications", 
+                                                     partial: "shared/error_notification",
+                                                     locals: { message: "Invalid request: missing travel plan data" })
+        end
+        format.html { redirect_to travel_recommendations_path, alert: "Invalid request: missing travel plan data" }
+        format.json { render json: { error: "Missing travel plan data" }, status: :unprocessable_entity }
+      end
+      return
+    end
+    
     # Find or create destination based on recommendation data
     destination = find_or_create_destination_from_params
     
@@ -127,6 +141,9 @@ class TravelPlansController < ApplicationController
 
   # Find or create a destination based on recommendation data
   def find_or_create_destination_from_params
+    # Return nil if travel_plan params don't exist
+    return nil unless params[:travel_plan].present?
+    
     destination_name = params[:travel_plan][:destination_name] || params[:travel_plan][:name]
     destination_city = params[:travel_plan][:destination_city] || destination_name
     destination_country = params[:travel_plan][:destination_country]

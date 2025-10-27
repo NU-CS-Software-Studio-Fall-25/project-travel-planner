@@ -110,6 +110,35 @@
                       event.target.querySelector('button[type=submit]').classList.replace('btn-primary', 'btn-success');
                       event.target.querySelector('button[type=submit]').innerHTML = '✓ Saved';">
                 <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <%= hidden_field_tag 'travel_plan[name]', rec[:name] %>
+                <%= hidden_field_tag 'travel_plan[destination_name]', rec[:name] %>
+                <%= hidden_field_tag 'travel_plan[destination_city]', rec[:destination_city] %>
+                <%= hidden_field_tag 'travel_plan[destination_country]', rec[:destination_country] %>
+                <%= hidden_field_tag 'travel_plan[description]', rec[:description] %>
+                <%= hidden_field_tag 'travel_plan[details]', rec[:details] %>
+                <%= hidden_field_tag 'travel_plan[budget_min]', rec[:budget_min] %>
+                <%= hidden_field_tag 'travel_plan[budget_max]', rec[:budget_max] %>
+                <%= hidden_field_tag 'travel_plan[safety_level]', rec[:safety_level] %>
+                <%= hidden_field_tag 'travel_plan[travel_style]', rec[:travel_style] %>
+                <%= hidden_field_tag 'travel_plan[length_of_stay]', rec[:length_of_stay] %>
+                <%= hidden_field_tag 'travel_plan[travel_month]', rec[:travel_month] %>
+                <%= hidden_field_tag 'travel_plan[trip_scope]', rec[:trip_scope] %>
+                <%= hidden_field_tag 'travel_plan[trip_type]', rec[:trip_type] %>
+                <%= hidden_field_tag 'travel_plan[general_purpose]', rec[:general_purpose] %>
+                <%= hidden_field_tag 'travel_plan[visa_info]', rec[:visa_info] %>
+                <%= hidden_field_tag 'travel_plan[status]', 'planned' %>
+                <%= hidden_field_tag 'travel_plan[start_date]', rec[:start_date] if rec[:start_date].present? %>
+                <%= hidden_field_tag 'travel_plan[end_date]', rec[:end_date] if rec[:end_date].present? %>
+                <% if rec[:itinerary].is_a?(Hash) %>
+                  <% rec[:itinerary].each do |day, description| %>
+                    <%= hidden_field_tag "travel_plan[itinerary][#{day}]", description %>
+                  <% end %>
+                <% end %>
+                <% if rec[:budget_breakdown].is_a?(Hash) %>
+                  <% rec[:budget_breakdown].each do |item, cost| %>
+                    <%= hidden_field_tag "travel_plan[budget_breakdown][#{item}]", cost %>
+                  <% end %>
+                <% end %>
                 <button type="submit" class="btn btn-primary btn-sm">
                   <i class="bi bi-bookmark-plus me-1"></i> Save
                 </button>
