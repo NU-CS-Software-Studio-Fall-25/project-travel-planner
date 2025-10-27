@@ -19,7 +19,7 @@ class OpenaiService
         model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 7000,
+        max_tokens: 16384,
         response_format: { type: "json_object" }
       )
 
@@ -155,73 +155,108 @@ class OpenaiService
     safety_context = build_safety_context(safety_preference)
 
     <<~PROMPT
-      You are a professional travel planner. Based on the following travel preferences, suggest 5 travel destinations that STRICTLY match ALL the user's requirements.
-
-      CRITICAL REQUIREMENTS - ALL recommendations MUST:
-      1. Have itineraries for EXACTLY #{length_of_stay} days (no more, no less)
-      2. Be suitable for travel #{date_range} (consider weather, seasonal events, holidays, and typical conditions for this specific time period)
-      3. Fit within the budget range of $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (budget_min and budget_max MUST be within this range)
-      4. Match the #{@preferences[:trip_scope]} scope (only suggest #{@preferences[:trip_scope]} destinations)
-      5. Be appropriate for #{@preferences[:trip_type]} travelers
-      6. Follow the #{@preferences[:travel_style]} travel style
-
-      ⚠️ CRITICAL SAFETY REQUIREMENT - YOU MUST FOLLOW THIS STRICTLY:
-
-      User's Safety Preference: "#{safety_preference || 'Generally Safe'}"
-      #{safety_context[:restriction_note]}
-
-      YOU CAN ONLY RECOMMEND DESTINATIONS FROM THE FOLLOWING #{safety_context[:country_count]} COUNTRIES:
-      #{safety_context[:country_list]}
-
-      DO NOT recommend any country that is NOT in the above list. These countries have been pre-screened based on the 2025 Global Peace Index (GPI) to meet the user's safety requirements.
-
-      Top countries by safety (for your reference):
-       #{safety_context[:country_details]}
-
-      The user selected "#{safety_preference}" which means they want destinations that are #{safety_context[:top_country]&.safety_description&.downcase || 'safe for travel'}.
-
-      Return the response as a valid JSON object with a single key "destinations" that is an array where each object has the following keys:
-
-      - "name": A creative name for this specific trip (e.g., "Costa Rican Jungle Adventure").
-      - "destination_city": The primary city or location name for this destination. For better accuracy, include the state/province for cities in large countries (e.g., "Burlington, Vermont" or "Burlington, Wisconsin" for USA; "Paris, Texas" or just "Paris" for France). This should be a real, geocodable location name, NOT a creative name.
-      - "destination_country": The country of the recommended destination. MUST be from the allowed country list above.
-      - "description": A one-paragraph summary of the trip, mentioning why it's perfect for #{date_range}.
-      - "details": Additional trip details, notes, or tips. Include seasonal information for the travel dates.
-      - "itinerary": A detailed, day-by-day travel itinerary for EXACTLY #{length_of_stay} days. Create keys "Day 1", "Day 2", up to "Day #{length_of_stay}". Each day should have a detailed paragraph describing specific activities, sights, and dining suggestions appropriate for the travel dates.
-      - "budget_min": Minimum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
-      - "budget_max": Maximum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
-      - "budget_breakdown": A JSON object with keys: "flights", "hotel", "food", "activities", "car_rental". The sum should roughly equal budget_max. Use 0 if not applicable.
-      - "safety_score": The actual GPI safety score for this country (you can reference the list above for accurate scores).
-      - "travel_style": Primary travel style matching "#{@preferences[:travel_style]}".
-      - "visa_info": Visa requirements for citizens from #{@preferences[:passport_country]}.
-      - "length_of_stay": Must be exactly #{length_of_stay} (as a number).
-      - "travel_month": "#{travel_month}".
-      - "trip_scope": Must be "#{@preferences[:trip_scope]}".
-      - "trip_type": Must be "#{@preferences[:trip_type]}".
-      - "general_purpose": "#{@preferences[:general_purpose]}"
-
-      User Preferences Summary:
-      - Trip Name Idea: #{@preferences[:name]}
-      - Passport Country: #{@preferences[:passport_country]}
-      - Budget Range: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
-      - Travel Dates: #{date_range}
-      - Length of Stay: #{length_of_stay} days
-      - Trip Type: #{@preferences[:trip_type]}
-      - Travel Style: #{@preferences[:travel_style]}
-      - Purpose: #{@preferences[:general_purpose]}
-      - Safety Requirement: #{safety_preference} (only from pre-approved country list)
-      - Scope: #{@preferences[:trip_scope]}
-
-      IMPORTANT:#{' '}
-      - The itinerary MUST have exactly #{length_of_stay} days
-      - All destinations MUST be suitable for travel #{date_range}
-      - Consider any holidays, festivals, or special events during this time period
-      - Budget estimates MUST fall within $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
-      - Only suggest #{@preferences[:trip_scope]} destinations
-      - ONLY recommend countries from the provided safety-approved list above
-
-      Return ONLY the JSON object, with no other text before or after it.
-    PROMPT
+    You are a professional travel planner. Based on the following travel preferences, suggest 5 travel destinations that STRICTLY match ALL the user's requirements.
+  
+    CRITICAL REQUIREMENTS - ALL recommendations MUST:
+    1. Have itineraries for EXACTLY #{length_of_stay} days (no more, no less)
+    2. Be suitable for travel #{date_range} (consider weather, seasonal events, holidays, and typical conditions for this specific time period)
+    3. Fit within the budget range of $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (budget_min and budget_max MUST be within this range)
+    4. Match the #{@preferences[:trip_scope]} scope (only suggest #{@preferences[:trip_scope]} destinations)
+    5. Be appropriate for #{@preferences[:trip_type]} travelers
+    6. Follow the #{@preferences[:travel_style]} travel style
+  
+    ⚠️ CRITICAL SAFETY REQUIREMENT - YOU MUST FOLLOW THIS STRICTLY:
+  
+    User's Safety Preference: "#{safety_preference || 'Generally Safe'}"
+    #{safety_context[:restriction_note]}
+  
+    YOU CAN ONLY RECOMMEND DESTINATIONS FROM THE FOLLOWING #{safety_context[:country_count]} COUNTRIES:
+    #{safety_context[:country_list]}
+  
+    DO NOT recommend any country that is NOT in the above list. These countries have been pre-screened based on the 2025 Global Peace Index (GPI) to meet the user's safety requirements.
+  
+    Top countries by safety (for your reference):
+     #{safety_context[:country_details]}
+  
+    The user selected "#{safety_preference}" which means they want destinations that are #{safety_context[:top_country]&.safety_description&.downcase || 'safe for travel'}.
+  
+    Return the response as a valid JSON object with a single key "destinations" that is an array where each object has the following keys:
+  
+    - "name": A creative name for this specific trip (e.g., "Costa Rican Jungle Adventure").
+    - "destination_city": The primary city or location name for this destination. For better accuracy, include the state/province for cities in large countries (e.g., "Burlington, Vermont" or "Burlington, Wisconsin" for USA; "Paris, Texas" or just "Paris" for France). This should be a real, geocodable location name, NOT a creative name.
+    - "destination_country": The country of the recommended destination. MUST be from the allowed country list above.
+    - "description": A one-paragraph summary of the trip, mentioning why it's perfect for #{date_range}.
+    - "details": Additional trip details, notes, or tips. Include seasonal information for the travel dates.
+    - "itinerary": A detailed, day-by-day travel itinerary for EXACTLY #{length_of_stay} days. 
+       • Create keys "Day 1", "Day 2", up to "Day #{length_of_stay}".  
+       • Each day MUST include **exactly one full paragraph (no lists)**.  
+       • Each paragraph MUST contain **at least 6 complete sentences**, each describing **distinct morning, afternoon, evening, and cultural/dining activities**, ensuring detail equivalent to 100+ words.  
+       • If any day's paragraph is under 6 sentences, the output will be rejected.  
+       • Focus on realism and storytelling — the itinerary should read like a high-quality travel magazine description, not a summary.
+  
+    - "budget_min": Minimum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
+    - "budget_max": Maximum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
+    - "budget_breakdown": A JSON object with these detailed keys:
+          {
+            "flights": {
+                "description": "Round-trip flight details including exact route (from #{@preferences[:passport_country]}’s major airport, e.g., JFK or LAX, to destination airport, e.g., CDG Paris or OSL Oslo)",
+                "cost": <numeric value>
+            },
+            "hotel": {
+                "description": "Hotel name or type (e.g., 4-star boutique, beachfront resort) and nightly rate with total for #{length_of_stay} nights",
+                "cost_per_night": <numeric value>,
+                "total_cost": <numeric value>
+            },
+            "food": {
+                "description": "Average per-day cost of meals and drinks with local cuisine examples",
+                "cost_per_day": <numeric value>,
+                "total_cost": <numeric value>
+            },
+            "activities": {
+                "description": "List each major paid activity (e.g., guided tour, museum ticket, adventure excursion) with individual cost lines and then sum total",
+                "total_cost": <numeric value>
+            },
+            "car_rental": {
+                "description": "Vehicle type (e.g., compact, SUV) and total rental cost for duration of stay",
+                "total_cost": <numeric value>
+            },
+            "total_trip_cost": "Sum of all above categories; must match budget_max approximately"
+          }
+  
+    - "safety_score": The actual GPI safety score for this country (you can reference the list above for accurate scores).
+    - "travel_style": Primary travel style matching "#{@preferences[:travel_style]}".  
+    - "visa_info": Visa requirements for citizens from #{@preferences[:passport_country]}.  
+    - "length_of_stay": Must be exactly #{length_of_stay} (as a number).  
+    - "travel_month": "#{travel_month}".  
+    - "trip_scope": Must be "#{@preferences[:trip_scope]}".  
+    - "trip_type": Must be "#{@preferences[:trip_type]}".  
+    - "general_purpose": "#{@preferences[:general_purpose]}"
+  
+    User Preferences Summary:
+    - Trip Name Idea: #{@preferences[:name]}
+    - Passport Country: #{@preferences[:passport_country]}
+    - Budget Range: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
+    - Travel Dates: #{date_range}
+    - Length of Stay: #{length_of_stay} days
+    - Trip Type: #{@preferences[:trip_type]}
+    - Travel Style: #{@preferences[:travel_style]}
+    - Purpose: #{@preferences[:general_purpose]}
+    - Safety Requirement: #{safety_preference} (only from pre-approved country list)
+    - Scope: #{@preferences[:trip_scope]}
+  
+    IMPORTANT:
+    - The itinerary MUST have exactly #{length_of_stay} days
+    - Each day MUST have exactly ONE detailed paragraph of at least 6 complete sentences (no bullet points or short entries)
+    - Each day's text should be approximately 100+ words
+    - The budget_breakdown MUST include realistic flight routes, nightly hotel costs, per-day food costs, detailed activity costs, rental car info, and a total_trip_cost line.
+    - All destinations MUST be suitable for travel #{date_range}
+    - Consider any holidays, festivals, or special events during this time period
+    - Budget estimates MUST fall within $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
+    - Only suggest #{@preferences[:trip_scope]} destinations
+    - ONLY recommend countries from the provided safety-approved list above
+  
+    Return ONLY the JSON object, with no other text before or after it.
+  PROMPT
   end
 
   def parse_response(response)
