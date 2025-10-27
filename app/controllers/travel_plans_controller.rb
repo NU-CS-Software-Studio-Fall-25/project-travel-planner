@@ -128,11 +128,12 @@ class TravelPlansController < ApplicationController
   # Find or create a destination based on recommendation data
   def find_or_create_destination_from_params
     destination_name = params[:travel_plan][:destination_name] || params[:travel_plan][:name]
+    destination_city = params[:travel_plan][:destination_city] || destination_name
     destination_country = params[:travel_plan][:destination_country]
     
     return nil unless destination_name && destination_country
     
-    # Try to find existing destination
+    # Try to find existing destination by name and country
     destination = Destination.find_by(
       name: destination_name,
       country: destination_country
@@ -153,12 +154,29 @@ class TravelPlansController < ApplicationController
         params[:travel_plan][:safety_score]&.to_i
       end
       
+      # Calculate average cost from budget
+      average_cost = if params[:travel_plan][:budget_min].present? && params[:travel_plan][:budget_max].present?
+        (params[:travel_plan][:budget_min].to_f + params[:travel_plan][:budget_max].to_f) / 2
+      elsif params[:travel_plan][:average_cost].present?
+        params[:travel_plan][:average_cost].to_f
+      else
+        nil
+      end
+      
+      # Get best season from travel_month
+      best_season = params[:travel_plan][:travel_month] || params[:travel_plan][:best_season]
+      
       destination = Destination.create(
         name: destination_name,
+        city: destination_city,
         country: destination_country,
         description: params[:travel_plan][:description],
         safety_score: safety_score_value,
-        visa_required: params[:travel_plan][:visa_info]&.downcase&.include?('required')
+        visa_required: params[:travel_plan][:visa_info]&.downcase&.include?('required'),
+        average_cost: average_cost,
+        best_season: best_season
+        # Note: latitude and longitude will be auto-geocoded by the Destination model
+        # based on the city and country (or name and country if city is blank) through the geocoded_by callback
       )
     end
     

@@ -1,11 +1,21 @@
-<% content_for :title, "New destination" %>
+<% content_for :title, "New Destination - Travel Planner" %>
 
-<h1>New destination</h1>
-
-<%= render "form", destination: @destination %>
-
-<br>
-
-<div>
-  <%= link_to "Back to destinations", destinations_path %>
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header">
+          <h1 class="text-center mb-0">Add New Destination</h1>
+          <p class="text-center text-muted mb-0">Share a new travel destination with the community</p>
+        </div>
+        <div class="card-body">
+          <%= render "form", destination: @destination %>
+          
+          <div class="text-center mt-3">
+            <%= link_to "← Back to Destinations", destinations_path, class: "btn btn-secondary" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

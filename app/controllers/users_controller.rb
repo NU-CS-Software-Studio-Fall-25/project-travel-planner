@@ -68,7 +68,7 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.expect(user: [ :name, :email, :password, :password_confirmation, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference ])
+      params.expect(user: [ :name, :email, :password, :password_confirmation, :current_country, :passport_country, :budget_min, :budget_max, :preferred_travel_season, :safety_preference ])
     end
     
     # Ensure users can only access their own profile

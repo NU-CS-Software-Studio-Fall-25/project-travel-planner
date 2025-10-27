@@ -1,12 +1,22 @@
-<% content_for :title, "Editing destination" %>
+<% content_for :title, "Edit Destination - Travel Planner" %>
 
-<h1>Editing destination</h1>
-
-<%= render "form", destination: @destination %>
-
-<br>
-
-<div>
-  <%= link_to "Show this destination", @destination %> |
-  <%= link_to "Back to destinations", destinations_path %>
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header">
+          <h1 class="text-center mb-0">Edit Destination</h1>
+          <p class="text-center text-muted mb-0">Update destination information</p>
+        </div>
+        <div class="card-body">
+          <%= render "form", destination: @destination %>
+          
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <%= link_to "← Back to Destinations", destinations_path, class: "btn btn-secondary" %>
+            <%= link_to "View Destination", @destination, class: "btn btn-info" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

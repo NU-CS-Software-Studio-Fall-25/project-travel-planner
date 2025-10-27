@@ -183,6 +183,7 @@ class OpenaiService
       Return the response as a valid JSON object with a single key "destinations" that is an array where each object has the following keys:
 
       - "name": A creative name for this specific trip (e.g., "Costa Rican Jungle Adventure").
+      - "destination_city": The primary city or location name for this destination. For better accuracy, include the state/province for cities in large countries (e.g., "Burlington, Vermont" or "Burlington, Wisconsin" for USA; "Paris, Texas" or just "Paris" for France). This should be a real, geocodable location name, NOT a creative name.
       - "destination_country": The country of the recommended destination. MUST be from the allowed country list above.
       - "description": A one-paragraph summary of the trip, mentioning why it's perfect for #{date_range}.
       - "details": Additional trip details, notes, or tips. Include seasonal information for the travel dates.
@@ -246,6 +247,7 @@ class OpenaiService
       destinations.map do |dest|
         {
           name: dest[:name] || "Unnamed Trip",
+          destination_city: dest[:destination_city] || dest[:name], # Use city if provided, fallback to name
           destination_country: dest[:destination_country] || "Unknown",
           description: dest[:description] || "",
           details: dest[:details] || "",

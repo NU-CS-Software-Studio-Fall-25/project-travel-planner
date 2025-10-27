@@ -14,6 +14,12 @@
             <dd class="col-sm-9"><%= @user.name %></dd>
             <dt class="col-sm-3">Email:</dt>
             <dd class="col-sm-9"><%= @user.email %></dd>
+            <dt class="col-sm-3">Current Country:</dt>
+            <dd class="col-sm-9">
+              <span class="badge bg-primary">
+                <%= @user.current_country || 'United States' %>
+              </span>
+            </dd>
             <dt class="col-sm-3">Member Since:</dt>
             <dd class="col-sm-9"><%= @user.created_at.strftime("%B %d, %Y") %></dd>
             <dt class="col-sm-3">Total Travel Plans:</dt>
