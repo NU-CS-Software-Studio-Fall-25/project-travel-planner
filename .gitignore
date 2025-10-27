@@ -28,6 +28,17 @@
 !/tmp/storage/
 !/tmp/storage/.keep
 
+# IMPORTANT: SQLite database files should NOT be committed
+# Team members will create their own local databases using migrations
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Database schema and migrations SHOULD be committed (don't add these to gitignore!)
+# ✅ db/schema.rb - COMMIT THIS
+# ✅ db/migrate/*.rb - COMMIT THESE
+# ❌ *.sqlite3 - DON'T COMMIT THESE
+
 /public/assets
 
 # Ignore master key for decrypting credentials and more.

@@ -1,12 +1,67 @@
 #!/usr/bin/env ruby
-# Script to setup database for different environments
+# Script to setup database for different environments and sync with team
 
 require 'fileutils'
 
 def setup_sqlite
-  puts "Setting up SQLite for development..."
+  puts "🔧 Setting up SQLite for development..."
   system("rails db:drop db:create db:migrate")
   puts "✅ SQLite database setup complete!"
+end
+
+def sync_after_pull
+  puts "🔄 Syncing database after pulling changes..."
+  puts ""
+  
+  # Check for pending migrations
+  puts "📋 Checking migration status..."
+  system("rails db:migrate:status")
+  puts ""
+  
+  # Run pending migrations
+  puts "🚀 Running pending migrations..."
+  if system("rails db:migrate")
+    puts "✅ Database is up to date!"
+  else
+    puts "❌ Migration failed. Try running: rails db:reset"
+    exit 1
+  end
+  
+  puts ""
+  puts "💡 Database synced successfully!"
+  puts "   You can now start your server with: rails s"
+end
+
+def full_reset
+  puts "⚠️  Performing full database reset..."
+  puts "   This will delete all data and rebuild from scratch."
+  puts ""
+  
+  if system("rails db:reset")
+    puts ""
+    puts "✅ Database reset complete!"
+    puts "   All migrations have been run and seeds loaded."
+  else
+    puts "❌ Reset failed. Check the error messages above."
+    exit 1
+  end
+end
+
+def check_status
+  puts "📊 Current migration status:"
+  puts ""
+  system("rails db:migrate:status")
+  puts ""
+  
+  # Count pending migrations
+  pending = `rails db:migrate:status | grep -c "down"`.strip.to_i rescue 0
+  
+  if pending > 0
+    puts "⚠️  You have #{pending} pending migration(s)."
+    puts "   Run: bin/setup_database sync"
+  else
+    puts "✅ All migrations are up to date!"
+  end
 end
 
 def setup_postgresql
@@ -48,10 +103,32 @@ end
 case ARGV[0]
 when 'sqlite'
   setup_sqlite
+when 'sync'
+  sync_after_pull
+when 'reset'
+  full_reset
+when 'status'
+  check_status
 when 'postgresql', 'pg'
   setup_postgresql
-else
-  puts "Usage: ruby bin/setup_database [sqlite|postgresql]"
-  puts "  sqlite     - Setup SQLite for development (default)"
+when nil
+  puts "🗃️  Database Setup & Sync Tool"
+  puts ""
+  puts "Usage: bin/setup_database [command]"
+  puts ""
+  puts "Commands:"
+  puts "  sync       - Sync database after pulling changes (run migrations)"
+  puts "  status     - Check current migration status"
+  puts "  reset      - Full reset: drop, create, migrate, seed"
+  puts "  sqlite     - Setup SQLite for development"
   puts "  postgresql - Setup PostgreSQL for production testing"
+  puts ""
+  puts "Common workflows:"
+  puts "  After git pull:  bin/setup_database sync"
+  puts "  Fresh start:     bin/setup_database reset"
+  puts "  Check status:    bin/setup_database status"
+else
+  puts "❌ Unknown command: #{ARGV[0]}"
+  puts "Run 'bin/setup_database' for usage information."
+  exit 1
 end
