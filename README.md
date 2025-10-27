@@ -2,6 +2,7 @@
 
 A personalized travel recommendation application built with Ruby on Rails and JavaScript. Users can create profiles with their travel preferences, budget, and passport country to receive AI-powered destination suggestions tailored specifically for them.
 
+https://travel-planner-cs397-9396d2cb2102.herokuapp.com/
 
 ## MVP Overview
 

@@ -3,19 +3,50 @@ class TravelRecommendationsController < ApplicationController
   before_action :require_login
 
   def index
-    @travel_plan = TravelPlan.new(session.fetch(:last_preferences, {}))
-    # Load recommendations from the user record, or initialize as an empty array
-    @recommendations = current_user.cached_recommendations
+    # Load last recommendations from the current user's database record
+    # Convert string keys to symbol keys for view compatibility
+    stored_recommendations = current_user.recommendations_json || []
+    @recommendations = stored_recommendations.map { |rec| rec.deep_symbolize_keys }
+    
+    # Load last preferences from session to pre-fill the form
+    last_prefs = session[:last_preferences] || {}
+    @travel_plan = TravelPlan.new(last_prefs)
+    
+    # If we have recommendations, show a helpful message
+    if @recommendations.present?
+      if last_prefs.present?
+        flash.now[:info] = "Showing your recent recommendations. You can save multiple plans or generate new ones below!"
+      else
+        flash.now[:info] = "Welcome back! These are your last generated recommendations. Fill out the form below to get new ones!"
+      end
+    end
   end
 
   def create
     preferences = travel_plan_params
-    session[:last_preferences] = preferences.to_h
+    
+    # Calculate length of stay from dates
+    if preferences[:start_date].present? && preferences[:end_date].present?
+      start_date = Date.parse(preferences[:start_date]) rescue nil
+      end_date = Date.parse(preferences[:end_date]) rescue nil
+      
+      if start_date && end_date && end_date >= start_date
+        preferences[:length_of_stay] = (end_date - start_date).to_i + 1
+        # Derive the travel month from start_date
+        preferences[:travel_month] = start_date.strftime("%B") # e.g., "November"
+      end
+    end
+    
+    # Store preferences in session for form pre-filling, but exclude safety_levels (not a TravelPlan attribute)
+    session_prefs = preferences.to_h.except(:safety_levels)
+    session[:last_preferences] = session_prefs
 
     @recommendations = OpenaiService.new(preferences).get_recommendations
-    # Store the new recommendations in the user record instead of session
-    current_user.cache_recommendations(@recommendations)
-    @travel_plan = TravelPlan.new(preferences)
+    # Store the new recommendations in the user's database record instead of session
+    current_user.update(recommendations_json: @recommendations)
+    
+    # Create TravelPlan object for form display (without safety_levels attribute)
+    @travel_plan = TravelPlan.new(session_prefs)
 
     respond_to do |format|
       format.turbo_stream do
@@ -30,13 +61,12 @@ class TravelRecommendationsController < ApplicationController
   end
 
   def destroy
-    # Remove the recommendation from the user record by its index
+    # Remove the recommendation from the user's stored recommendations by its index
     index_to_delete = params[:id].to_i
-    recommendations = current_user.cached_recommendations
-    
+    recommendations = current_user.recommendations_json || []
     if recommendations[index_to_delete]
       recommendations.delete_at(index_to_delete)
-      current_user.cache_recommendations(recommendations)
+      current_user.update(recommendations_json: recommendations)
     end
 
     # Respond to the Turbo Stream request by removing the element from the page
@@ -50,9 +80,9 @@ class TravelRecommendationsController < ApplicationController
 
   def travel_plan_params
     params.require(:travel_plan).permit(
-      :name, :passport_country, :budget_min, :budget_max, :safety_preference,
+      :name, :passport_country, :current_location, :budget_min, :budget_max,
       :length_of_stay, :travel_style, :travel_month, :trip_scope, :trip_type,
-      :general_purpose
+      :general_purpose, :start_date, :end_date, :safety_preference
     )
   end
 

@@ -1,11 +1,38 @@
-<% content_for :title, "New travel plan" %>
+<% content_for :title, "Create New Travel Plan" %>
 
-<h1>New travel plan</h1>
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">
+          <svg class="me-2" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+          </svg>
+          Create New Travel Plan
+        </h1>
+        <%= link_to travel_plans_path, class: "btn btn-outline-secondary" do %>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+          Back to Plans
+        <% end %>
+      </div>
 
-<%= render "form", travel_plan: @travel_plan %>
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Plan Details</h5>
+        </div>
+        <div class="card-body">
+          <%= render "form", travel_plan: @travel_plan %>
+        </div>
+      </div>
 
-<br>
-
-<div>
-  <%= link_to "Back to travel plans", travel_plans_path %>
+      <div class="alert alert-info mt-4" role="alert">
+        <svg class="me-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </svg>
+        <strong>Tip:</strong> You can manually create a travel plan here, or use our AI-powered recommendation system to get personalized suggestions!
+      </div>
+    </div>
+  </div>
 </div>

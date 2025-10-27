@@ -6,6 +6,9 @@ class User < ApplicationRecord
   has_many :recommendations, dependent: :destroy
   has_many :destinations, through: :travel_plans
 
+  # Serialize recommendations_json as JSON
+  serialize :recommendations_json, coder: JSON
+
   validates :name, presence: true, length: { minimum: 2, maximum: 50 }
   validates :email, presence: true, uniqueness: { case_sensitive: false },
             format: { with: URI::MailTo::EMAIL_REGEXP }

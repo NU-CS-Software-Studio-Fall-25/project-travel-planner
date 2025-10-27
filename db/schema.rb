@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_15_145029) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_15_191125) do
+  create_table "country_safety_scores", force: :cascade do |t|
+    t.string "country_name", null: false
+    t.decimal "gpi_score", precision: 5, scale: 3, null: false
+    t.integer "gpi_rank", null: false
+    t.integer "year", default: 2025, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country_name"], name: "index_country_safety_scores_on_country_name"
+    t.index ["gpi_rank"], name: "index_country_safety_scores_on_gpi_rank"
+    t.index ["gpi_score"], name: "index_country_safety_scores_on_gpi_score"
+    t.index ["year", "country_name"], name: "index_country_safety_scores_on_year_and_country_name", unique: true
+  end
+
   create_table "destinations", force: :cascade do |t|
     t.string "name"
     t.string "country"
@@ -50,7 +63,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_145029) do
     t.string "passport_country"
     t.decimal "budget_min"
     t.decimal "budget_max"
-    t.integer "safety_preference"
     t.string "travel_style"
     t.integer "length_of_stay"
     t.string "travel_month"
@@ -64,6 +76,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_145029) do
     t.string "visa_info"
     t.text "budget_breakdown"
     t.string "destination_country"
+    t.string "safety_preference"
     t.string "current_location"
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
@@ -76,6 +89,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_145029) do
     t.datetime "updated_at", null: false
     t.string "password_digest"
     t.text "recommendations_json"
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "recommendations", "destinations"
