@@ -2,6 +2,9 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
+# Load GPI 2025 safety data
+load Rails.root.join('db', 'seeds', 'gpi_2025_data.rb')
+
 # Sample data for travel planner
 
 # Create sample destinations
@@ -296,4 +299,6 @@ users.each do |user_attrs|
 end
 
 puts "Sample data created successfully!"
-puts "#{Destination.count} destinations and #{User.count} users in database."
+puts "#{Destination.count} destinations, #{User.count} users, and #{CountrySafetyScore.count} country safety scores in database."
+
+

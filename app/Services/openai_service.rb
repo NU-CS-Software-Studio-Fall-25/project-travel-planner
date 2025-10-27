@@ -10,16 +10,52 @@ class OpenaiService
   def get_recommendations
     prompt = build_prompt
 
-    response = @client.chat.completions.create(
-      model: "gpt-4o",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 7000,
-      response_format: { type: "json_object" }
-    )
+    begin
+      Rails.logger.info "=== OpenAI API Call Starting ==="
+      Rails.logger.info "API Key present: #{ENV['OPENAI_API_KEY'].present?}"
+      Rails.logger.info "API Key length: #{ENV['OPENAI_API_KEY']&.length}"
+      
+      response = @client.chat.completions.create(
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 7000,
+        response_format: { type: "json_object" }
+      )
 
-    # Parse the response and return it
-    parse_response(response)
+      Rails.logger.info "=== OpenAI Response Received ==="
+      Rails.logger.info "Response: #{response.inspect}"
+      
+      # Parse the response and return it
+      parse_response(response)
+    rescue => e
+      Rails.logger.error "=== OpenAI API Error ==="
+      Rails.logger.error "Error class: #{e.class}"
+      Rails.logger.error "Error message: #{e.message}"
+      Rails.logger.error "Backtrace: #{e.backtrace.first(5).join("\n")}"
+      
+      # Return an error recommendation
+      [{
+        name: "API Error",
+        destination_country: "Error",
+        description: "Failed to get recommendations from OpenAI: #{e.message}",
+        details: "Please check your API key and try again. Error: #{e.class}",
+        itinerary: {},
+        budget_min: 0,
+        budget_max: 0,
+        budget_breakdown: {},
+        safety_level: "level_1",
+        travel_style: "N/A",
+        visa_info: "N/A",
+        length_of_stay: @preferences[:length_of_stay]&.to_i || 4,
+        travel_month: @preferences[:travel_month] || "Unknown",
+        trip_scope: @preferences[:trip_scope] || "Unknown",
+        trip_type: @preferences[:trip_type] || "Unknown",
+        general_purpose: @preferences[:general_purpose] || "Unknown",
+        start_date: @preferences[:start_date],
+        end_date: @preferences[:end_date]
+      }]
+    end
   end
 
   private
@@ -32,8 +68,21 @@ class OpenaiService
     
     # Filter by trip scope if needed
     if @preferences[:trip_scope] == "Domestic" && @preferences[:passport_country].present?
-      # For domestic trips, only return the user's home country if it's in the safe list
-      countries = countries.where(country_name: @preferences[:passport_country])
+      # For domestic trips, check if home country meets safety criteria
+      home_country = CountrySafetyScore.find_by(country_name: @preferences[:passport_country], year: 2025)
+      
+      if home_country && countries.exists?(country_name: @preferences[:passport_country])
+        # Home country meets the safety criteria
+        countries = countries.where(country_name: @preferences[:passport_country])
+      elsif home_country
+        # Home country exists but doesn't meet safety criteria - include it anyway for domestic trips
+        # but note the actual safety level
+        Rails.logger.warn "Domestic trip: Including #{@preferences[:passport_country]} (GPI: #{home_country.gpi_score}, #{home_country.safety_level}) even though it doesn't meet '#{safety_preference}' criteria"
+        countries = CountrySafetyScore.where(country_name: @preferences[:passport_country])
+      else
+        # Home country not in database - return empty to trigger appropriate message
+        countries = CountrySafetyScore.none
+      end
     elsif @preferences[:trip_scope] == "International" && @preferences[:passport_country].present?
       # For international trips, exclude the user's home country
       countries = countries.where.not(country_name: @preferences[:passport_country])
@@ -49,8 +98,10 @@ class OpenaiService
     if countries.empty?
       return {
         country_list: "No countries available",
+        country_count: 0,
         country_details: "No countries match the selected criteria.",
-        restriction_note: "Please adjust your preferences."
+        restriction_note: "Please adjust your preferences.",
+        safety_level: safety_preference
       }
     end
     
@@ -63,13 +114,22 @@ class OpenaiService
       "#{c.country_name} (GPI: #{c.gpi_score}, Rank: ##{c.gpi_rank}/163, #{c.safety_level})"
     end.join("\n       ")
     
+    # Check if this is a domestic trip where home country doesn't meet preferred safety level
+    safety_note = "Based on 2025 Global Peace Index data"
+    if @preferences[:trip_scope] == "Domestic" && countries.count == 1
+      home_country = countries.first
+      if home_country.safety_level != safety_preference
+        safety_note = "NOTE: #{home_country.country_name} is classified as '#{home_country.safety_level}' (GPI: #{home_country.gpi_score}), which is different from your '#{safety_preference}' preference. For domestic travel, recommendations will be provided within your home country."
+      end
+    end
+    
     {
       country_list: country_names.join(", "),
       country_count: countries.count,
       country_details: country_details,
       safety_level: safety_preference,
       top_country: top_countries.first,
-      restriction_note: "Based on 2025 Global Peace Index data"
+      restriction_note: safety_note
     }
   end
 
@@ -165,6 +225,12 @@ class OpenaiService
 
   def parse_response(response)
     raw_content = response.choices.first&.message&.content
+    
+    Rails.logger.info "=== Parsing OpenAI Response ==="
+    Rails.logger.info "Raw content present: #{raw_content.present?}"
+    Rails.logger.info "Raw content length: #{raw_content&.length}"
+    Rails.logger.info "Raw content (first 500 chars): #{raw_content&.slice(0, 500)}"
+    
     return [] unless raw_content
 
     begin
@@ -172,6 +238,9 @@ class OpenaiService
       # We parse it and return the array inside that key.
       parsed_json = JSON.parse(raw_content, symbolize_names: true)
       destinations = parsed_json[:destinations] || []
+      
+      Rails.logger.info "=== Parsed JSON Successfully ==="
+      Rails.logger.info "Number of destinations: #{destinations.length}"
       
       # Ensure all required fields are present with defaults if missing
       destinations.map do |dest|
@@ -197,6 +266,10 @@ class OpenaiService
         }
       end
     rescue JSON::ParserError => e
+      Rails.logger.error "=== JSON Parse Error ==="
+      Rails.logger.error "Error: #{e.message}"
+      Rails.logger.error "Raw content: #{raw_content}"
+      
       # Return an error object that can be displayed in the view
       [{
          name: "Error Generating Recommendations",

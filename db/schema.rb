@@ -63,6 +63,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_191125) do
     t.string "passport_country"
     t.decimal "budget_min"
     t.decimal "budget_max"
+    t.integer "safety_preference"
     t.string "travel_style"
     t.integer "length_of_stay"
     t.string "travel_month"
@@ -76,7 +77,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_191125) do
     t.string "visa_info"
     t.text "budget_breakdown"
     t.string "destination_country"
-    t.string "safety_preference"
     t.string "current_location"
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
@@ -89,7 +89,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_191125) do
     t.datetime "updated_at", null: false
     t.string "password_digest"
     t.text "recommendations_json"
-    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "recommendations", "destinations"
