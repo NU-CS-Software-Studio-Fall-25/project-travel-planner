@@ -155,7 +155,7 @@ class OpenaiService
     safety_context = build_safety_context(safety_preference)
 
     <<~PROMPT
-    You are a professional travel planner. Based on the following travel preferences, suggest 2 travel destinations that STRICTLY match ALL the user's requirements.
+    You are a professional travel planner. Based on the following travel preferences, suggest one travel destinations that STRICTLY match ALL the user's requirements.
   
     CRITICAL REQUIREMENTS - ALL recommendations MUST:
     1. Have itineraries for EXACTLY #{length_of_stay} days (no more, no less)
