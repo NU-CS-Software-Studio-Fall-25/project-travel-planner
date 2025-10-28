@@ -29,7 +29,10 @@
           </div>
           <div class="col-md-6">
             <%= f.label :passport_country, "Passport/Citizenship Country", class: "form-label" %>
-            <%= f.text_field :passport_country, class: "form-control", placeholder: "e.g., United States" %>
+            <%= f.select :passport_country, 
+                options_for_select(@countries, @travel_plan.passport_country), 
+                { prompt: "Select your country" }, 
+                class: "form-select" %>
           </div>
           
           <div class="col-md-6">

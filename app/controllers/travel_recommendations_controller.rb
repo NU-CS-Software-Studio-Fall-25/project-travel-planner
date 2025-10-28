@@ -8,6 +8,9 @@ class TravelRecommendationsController < ApplicationController
     stored_recommendations = current_user.recommendations_json || []
     @recommendations = stored_recommendations.map { |rec| rec.deep_symbolize_keys }
     
+    # Load all countries from the database for the dropdown
+    @countries = CountrySafetyScore.where(year: 2025).order(:country_name).pluck(:country_name).uniq
+    
     # Load last preferences from session to pre-fill the form
     last_prefs = session[:last_preferences] || {}
     @travel_plan = TravelPlan.new(last_prefs)
