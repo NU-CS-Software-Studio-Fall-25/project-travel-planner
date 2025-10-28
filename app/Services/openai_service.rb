@@ -155,7 +155,7 @@ class OpenaiService
     safety_context = build_safety_context(safety_preference)
 
     <<~PROMPT
-    You are a professional travel planner. Based on the following travel preferences, suggest only 1 travel destinations that STRICTLY match ALL the user's requirements.
+    You are a professional travel planner. Based on the following travel preferences, suggest 2 travel destinations that STRICTLY match ALL the user's requirements.
   
     CRITICAL REQUIREMENTS - ALL recommendations MUST:
     1. Have itineraries for EXACTLY #{length_of_stay} days (no more, no less)
@@ -187,10 +187,12 @@ class OpenaiService
     - "destination_country": The country of the recommended destination. MUST be from the allowed country list above.
     - "description": A one-paragraph summary of the trip, mentioning why it's perfect for #{date_range}.
     - "details": Additional trip details, notes, or tips. Include seasonal information for the travel dates.
-    - "itinerary": A day-by-day travel itinerary for EXACTLY #{length_of_stay} days. 
+    - "itinerary": A detailed, day-by-day travel itinerary for EXACTLY #{length_of_stay} days. 
        • Create keys "Day 1", "Day 2", up to "Day #{length_of_stay}".  
-       • Each day should be 3-4 sentences covering morning, afternoon, and evening activities.
-       • Be concise but informative.
+       • Each day MUST include **exactly one full paragraph (no lists)**.  
+       • Each paragraph MUST contain **at least 6 complete sentences**, each describing **distinct morning, afternoon, evening, and cultural/dining activities**, ensuring detail equivalent to 100+ words.  
+       • If any day's paragraph is under 6 sentences, the output will be rejected.  
+       • Focus on realism and storytelling — the itinerary should read like a high-quality travel magazine description, not a summary.
   
     - "budget_min": Minimum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
     - "budget_max": Maximum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
