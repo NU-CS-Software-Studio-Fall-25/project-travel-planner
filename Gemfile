@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Specify Ruby version - using 3.4.1 to match local development
-ruby "3.4.6"
+# ruby "3.4.6"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.3"
