@@ -55,7 +55,9 @@
                 <div class="col-md-4">
                   <ul class="list-group list-group-flush">
                     <% if travel_plan.budget_min.present? && travel_plan.budget_max.present? %>
-                      <li class="list-group-item"><strong>Budget:</strong> $<%= number_with_delimiter(travel_plan.budget_min) %> - $<%= number_with_delimiter(travel_plan.budget_max) %></li>
+                      <li class="list-group-item">
+                        <strong>Budget:</strong> $<%= number_with_precision(travel_plan.budget_min, precision: 0, delimiter: ",") %> - $<%= number_with_precision(travel_plan.budget_max, precision: 0, delimiter: ",") %>
+                      </li>
                     <% end %>
                     
                     <% if travel_plan.safety_score.present? %>

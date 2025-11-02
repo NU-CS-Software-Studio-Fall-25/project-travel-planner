@@ -153,19 +153,65 @@
             <% if travel_plan.budget_breakdown.is_a?(Hash) %>
               <div class="row g-2">
                 <% travel_plan.budget_breakdown.each do |category, amount| %>
+                  <% next if category.to_s.downcase.include?("total_trip_cost") %> <!-- Skip total trip cost -->
+
+                  <%
+                    # Convert to string for pattern matching
+                    text = amount.to_s
+
+                    # Match cost patterns in priority order
+                    extracted_cost = nil
+                    if text =~ /total_cost\s+(\d+(?:\.\d+)?)/
+                      extracted_cost = $1
+                    elsif text =~ /cost_per_night\s+(\d+(?:\.\d+)?)/
+                      extracted_cost = $1
+                    elsif text =~ /cost_per_day\s+(\d+(?:\.\d+)?)/
+                      extracted_cost = $1
+                    elsif text =~ /cost\s+(\d+(?:\.\d+)?)/
+                      extracted_cost = $1
+                    else
+                      extracted_cost = text.gsub(/[^\d.]/, '')
+                    end
+
+                    formatted_cost = "$#{number_with_delimiter(extracted_cost.to_f.round, delimiter: ',')}"
+                  %>
+
                   <div class="col-md-6">
                     <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
                       <span class="fw-semibold"><%= category.to_s.titleize %></span>
-                      <span class="badge bg-success">$<%= amount.to_s.gsub(/[^\d.]/, '') %></span>
+                      <span class="badge bg-success"><%= formatted_cost %></span>
                     </div>
                   </div>
                 <% end %>
               </div>
               <hr>
+
+              <%
+                total = travel_plan.budget_breakdown.sum do |key, value|
+                  next 0 if key.to_s.downcase.include?("total_trip_cost")
+
+                  text = value.to_s
+                  if text =~ /total_cost\s+(\d+(?:\.\d+)?)/
+                    $1.to_f
+                  elsif text =~ /cost_per_night\s+(\d+(?:\.\d+)?)/
+                    $1.to_f
+                  elsif text =~ /cost_per_day\s+(\d+(?:\.\d+)?)/
+                    $1.to_f
+                  elsif text =~ /cost\s+(\d+(?:\.\d+)?)/
+                    $1.to_f
+                  else
+                    text.gsub(/[^\d.]/, '').to_f
+                  end
+                end
+
+                # Remove trailing .0 if the number is whole
+                formatted_total = total % 1 == 0 ? total.to_i : total.round(2)
+              %>
+
               <div class="d-flex justify-content-between align-items-center">
                 <strong class="h5 mb-0">Total Budget</strong>
                 <strong class="h4 mb-0 text-success">
-                  $<%= travel_plan.budget_breakdown.values.map { |v| v.to_s.gsub(/[^\d.]/, '').to_f }.sum.round(2) %>
+                  $<%= number_with_delimiter(formatted_total, delimiter: ',') %>
                 </strong>
               </div>
             <% else %>
