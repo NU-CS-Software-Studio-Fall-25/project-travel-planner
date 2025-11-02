@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_27_031104) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_02_163222) do
   create_table "country_safety_scores", force: :cascade do |t|
     t.string "country_name", null: false
     t.decimal "gpi_score", precision: 5, scale: 3, null: false
@@ -71,14 +71,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_27_031104) do
     t.string "general_purpose"
     t.string "trip_scope"
     t.string "trip_type"
-    t.text "itinerary"
-    t.text "details"
-    t.text "description"
     t.integer "safety_score"
     t.string "visa_info"
     t.text "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
+    t.text "description"
+    t.text "details"
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
   end
