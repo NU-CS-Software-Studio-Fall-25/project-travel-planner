@@ -82,19 +82,57 @@
 
                   <% if rec[:budget_breakdown].present? %>
                     <div class="accordion mt-3" id="accordion-budget-<%= index %>">
-                      <div class="accordion-item border-0 shadow-sm rounded-3">
+                      <div class="accordion-item border-0 shadow-sm rounded-4">
                         <h2 class="accordion-header" id="heading-budget-<%= index %>">
                           <button class="accordion-button fw-semibold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= index %>">
                             <i class="bi bi-wallet2 me-2"></i> Budget Breakdown
                           </button>
                         </h2>
                         <div id="collapse-budget-<%= index %>" class="accordion-collapse collapse">
-                          <div class="accordion-body">
-                            <ul class="list-unstyled mb-0">
-                              <% rec[:budget_breakdown].each do |item, cost| %>
-                                <li class="mb-1"><strong><%= item.to_s.humanize %>:</strong> $<%= number_with_delimiter(cost) %></li>
-                              <% end %>
-                            </ul>
+                          <div class="accordion-body p-4 bg-light rounded-4">
+                            <% rec[:budget_breakdown].each do |category, data| %>
+                              <div class="budget-item mb-4 p-3 bg-white shadow-sm rounded-4 border-start border-4 border-primary-subtle">
+                                <h5 class="fw-bold text-primary mb-2 d-flex align-items-center">
+                                  <i class="bi bi-dot fs-3 lh-1 me-1 text-primary"></i>
+                                  <%= category.to_s.titleize %>
+                                </h5>
+
+                                <% if data.is_a?(Hash) %>
+                                  <% if data[:description].present? %>
+                                    <p class="mb-2">
+                                      <span class="fw-semibold text-dark">Description:</span>
+                                      <span class="text-muted"><%= data[:description] %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% data.each do |key, value| %>
+                                    <% next if key.to_s == "description" %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark"><%= key.to_s.humanize %>:</span>
+                                      <% if value.is_a?(Numeric) %>
+                                        <span class="text-muted">$<%= number_with_delimiter(value) %></span>
+                                      <% else %>
+                                        <span class="text-muted"><%= value %></span>
+                                      <% end %>
+                                    </p>
+                                  <% end %>
+                                <% else %>
+                                  <p class="mb-0"><span class="fw-semibold text-dark">Cost:</span> $<%= number_with_delimiter(data) %></p>
+                                <% end %>
+                              </div>
+                            <% end %>
+
+                            <% if rec[:budget_breakdown]["Total trip cost"].present? %>
+                              <div class="total-trip bg-gradient text-white p-3 rounded-4 text-center shadow-sm mt-4"
+                                   style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
+                                <h5 class="fw-bold mb-1">
+                                  <i class="bi bi-cash-stack me-2"></i>Total Trip Cost
+                                </h5>
+                                <p class="fs-5 fw-bold mb-0">
+                                  $<%= number_with_delimiter(rec[:budget_breakdown]["Total trip cost"].to_s.gsub(/[^\d]/, '').to_i) %>
+                                </p>
+                              </div>
+                            <% end %>
                           </div>
                         </div>
                       </div>
@@ -170,7 +208,23 @@
         -webkit-text-fill-color: transparent;
     }
 
+    .budget-item {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .budget-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .budget-item h5 {
+        font-size: 1.1rem;
+    }
+    .budget-item p {
+        font-size: 0.95rem;
+    }
+    .total-trip {
+        letter-spacing: 0.3px;
+    }
     .accordion-button {
-        border-radius: 0.5rem;
+        border-radius: 0.75rem !important;
     }
 </style>

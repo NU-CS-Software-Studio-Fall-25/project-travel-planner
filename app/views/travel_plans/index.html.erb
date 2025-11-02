@@ -77,22 +77,139 @@
                     <% end %>
                   </ul>
 
-                  <%# Budget Breakdown Accordion %>
+                  <%# BUDGET BREAKDOWN EXTRACTION %>
                   <% if travel_plan.budget_breakdown.present? %>
                     <div class="accordion mt-3" id="accordion-budget-<%= travel_plan.id %>">
-                      <div class="accordion-item">
+                      <div class="accordion-item border-0 shadow-sm rounded-4">
                         <h2 class="accordion-header" id="heading-budget-<%= travel_plan.id %>">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= travel_plan.id %>">
-                            View Budget Breakdown
+                          <button class="accordion-button fw-semibold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= travel_plan.id %>">
+                            <i class="bi bi-wallet2 me-2"></i> Budget Breakdown
                           </button>
                         </h2>
+
                         <div id="collapse-budget-<%= travel_plan.id %>" class="accordion-collapse collapse">
-                          <div class="accordion-body">
-                            <ul class="list-unstyled">
-                              <% travel_plan.budget_breakdown.each do |item, cost| %>
-                                <li><strong><%= item.to_s.humanize %>:</strong> $<%= number_with_delimiter(cost) %></li>
-                              <% end %>
-                            </ul>
+                          <div class="accordion-body p-4 bg-light rounded-4">
+
+                            <% travel_plan.budget_breakdown.each do |category, data| %>
+                              <% next if category.to_s.match?(/total.*trip|total_trip|total trip cost|total_trip_cost|total_trip/i) %>
+
+                              <div class="budget-item mb-4 p-3 bg-white shadow-sm rounded-4 border-start border-4 border-primary-subtle">
+                                <h5 class="fw-bold text-primary mb-2 d-flex align-items-center">
+                                  <i class="bi bi-dot fs-3 lh-1 me-1 text-primary"></i>
+                                  <%= category.to_s.titleize %>
+                                </h5>
+
+                                <% if data.is_a?(Hash) %>
+                                  <% desc = data[:description] || data["description"] %>
+                                  <% if desc.present? %>
+                                    <p class="mb-2">
+                                      <span class="fw-semibold text-dark">Description:</span>
+                                      <span class="text-muted"><%= desc %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% [:cost, :cost_per_day, :cost_per_night, :total_cost].each do |sym| %>
+                                    <% if data[sym].present? %>
+                                      <% num = data[sym].to_s.gsub(/[^\d]/, '').to_i %>
+                                      <% label =
+                                           case sym
+                                           when :cost then "Cost"
+                                           when :cost_per_day then "Cost per day"
+                                           when :cost_per_night then "Cost per night"
+                                           when :total_cost then "Total cost"
+                                           end %>
+                                      <p class="mb-1">
+                                        <span class="fw-semibold text-dark"><%= label %>:</span>
+                                        <span class="text-muted">$<%= number_with_delimiter(num) %></span>
+                                      </p>
+                                    <% end %>
+                                  <% end %>
+
+                                <% else %>
+                                  <% s = data.to_s.dup %>
+                                  <% desc = s[/description\s+(.+?)(?=\s+(?:cost(?:_per_day|_per_night)?|cost_per_day|cost_per_night|total_cost)\s*(?:\$?[\d,])|\z)/i, 1]&.strip %>
+                                  <% if desc.present? %>
+                                    <p class="mb-2">
+                                      <span class="fw-semibold text-dark">Description:</span>
+                                      <span class="text-muted"><%= desc %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% extract_num = ->(regex) do
+                                    m = s[regex, 1]
+                                    m.present? ? m.gsub(/[^\d]/, '').to_i : nil
+                                  end %>
+
+                                  <% cost_val = extract_num.call(/\bcost\s*\$?([\d,]+)/i) %>
+                                  <% cost_per_day_val = extract_num.call(/\bcost_per_day\s*\$?([\d,]+)/i) %>
+                                  <% cost_per_night_val = extract_num.call(/\bcost_per_night\s*\$?([\d,]+)/i) %>
+                                  <% total_cost_val = extract_num.call(/\btotal_cost\s*\$?([\d,]+)/i) || extract_num.call(/\btotal\s*cost\s*\$?([\d,]+)/i) %>
+
+                                  <% if cost_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Cost:</span>
+                                      <span class="text-muted">$<%= number_with_delimiter(cost_val) %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if cost_per_night_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Cost per night:</span>
+                                      <span class="text-muted">$<%= number_with_delimiter(cost_per_night_val) %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if cost_per_day_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Cost per day:</span>
+                                      <span class="text-muted">$<%= number_with_delimiter(cost_per_day_val) %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if total_cost_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Total cost:</span>
+                                      <span class="text-muted">$<%= number_with_delimiter(total_cost_val) %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if cost_val.blank? && cost_per_day_val.blank? && cost_per_night_val.blank? && total_cost_val.blank? %>
+                                    <% simple_num = s[/\b(\d{1,3}(?:,\d{3})*|\d+)\b/] %>
+                                    <% if simple_num.present? %>
+                                      <% num = simple_num.gsub(/[^\d]/, '').to_i %>
+                                      <p class="mb-0">
+                                        <span class="fw-semibold text-dark">Cost:</span>
+                                        <span class="text-muted">$<%= number_with_delimiter(num) %></span>
+                                      </p>
+                                    <% end %>
+                                  <% end %>
+
+                                <% end %>
+                              </div>
+                            <% end %>
+
+                            <% total_key_value =
+                                 travel_plan.budget_breakdown["total_trip_cost"] ||
+                                 travel_plan.budget_breakdown["total trip cost"] ||
+                                 travel_plan.budget_breakdown["Total trip cost"] ||
+                                 travel_plan.budget_breakdown["total"] ||
+                                 travel_plan.budget_breakdown["total_trip"] ||
+                                 travel_plan.budget_breakdown["Total"] %>
+
+                            <% if total_key_value.present? %>
+                              <% total_num = total_key_value.to_s.gsub(/[^\d]/, '').to_i %>
+                              <div class="budget-item mb-4 p-3 bg-white shadow-sm rounded-4 border-start border-4 border-primary-subtle">
+                                <h5 class="fw-bold text-primary mb-2 d-flex align-items-center">
+                                  <i class="bi bi-cash-stack fs-3 lh-1 me-1 text-primary"></i>
+                                  Total Trip Cost
+                                </h5>
+                                <p class="mb-1">
+                                  <span class="fw-semibold text-dark">Total cost:</span>
+                                  <span class="text-muted">$<%= number_with_delimiter(total_num) %></span>
+                                </p>
+                              </div>
+                            <% end %>
+
                           </div>
                         </div>
                       </div>
@@ -125,3 +242,31 @@
     <%= link_to "Create Manual Plan", new_travel_plan_path, class: "btn btn-outline-primary" %>
   </div>
 </div>
+
+<style>
+    .budget-item {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .budget-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    .budget-item h5 {
+        font-size: 1.1rem;
+    }
+    .budget-item p {
+        font-size: 0.95rem;
+    }
+    .budget-item span.fw-semibold.text-dark {
+        color: #000 !important;
+    }
+    .budget-item span.text-muted {
+        color: #555 !important;
+    }
+    .total-trip {
+        letter-spacing: 0.3px;
+    }
+    .accordion-button {
+        border-radius: 0.75rem !important;
+    }
+</style>
