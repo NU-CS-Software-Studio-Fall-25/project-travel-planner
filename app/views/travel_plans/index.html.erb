@@ -33,7 +33,12 @@
                     <div class="accordion mt-3" id="accordion-itinerary-<%= travel_plan.id %>">
                       <div class="accordion-item">
                         <h2 class="accordion-header" id="heading-itinerary-<%= travel_plan.id %>">
-                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-itinerary-<%= travel_plan.id %>">
+                          <button class="accordion-button collapsed fw-semibold text-primary bg-white"
+                                  type="button"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target="#collapse-itinerary-<%= travel_plan.id %>"
+                                  aria-expanded="false"
+                                  aria-controls="collapse-itinerary-<%= travel_plan.id %>">
                             View Detailed Itinerary
                           </button>
                         </h2>
@@ -84,7 +89,12 @@
                     <div class="accordion mt-3" id="accordion-budget-<%= travel_plan.id %>">
                       <div class="accordion-item border-0 shadow-sm rounded-4">
                         <h2 class="accordion-header" id="heading-budget-<%= travel_plan.id %>">
-                          <button class="accordion-button fw-semibold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-budget-<%= travel_plan.id %>">
+                          <button class="accordion-button collapsed fw-semibold text-primary bg-white"
+                                  type="button"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target="#collapse-budget-<%= travel_plan.id %>"
+                                  aria-expanded="false"
+                                  aria-controls="collapse-budget-<%= travel_plan.id %>">
                             <i class="bi bi-wallet2 me-2"></i> Budget Breakdown
                           </button>
                         </h2>
@@ -268,7 +278,29 @@
     .total-trip {
         letter-spacing: 0.3px;
     }
+    /* --- Accordion visual behavior --- */
     .accordion-button {
         border-radius: 0.75rem !important;
+        background-color: #fff !important; /* collapsed: white */
+        color: #0d6efd !important; /* blue text when collapsed */
+        box-shadow: none !important;
+        transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Hover effect when collapsed */
+    .accordion-button:hover {
+        background-color: #f8f9fa !important; /* light gray hover */
+    }
+
+    /* Expanded state: light blue background, blue text */
+    .accordion-button:not(.collapsed) {
+        background-color: #cfe2ff !important; /* light blue */
+        color: #0d6efd !important; /* blue text on light blue */
+        box-shadow: none !important;
+    }
+
+    /* Focus outline */
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.3) !important;
     }
 </style>
