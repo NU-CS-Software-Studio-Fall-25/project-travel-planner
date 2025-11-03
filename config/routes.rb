@@ -1,15 +1,16 @@
+# config/routes.rb
 Rails.application.routes.draw do
   # Set the root route to home page (serves both web and API)
   root "home#index"
-  
+
   get "home/index"
-  
+
   # Authentication routes
   get "/signup", to: "users#new"
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy"
-  
+
   # API routes
   namespace :api do
     namespace :v1 do
@@ -19,13 +20,14 @@ Rails.application.routes.draw do
       resources :travel_recommendations, only: [:index, :show, :create]
     end
   end
-  
+
   # Traditional web routes (for backward compatibility)
   resources :travel_recommendations, only: [:index, :show, :new, :create]
   resources :travel_plans
   resources :destinations
   resources :users
-  
+
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -38,7 +40,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  
+
   # Catch all unmatched routes and show custom 404 page (must be last)
   match '*path', to: 'errors#not_found', via: :all
 end

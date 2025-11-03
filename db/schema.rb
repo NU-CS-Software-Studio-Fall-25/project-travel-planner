@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_02_210346) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_03_010018) do
   create_table "country_safety_scores", force: :cascade do |t|
     t.string "country_name", null: false
     t.decimal "gpi_score", precision: 5, scale: 3, null: false
@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_02_210346) do
     t.string "password_digest"
     t.text "recommendations_json"
     t.string "current_country", default: "United States"
+    t.string "subscription_tier", default: "free", null: false
   end
 
   add_foreign_key "recommendations", "destinations"

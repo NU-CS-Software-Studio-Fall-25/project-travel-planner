@@ -134,3 +134,30 @@ body {
 .badge.bg-orange {
   color: #000 !important;
 }
+
+.tier-card {
+    cursor: pointer;
+}
+
+.tier-radio {
+    display: none;
+}
+
+.tier-card-inner {
+    border: 1.5px solid #d0d0d0;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+    padding: 0.75rem !important;
+    font-size: 0.9rem;
+}
+
+.tier-radio:checked + .tier-card-inner {
+    border-color: #0d6efd;
+    background: #f5f9ff;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.tier-card-inner:hover {
+    border-color: #9cc5ff;
+    box-shadow: 0 0 5px rgba(13, 110, 253, 0.2);
+}

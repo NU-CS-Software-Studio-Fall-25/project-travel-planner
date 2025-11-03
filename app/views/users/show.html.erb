@@ -1,3 +1,4 @@
+<%# app/views/users/show.html.erb %>
 <div class="container my-4">
   <div class="row justify-content-center">
     <div class="col-md-8 col-lg-7">
@@ -25,6 +26,12 @@
 
             <dt class="col-sm-3">Member Since</dt>
             <dd class="col-sm-9"><%= @user.created_at.strftime("%B %d, %Y") %></dd>
+
+            <dt class="col-sm-3">Subscription Tier</dt>
+            <dd class="col-sm-9">
+              <% tier = @user.subscription_tier&.titleize || "Free" %>
+              <span class="badge subscription-badge <%= tier.parameterize %>"><%= tier %></span>
+            </dd>
 
             <dt class="col-sm-3">Total Plans</dt>
             <dd class="col-sm-9"><%= @user.travel_plans.count %></dd>
@@ -124,6 +131,23 @@
     .quick-actions .btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .subscription-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 20px;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    /* Optional colors based on subscription tier */
+    .subscription-badge.free {
+        background-color: #6c757d; /* gray */
+    }
+    .subscription-badge.premium {
+        background-color: #7950f2; /* purple */
     }
     .footer-actions {
         padding: 1rem 2rem;

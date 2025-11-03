@@ -19,7 +19,7 @@ class OpenaiService
         model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
-        max_tokens: 16384,
+        max_tokens: 5000,
         response_format: { type: "json_object" }
       )
 
