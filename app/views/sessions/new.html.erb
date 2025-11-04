@@ -6,22 +6,24 @@
           <h2 class="text-center">Login to Travel Planner</h2>
         </div>
         <div class="card-body">
-          <%= form_with url: login_path, method: :post, local: true do |form| %>
+          <%= form_with url: login_path, method: :post, local: true, id: "login-form" do |form| %>
             <div class="mb-3">
               <%= form.label :email, class: "form-label" %>
-              <%= form.email_field :email, class: "form-control", placeholder: "Enter your email" %>
+              <%= form.email_field :email, class: "form-control", placeholder: "Enter your email", required: true, id: "login-email-field", maxlength: 75 %>
+              <div class="invalid-feedback" id="login-email-error"></div>
             </div>
 
             <div class="mb-3">
               <%= form.label :password, class: "form-label" %>
-              <%= form.password_field :password, class: "form-control", placeholder: "Enter your password" %>
+              <%= form.password_field :password, class: "form-control", placeholder: "Enter your password", required: true, id: "login-password-field", maxlength: 75 %>
+              <div class="invalid-feedback" id="login-password-error"></div>
             </div>
 
             <div class="d-grid">
-              <%= form.submit "Login", class: "btn btn-primary" %>
+              <%= form.submit "Login", class: "btn btn-primary", id: "login-submit-btn" %>
             </div>
           <% end %>
-          
+
           <div class="text-center mt-3">
             <p>Don't have an account? <%= link_to "Sign up here", signup_path, class: "text-decoration-none" %></p>
           </div>
@@ -30,3 +32,115 @@
     </div>
   </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // DOM elements
+        const form = document.getElementById("login-form");
+        const emailField = document.getElementById("login-email-field");
+        const passwordField = document.getElementById("login-password-field");
+        const submitBtn = document.getElementById("login-submit-btn");
+
+        // Error elements
+        const errors = {
+            email: document.getElementById("login-email-error"),
+            password: document.getElementById("login-password-error")
+        };
+
+        const MAX_LENGTH = 75;
+
+        // Validation functions
+        function validateEmail(value) {
+            if (!value) {
+                return "Email is required.";
+            }
+            if (value.length > MAX_LENGTH) {
+                return `Email cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                return "Please enter a valid email address.";
+            }
+            return null;
+        }
+
+        function validatePassword(value) {
+            if (!value) {
+                return "Password is required.";
+            }
+            if (value.length > MAX_LENGTH) {
+                return `Password cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            return null;
+        }
+
+        // UI update functions
+        function showError(element, message) {
+            element.textContent = message;
+            element.parentElement.classList.add("is-invalid");
+            element.parentElement.classList.remove("is-valid");
+        }
+
+        function hideError(element) {
+            element.textContent = "";
+            element.parentElement.classList.remove("is-invalid");
+            element.parentElement.classList.add("is-valid");
+        }
+
+        // Real-time validation on input
+        emailField.addEventListener("input", () => {
+            const error = validateEmail(emailField.value);
+            if (error) {
+                showError(errors.email, error);
+            } else {
+                hideError(errors.email);
+            }
+        });
+
+        passwordField.addEventListener("input", () => {
+            const error = validatePassword(passwordField.value);
+            if (error) {
+                showError(errors.password, error);
+            } else {
+                hideError(errors.password);
+            }
+        });
+
+        // Form submit validation
+        form.addEventListener("submit", (e) => {
+            let isValid = true;
+
+            // Email
+            const emailError = validateEmail(emailField.value);
+            if (emailError) {
+                showError(errors.email, emailError);
+                isValid = false;
+            }
+
+            // Password
+            const passwordError = validatePassword(passwordField.value);
+            if (passwordError) {
+                showError(errors.password, passwordError);
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                submitBtn.textContent = "Please fix errors above";
+                setTimeout(() => {
+                    submitBtn.textContent = "Login";
+                }, 3000);
+            }
+        });
+
+        // Initial validation
+        [emailField, passwordField].forEach(field => {
+            if (field.value) {
+                const validator = field.id === "login-email-field" ? validateEmail : validatePassword;
+                if (!validator(field.value)) {
+                    field.parentElement.classList.add("is-valid");
+                }
+            }
+        });
+    });
+</script>

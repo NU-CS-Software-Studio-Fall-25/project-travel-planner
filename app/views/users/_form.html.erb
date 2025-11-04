@@ -1,5 +1,5 @@
 <%# app/views/users/_form.html.erb %>
-<%= form_with(model: user, local: true) do |form| %>
+<%= form_with(model: user, local: true, id: "user-form") do |form| %>
   <% if user.errors.any? %>
     <div class="alert alert-danger">
       <h4><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h4>
@@ -13,12 +13,14 @@
 
   <div class="mb-3">
     <%= form.label :name, "Full Name", class: "form-label" %>
-    <%= form.text_field :name, class: "form-control", placeholder: "Enter your full name", required: true %>
+    <%= form.text_field :name, class: "form-control", placeholder: "Enter your full name", required: true, id: "name-field", maxlength: 75 %>
+    <div class="invalid-feedback" id="name-error"></div>
   </div>
 
   <div class="mb-3">
     <%= form.label :email, "Email Address", class: "form-label" %>
-    <%= form.email_field :email, class: "form-control", placeholder: "Enter your email address", required: true %>
+    <%= form.email_field :email, class: "form-control", placeholder: "Enter your email address", required: true, id: "email-field", maxlength: 75 %>
+    <div class="invalid-feedback" id="email-error"></div>
   </div>
 
   <div class="mb-3">
@@ -117,7 +119,7 @@
                                          ['Guernsey', 'Guernsey'],
                                          ['Guinea', 'Guinea'],
                                          ['Guinea-bissau', 'Guinea-bissau'],
-                                         ['Guyana', 'Guyaná'],
+                                         ['Guyana', 'Guyana'],
                                          ['Haiti', 'Haiti'],
                                          ['Heard Island and Mcdonald Islands', 'Heard Island and Mcdonald Islands'],
                                          ['Holy See (Vatican City State)', 'Holy See (Vatican City State)'],
@@ -271,8 +273,9 @@
                                          ['Zimbabwe', 'Zimbabwe']
                                        ], user.current_country),
                     { prompt: 'Select your current country' },
-                    { class: "form-select", required: true }
+                    { class: "form-select", required: true, id: "country-field" }
     %>
+    <div class="invalid-feedback" id="country-error"></div>
   </div>
 
   <div class="mb-3">
@@ -280,7 +283,9 @@
     <%= form.password_field :promo_code,
                             class: "form-control form-control-sm",
                             placeholder: "Enter promo code to unlock higher tier. Payment coming soon!",
-                            id: "promo-code-field" %>
+                            id: "promo-code-field",
+                            maxlength: 75 %>
+    <div class="invalid-feedback" id="promo-error"></div>
   </div>
 
   <div class="mb-3">
@@ -301,8 +306,8 @@
             <%= form.radio_button :subscription_tier, plan[:key],
                                   class: "tier-radio",
                                   checked: (selected == plan[:key]),
-                                  'data-tier': plan[:key] %>
-
+                                  'data-tier': plan[:key],
+                                  id: "tier-#{plan[:key]}" %>
             <div class="card p-3 tier-card-inner">
               <div class="d-flex justify-content-between align-items-center">
                 <h5 class="fw-bold mb-0"><%= plan[:title] %></h5>
@@ -315,62 +320,382 @@
       <% end %>
 
     </div>
+    <div class="invalid-feedback d-block" id="tier-error"></div>
   </div>
 
   <% if user.new_record? %>
     <div class="mb-3">
       <%= form.label :password, class: "form-label" %>
-      <%= form.password_field :password, class: "form-control", placeholder: "Create a password (minimum 6 characters)", required: true %>
+      <%= form.password_field :password, class: "form-control", placeholder: "Create a password (minimum 6 characters)", required: true, id: "password-field", maxlength: 75 %>
+      <div class="invalid-feedback" id="password-error"></div>
     </div>
 
     <div class="mb-3">
       <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
-      <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password", required: true %>
+      <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password", required: true, id: "password-confirm-field", maxlength: 75 %>
+      <div class="invalid-feedback" id="password-confirm-error"></div>
     </div>
   <% end %>
 
   <div class="d-grid">
-    <%= form.submit user.new_record? ? "Create Account" : "Update Profile", class: "btn btn-primary" %>
+    <%= form.submit user.new_record? ? "Create Account" : "Update Profile", class: "btn btn-primary", id: "submit-btn" %>
   </div>
 <% end %>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // DOM elements
+        const form = document.getElementById("user-form");
+        const nameField = document.getElementById("name-field");
+        const emailField = document.getElementById("email-field");
+        const countryField = document.getElementById("country-field");
         const promoField = document.getElementById("promo-code-field");
-        const radios = document.querySelectorAll(".tier-radio");
+        const tierRadios = document.querySelectorAll(".tier-radio");
         const freeTierRadio = document.querySelector(".tier-radio[data-tier='free']");
         const premiumTierRadio = document.querySelector(".tier-radio[data-tier='premium']");
+        const passwordField = document.getElementById("password-field");
+        const passwordConfirmField = document.getElementById("password-confirm-field");
+        const submitBtn = document.getElementById("submit-btn");
+
+        // Error elements
+        const errors = {
+            name: document.getElementById("name-error"),
+            email: document.getElementById("email-error"),
+            country: document.getElementById("country-error"),
+            promo: document.getElementById("promo-error"),
+            tier: document.getElementById("tier-error"),
+            password: document.getElementById("password-error"),
+            passwordConfirm: document.getElementById("password-confirm-error")
+        };
+
         const initialTier = "<%= user.subscription_tier || 'free' %>";
+        const isNewRecord = <%= user.new_record? %>;
+        const MAX_LENGTH = 75;
+
+        // Validation functions
+        function validateName(value) {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                return "Full name is required.";
+            }
+            if (trimmed.length < 2) {
+                return "Full name must be at least 2 characters long.";
+            }
+            if (trimmed.length > MAX_LENGTH) {
+                return `Full name cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            return null;
+        }
+
+        function validateEmail(value) {
+            if (!value) {
+                return "Email is required.";
+            }
+            if (value.length > MAX_LENGTH) {
+                return `Email cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                return "Please enter a valid email address.";
+            }
+            return null;
+        }
+
+        function validateCountry(value) {
+            if (!value) {
+                return "Please select your current country.";
+            }
+            return null;
+        }
+
+        function validatePromo() {
+            const value = promoField.value;
+            if (value.length > MAX_LENGTH) {
+                return `Promo code cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            return null;
+        }
+
+        function validatePromoForPremium() {
+            const code = promoField.value.trim();
+            const isValid = code === "cs397project";
+            if (premiumTierRadio.checked && !isValid) {
+                return "Valid promo code required to select Premium tier.";
+            }
+            return null;
+        }
+
+        function validateTier() {
+            const selected = document.querySelector("input[name='user[subscription_tier]']:checked");
+            if (!selected) {
+                return "Please select an account tier.";
+            }
+            const promoError = validatePromo();
+            if (promoError) {
+                return promoError;
+            }
+            return validatePromoForPremium();
+        }
+
+        function validatePassword(value) {
+            if (!value) {
+                return "Password is required.";
+            }
+            if (value.length < 6) {
+                return "Password must be at least 6 characters long.";
+            }
+            if (value.length > MAX_LENGTH) {
+                return `Password cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            return null;
+        }
+
+        function validatePasswordConfirm(value, passwordValue) {
+            if (!value) {
+                return "Password confirmation is required.";
+            }
+            if (value !== passwordValue) {
+                return "Passwords do not match.";
+            }
+            return null;
+        }
+
+        // UI update functions - Fixed to target the input/select element directly
+        function showError(errorElement, message, inputElement = null) {
+            errorElement.textContent = message;
+            if (inputElement) {
+                inputElement.classList.add("is-invalid");
+                inputElement.classList.remove("is-valid");
+            } else {
+                // Fallback for tier-error (always visible due to d-block)
+                const tierSection = errorElement.parentElement;
+                tierSection.classList.add("is-invalid");
+            }
+        }
+
+        function hideError(errorElement, inputElement = null) {
+            errorElement.textContent = "";
+            if (inputElement) {
+                inputElement.classList.remove("is-invalid");
+                inputElement.classList.add("is-valid");
+            } else {
+                // Fallback for tier-error
+                const tierSection = errorElement.parentElement;
+                tierSection.classList.remove("is-invalid");
+            }
+        }
 
         function updateTierAvailability() {
             const code = promoField.value.trim();
             const isCodeValid = (code === "cs397project");
+            const promoError = validatePromo();
 
-            // The premium tier is only enabled if the code is valid.
-            premiumTierRadio.disabled = !isCodeValid;
-
-            // If the premium tier is disabled and was selected,
-            // switch the selection back to the free tier.
-            if (premiumTierRadio.disabled && premiumTierRadio.checked) {
-                freeTierRadio.checked = true;
+            // Show promo length error if exceeded
+            if (promoError) {
+                showError(errors.promo, promoError, promoField);
+                return;
+            } else if (code) {
+                errors.promo.textContent = "";
             }
 
-            // If the user is already premium, we should not disable their current selection on page load
-            // but still require the code to re-select it if they change it.
-            // This part of the logic is tricky. The simplest strict rule is to disable it always without the code.
-            if (initialTier === 'premium' && !isCodeValid) {
-                // This condition is now handled by the logic above.
-                // If they are premium, the radio is checked. If they touch the promo field and it's wrong,
-                // it will become disabled, but their selection remains until they click something else or submit.
-                // A better user experience might be to not disable it if they are already premium,
-                // but the user request is to strictly require the code.
+            // Visual feedback for promo field
+            if (code && isCodeValid) {
+                promoField.classList.add("is-valid");
+                promoField.classList.remove("is-invalid");
+                errors.promo.textContent = "";
+            } else if (code) {
+                promoField.classList.add("is-invalid");
+                promoField.classList.remove("is-valid");
+                showError(errors.promo, "Invalid promo code.", promoField);
+            } else {
+                promoField.classList.remove("is-valid", "is-invalid");
+                errors.promo.textContent = "";
             }
         }
 
-        // Run on input in the promo field
+        // Prevent selecting premium without valid promo and show alert
+        premiumTierRadio.addEventListener('change', (e) => {
+            const code = promoField.value.trim();
+            if (code !== "cs397project") {
+                e.target.checked = false;
+                alert("Need to enter a valid promo code before accessing premium tier");
+            }
+        });
+
+        // Validation on blur for name and email
+        nameField.addEventListener("blur", () => {
+            const error = validateName(nameField.value);
+            if (error) {
+                showError(errors.name, error, nameField);
+            } else {
+                hideError(errors.name, nameField);
+            }
+        });
+
+        emailField.addEventListener("blur", () => {
+            const error = validateEmail(emailField.value);
+            if (error) {
+                showError(errors.email, error, emailField);
+            } else {
+                hideError(errors.email, emailField);
+            }
+        });
+
+        // Validation on blur for country
+        countryField.addEventListener("change", () => {
+            const error = validateCountry(countryField.value);
+            if (error) {
+                showError(errors.country, error, countryField);
+            } else {
+                hideError(errors.country, countryField);
+            }
+        });
+
         promoField.addEventListener("input", updateTierAvailability);
 
-        // Run on page load to set the initial state
+        tierRadios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                const error = validateTier();
+                if (error) {
+                    showError(errors.tier, error);
+                } else {
+                    hideError(errors.tier);
+                }
+            });
+        });
+
+        if (isNewRecord) {
+            // Password: validate on blur
+            passwordField.addEventListener("blur", () => {
+                const error = validatePassword(passwordField.value);
+                if (error) {
+                    showError(errors.password, error, passwordField);
+                } else {
+                    hideError(errors.password, passwordField);
+                }
+            });
+
+            // Password confirm: validate on input for match, on blur for required
+            passwordConfirmField.addEventListener("input", () => {
+                const error = validatePasswordConfirm(passwordConfirmField.value, passwordField.value);
+                if (error && passwordConfirmField.value) {
+                    showError(errors.passwordConfirm, error, passwordConfirmField);
+                } else if (passwordConfirmField.value) {
+                    hideError(errors.passwordConfirm, passwordConfirmField);
+                }
+            });
+
+            passwordConfirmField.addEventListener("blur", () => {
+                const error = validatePasswordConfirm(passwordConfirmField.value, passwordField.value);
+                if (error) {
+                    showError(errors.passwordConfirm, error, passwordConfirmField);
+                } else {
+                    hideError(errors.passwordConfirm, passwordConfirmField);
+                }
+            });
+
+            // Also trigger password validation on confirm input (for length if confirm changes)
+            passwordConfirmField.addEventListener("input", () => {
+                if (passwordField.value) {
+                    const pwError = validatePassword(passwordField.value);
+                    if (pwError) {
+                        showError(errors.password, pwError, passwordField);
+                    }
+                }
+            });
+        }
+
+        // Form submit validation
+        form.addEventListener("submit", (e) => {
+            let isValid = true;
+
+            // Name
+            const nameError = validateName(nameField.value);
+            if (nameError) {
+                showError(errors.name, nameError, nameField);
+                isValid = false;
+            }
+
+            // Email
+            const emailError = validateEmail(emailField.value);
+            if (emailError) {
+                showError(errors.email, emailError, emailField);
+                isValid = false;
+            }
+
+            // Country
+            const countryError = validateCountry(countryField.value);
+            if (countryError) {
+                showError(errors.country, countryError, countryField);
+                isValid = false;
+            }
+
+            // Tier and Promo
+            const tierError = validateTier();
+            if (tierError) {
+                showError(errors.tier, tierError);
+                isValid = false;
+            }
+
+            if (isNewRecord) {
+                // Password
+                const passwordError = validatePassword(passwordField.value);
+                if (passwordError) {
+                    showError(errors.password, passwordError, passwordField);
+                    isValid = false;
+                }
+
+                // Password confirm
+                const confirmError = validatePasswordConfirm(passwordConfirmField.value, passwordField.value);
+                if (confirmError) {
+                    showError(errors.passwordConfirm, confirmError, passwordConfirmField);
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                submitBtn.textContent = "Please fix errors above";
+                setTimeout(() => {
+                    submitBtn.textContent = isNewRecord ? "Create Account" : "Update Profile";
+                }, 3000);
+            }
+        });
+
+        // Initial validation
         updateTierAvailability();
+        [nameField, emailField].forEach(field => {
+            if (field.value) {
+                const validator = field.id === "name-field" ? validateName :
+                    validateEmail;
+                const error = validator(field.value);
+                if (error) {
+                    const errorKey = field.id.replace('-field', '');
+                    showError(errors[errorKey], error, field);
+                } else {
+                    const errorKey = field.id.replace('-field', '');
+                    hideError(errors[errorKey], field);
+                }
+            }
+        });
+        if (countryField.value) {
+            hideError(errors.country, countryField);
+        }
+        if (initialTier) {
+            const initialRadio = document.querySelector(`input[value="${initialTier}"]`);
+            if (initialRadio) {
+                initialRadio.dispatchEvent(new Event("change"));
+            }
+        }
+        if (isNewRecord) {
+            // For initial, trigger blur simulation if values present
+            if (passwordField.value) {
+                passwordField.dispatchEvent(new Event("blur"));
+            }
+            if (passwordConfirmField.value) {
+                passwordConfirmField.dispatchEvent(new Event("input"));
+                passwordConfirmField.dispatchEvent(new Event("blur"));
+            }
+        }
     });
 </script>
