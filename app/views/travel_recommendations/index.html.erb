@@ -25,20 +25,22 @@
         <div class="row g-3">
           <div class="col-md-6">
             <%= f.label :name, "Trip Name", class: "form-label" %>
-            <%= f.text_field :name, class: "form-control", placeholder: "e.g., Thanksgiving Getaway" %>
+            <%= f.text_field :name, class: "form-control", placeholder: "e.g., Thanksgiving Getaway", id: "trip-name-field", maxlength: 75 %>
+            <div class="invalid-feedback" id="trip-name-error"></div>
           </div>
           <div class="col-md-6">
             <%= f.label :passport_country, "Passport/Citizenship Country", class: "form-label" %>
             <%= f.select :passport_country,
-                options_for_select(@countries, @travel_plan.passport_country),
-                { prompt: "Select your country" },
-                class: "form-select" %>
+                         options_for_select(@countries, @travel_plan.passport_country),
+                         { prompt: "Select your country" },
+                         class: "form-select" %>
           </div>
 
           <div class="col-md-6">
             <%= f.label :current_location, "Current Location", class: "form-label" %>
             <span class="text-danger">*</span>
-            <%= f.text_field :current_location, class: "form-control", placeholder: "e.g., Chicago, Illinois", required: true %>
+            <%= f.text_field :current_location, class: "form-control", placeholder: "e.g., Chicago, Illinois", required: true, id: "current-location-field", maxlength: 50 %>
+            <div class="invalid-feedback" id="current-location-error"></div>
             <small class="text-muted">Where are you traveling from?</small>
           </div>
 
@@ -47,22 +49,26 @@
             <%= f.label :start_date, "Start Date", class: "form-label" %>
             <span class="text-danger">*</span>
             <%= f.date_field :start_date, class: "form-control", id: "start_date", min: Date.today, required: true %>
+            <div class="invalid-feedback" id="start-date-error"></div>
             <small class="text-muted">Trip start date</small>
           </div>
           <div class="col-md-3">
-            <%= f.label :end_date, "End Date", class: "form-label" %>
+            <%= f.label :end_date, "End Date", class:"form-label" %>
             <span class="text-danger">*</span>
             <%= f.date_field :end_date, class: "form-control", id: "end_date", min: Date.today, required: true %>
+            <div class="invalid-feedback" id="end-date-error"></div>
             <small class="text-muted">Trip end date</small>
           </div>
 
           <div class="col-md-3">
             <%= f.label :budget_min, "Min Budget ($)", class: "form-label" %>
-            <%= f.number_field :budget_min, class: "form-control", step: 100 %>
+            <%= f.number_field :budget_min, class: "form-control", step: 100, id: "budget-min-field", maxlength: 9, min: 0 %>
+            <div class="invalid-feedback" id="budget-min-error"></div>
           </div>
           <div class="col-md-3">
             <%= f.label :budget_max, "Max Budget ($)", class: "form-label" %>
-            <%= f.number_field :budget_max, class: "form-control", step: 100 %>
+            <%= f.number_field :budget_max, class: "form-control", step: 100, id: "budget-max-field", maxlength: 9, min: 0 %>
+            <div class="invalid-feedback" id="budget-max-error"></div>
           </div>
 
           <div class="col-md-6">
@@ -75,15 +81,17 @@
             <%= f.label :safety_preference, "Acceptable Safety Levels", class: "form-label" %>
             <span class="text-danger">*</span>
             <%= f.select :safety_preference,
-                [
-                  ["Level 1 - Safe Destinations (Exercise normal precautions)", "Very Safe"],
-                  ["Level 2 - Moderate Caution (Exercise increased caution)", "Generally Safe"],
-                  ["Level 3 - High Risk (Reconsider travel)", "Partly Safe"],
-                  ["Level 4 - Extreme Risk (Do not travel, Adventure style only)", "Not Safe"]
-                ],
-                { prompt: "Select safety level" },
-                class: "form-select",
-                required: true %>
+                         [
+                           ["Level 1 - Safe Destinations (Exercise normal precautions)", "Very Safe"],
+                           ["Level 2 - Moderate Caution (Exercise increased caution)", "Generally Safe"],
+                           ["Level 3 - High Risk (Reconsider travel)", "Partly Safe"],
+                           ["Level 4 - Extreme Risk (Do not travel, Adventure style only)", "Not Safe"]
+                         ],
+                         { prompt: "Select safety level" },
+                         class: "form-select",
+                         required: true,
+                         id: "safety-preference-field" %>
+            <div class="invalid-feedback" id="safety-preference-error"></div>
             <small class="text-muted">
               <svg width="14" height="14" fill="currentColor" class="bi bi-shield-check" viewBox="0 0 16 16">
                 <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
@@ -104,12 +112,13 @@
 
           <div class="col-12">
             <%= f.label :general_purpose, "Purpose of Trip (Optional)", class: "form-label" %>
-            <%= f.text_area :general_purpose, class: "form-control", rows: 3, placeholder: "e.g., I want to relax during Thanksgiving break, preferably somewhere in Japan or South Korea. I love hot springs and nature." %>
+            <%= f.text_area :general_purpose, class: "form-control", rows: 3, placeholder: "e.g., I want to relax during Thanksgiving break, preferably somewhere in Japan or South Korea. I love hot springs and nature.", id: "purpose-field", maxlength: 250 %>
+            <div class="invalid-feedback" id="purpose-error"></div>
             <small class="text-muted"><strong>Optional but recommended:</strong> Mention any countries, cities, activities, or experiences you're interested in. This helps us provide better personalized recommendations.</small>
           </div>
         </div>
         <div class="mt-4 text-center">
-          <%= f.submit "Get Recommendations", class: "btn btn-success btn-lg" %>
+          <%= f.submit "Get Recommendations", class: "btn btn-success btn-lg", id: "submit-btn" %>
         </div>
       <% end %>
     </div>
@@ -118,6 +127,8 @@
   <%# Render the recommendations partial inside the Turbo Frame %>
   <%= render 'recommendations_list', recommendations: @recommendations %>
 </div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places&callback=initAutocomplete" async defer></script>
 
 <%# The JavaScript for saving form state and validation logic %>
 <script>
@@ -129,7 +140,238 @@
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         const travelStyleSelect = document.getElementById('travel_style');
-        const safetyPreferenceSelect = document.querySelector('select[name="travel_plan[safety_preference]"]');
+        const safetyPreferenceSelect = document.getElementById('safety-preference-field');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // DOM elements for validation
+        const currentLocationField = document.getElementById('current-location-field');
+        const budgetMinField = document.getElementById('budget-min-field');
+        const budgetMaxField = document.getElementById('budget-max-field');
+
+        // Error elements
+        const errors = {
+            currentLocation: document.getElementById('current-location-error'),
+            startDate: document.getElementById('start-date-error'),
+            endDate: document.getElementById('end-date-error'),
+            safetyPreference: document.getElementById('safety-preference-error'),
+            budgetMin: document.getElementById('budget-min-error'),
+            budgetMax: document.getElementById('budget-max-error')
+        };
+
+        let locationValid = null; // Track validity state for submit
+
+        // NEW: Enforce 9-digit limit on budget fields (on input & paste)
+        function enforceMaxDigits(input, maxDigits = 9) {
+            input.addEventListener('input', function(e) {
+                let value = this.value.replace(/[^0-9]/g, ''); // Remove non-digits
+                if (value.length > maxDigits) {
+                    value = value.slice(0, maxDigits);
+                }
+                this.value = value;
+            });
+
+            input.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    let value = this.value.replace(/[^0-9]/g, '');
+                    if (value.length > maxDigits) {
+                        value = value.slice(0, maxDigits);
+                    }
+                    this.value = value;
+                }, 0);
+            });
+        }
+
+        if (budgetMinField) enforceMaxDigits(budgetMinField, 9);
+        if (budgetMaxField) enforceMaxDigits(budgetMaxField, 9);
+
+        // Validation functions for required fields
+        function validateCurrentLocation(value) {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                return "Current location is required.";
+            }
+            return null;
+        }
+
+        function validateStartDate(value) {
+            if (!value) {
+                return "Start date is required.";
+            }
+            return null;
+        }
+
+        function validateEndDate(value) {
+            if (!value) {
+                return "End date is required.";
+            }
+            return null;
+        }
+
+        function validateSafetyPreference(value) {
+            if (!value || value === "") {
+                return "Safety preference is required.";
+            }
+            return null;
+        }
+
+        function validateBudgetMin(value) {
+            if (!value) return null; // Optional
+            const numValue = parseFloat(value);
+            if (isNaN(numValue) || numValue < 0) {
+                return "Min budget must be a positive number.";
+            }
+            if (value.toString().replace(/\./g, '').length > 9) {
+                return "Min budget cannot exceed 9 digits.";
+            }
+            return null;
+        }
+
+        function validateBudgetMax(value, minValue) {
+            if (!value) return null; // Optional
+            const numValue = parseFloat(value);
+            if (isNaN(numValue) || numValue < 0) {
+                return "Max budget must be a positive number.";
+            }
+            if (value.toString().replace(/\./g, '').length > 9) {
+                return "Max budget cannot exceed 9 digits.";
+            }
+            if (minValue && numValue < parseFloat(minValue)) {
+                return "Max budget must be greater than or equal to min budget.";
+            }
+            return null;
+        }
+
+        // UI update functions
+        function showError(errorElement, message, inputElement) {
+            if (errorElement) {
+                errorElement.textContent = message;
+            }
+            inputElement.classList.add("is-invalid");
+            inputElement.classList.remove("is-valid");
+        }
+
+        function hideError(errorElement, inputElement) {
+            if (errorElement) {
+                errorElement.textContent = "";
+            }
+            inputElement.classList.remove("is-invalid");
+            inputElement.classList.add("is-valid");
+        }
+
+        // Function to validate location via Google Places API
+        function validateLocationWithAPI(inputValue, callback) {
+            if (!inputValue.trim()) {
+                callback(true); // Empty is handled separately
+                return;
+            }
+
+            const service = new google.maps.places.PlacesService(document.createElement('div'));
+            const request = {
+                query: inputValue,
+                fields: ['place_id']
+            };
+
+            service.findPlaceFromQuery(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                    callback(true); // Valid location
+                } else {
+                    callback(false); // Invalid location
+                }
+            });
+        }
+
+        // Blur validation for current location (required + validity)
+        if (currentLocationField) {
+            currentLocationField.addEventListener("blur", () => {
+                const trimmedValue = currentLocationField.value.trim();
+                let errorMsg = "";
+
+                // Required check
+                if (!trimmedValue) {
+                    errorMsg = "Current location is required.";
+                    showError(errors.currentLocation, errorMsg, currentLocationField);
+                    locationValid = false;
+                    return;
+                }
+
+                // API validity check (async)
+                validateLocationWithAPI(trimmedValue, (valid) => {
+                    if (!valid) {
+                        errorMsg = "Please enter a valid location.";
+                        showError(errors.currentLocation, errorMsg, currentLocationField);
+                        locationValid = false;
+                    } else {
+                        hideError(errors.currentLocation, currentLocationField);
+                        locationValid = true;
+                    }
+                });
+            });
+        }
+
+        if (startDateInput) {
+            startDateInput.addEventListener("blur", () => {
+                const error = validateStartDate(startDateInput.value);
+                if (error) {
+                    showError(errors.startDate, error, startDateInput);
+                } else {
+                    hideError(errors.startDate, startDateInput);
+                }
+            });
+        }
+
+        if (endDateInput) {
+            endDateInput.addEventListener("blur", () => {
+                const error = validateEndDate(endDateInput.value);
+                if (error) {
+                    showError(errors.endDate, error, endDateInput);
+                } else {
+                    hideError(errors.endDate, endDateInput);
+                }
+            });
+        }
+
+        if (safetyPreferenceSelect) {
+            safetyPreferenceSelect.addEventListener("change", () => {
+                const error = validateSafetyPreference(safetyPreferenceSelect.value);
+                if (error) {
+                    showError(errors.safetyPreference, error, safetyPreferenceSelect);
+                } else {
+                    hideError(errors.safetyPreference, safetyPreferenceSelect);
+                }
+            });
+        }
+
+        // Blur validation for budget fields
+        if (budgetMinField) {
+            budgetMinField.addEventListener("blur", () => {
+                const error = validateBudgetMin(budgetMinField.value);
+                if (error) {
+                    showError(errors.budgetMin, error, budgetMinField);
+                } else {
+                    hideError(errors.budgetMin, budgetMinField);
+                }
+                // Re-validate max if min changed
+                if (budgetMaxField.value) {
+                    const maxError = validateBudgetMax(budgetMaxField.value, budgetMinField.value);
+                    if (maxError) {
+                        showError(errors.budgetMax, maxError, budgetMaxField);
+                    } else {
+                        hideError(errors.budgetMax, budgetMaxField);
+                    }
+                }
+            });
+        }
+
+        if (budgetMaxField) {
+            budgetMaxField.addEventListener("blur", () => {
+                const maxError = validateBudgetMax(budgetMaxField.value, budgetMinField ? budgetMinField.value : '');
+                if (maxError) {
+                    showError(errors.budgetMax, maxError, budgetMaxField);
+                } else {
+                    hideError(errors.budgetMax, budgetMaxField);
+                }
+            });
+        }
 
         // Date validation logic
         if (startDateInput && endDateInput) {
@@ -159,12 +401,106 @@
             });
         }
 
-        // Form submission validation - ensure safety preference is selected
+        // Form submission validation
         form.addEventListener('submit', function(event) {
-            if (safetyPreferenceSelect && !safetyPreferenceSelect.value) {
+            let isValid = true;
+            let locationErrorMsg = "";
+
+            // Current Location (required + validity)
+            if (currentLocationField) {
+                const trimmedValue = currentLocationField.value.trim();
+                if (!trimmedValue) {
+                    locationErrorMsg = "Current location is required.";
+                    showError(errors.currentLocation, locationErrorMsg, currentLocationField);
+                    isValid = false;
+                } else if (locationValid === false) {
+                    locationErrorMsg = "Please enter a valid location.";
+                    showError(errors.currentLocation, locationErrorMsg, currentLocationField);
+                    isValid = false;
+                } else if (locationValid === null) {
+                    // If not yet validated, check now
+                    validateLocationWithAPI(trimmedValue, (valid) => {
+                        if (!valid) {
+                            locationErrorMsg = "Please enter a valid location.";
+                            showError(errors.currentLocation, locationErrorMsg, currentLocationField);
+                            isValid = false;
+                        } else {
+                            locationValid = true;
+                            hideError(errors.currentLocation, currentLocationField);
+                        }
+                        // Re-check overall validity after API
+                        if (!isValid) {
+                            event.preventDefault();
+                            if (submitBtn) {
+                                const originalText = submitBtn.textContent;
+                                submitBtn.textContent = "Please fix errors above";
+                                setTimeout(() => {
+                                    submitBtn.textContent = originalText;
+                                }, 3000);
+                            }
+                        } else {
+                            form.submit();
+                        }
+                    });
+                    event.preventDefault(); // Wait for API
+                    return false;
+                }
+            }
+
+            // Budget Min
+            if (budgetMinField) {
+                const minError = validateBudgetMin(budgetMinField.value);
+                if (minError) {
+                    showError(errors.budgetMin, minError, budgetMinField);
+                    isValid = false;
+                }
+            }
+
+            // Budget Max
+            if (budgetMaxField) {
+                const maxError = validateBudgetMax(budgetMaxField.value, budgetMinField ? budgetMinField.value : '');
+                if (maxError) {
+                    showError(errors.budgetMax, maxError, budgetMaxField);
+                    isValid = false;
+                }
+            }
+
+            // Start Date
+            if (startDateInput) {
+                const startError = validateStartDate(startDateInput.value);
+                if (startError) {
+                    showError(errors.startDate, startError, startDateInput);
+                    isValid = false;
+                }
+            }
+
+            // End Date
+            if (endDateInput) {
+                const endError = validateEndDate(endDateInput.value);
+                if (endError) {
+                    showError(errors.endDate, endError, endDateInput);
+                    isValid = false;
+                }
+            }
+
+            // Safety preference
+            if (safetyPreferenceSelect) {
+                const safetyError = validateSafetyPreference(safetyPreferenceSelect.value);
+                if (safetyError) {
+                    showError(errors.safetyPreference, safetyError, safetyPreferenceSelect);
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
                 event.preventDefault();
-                alert('Please select a safety level preference.');
-                safetyPreferenceSelect.focus();
+                if (submitBtn) {
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = "Please fix errors above";
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                    }, 3000);
+                }
                 return false;
             }
 
@@ -201,5 +537,87 @@
 
         loadFormData();
         form.addEventListener('input', saveFormData);
+
+        // Initial validation for pre-filled required fields
+        if (currentLocationField && currentLocationField.value) {
+            const trimmedValue = currentLocationField.value.trim();
+            if (trimmedValue) {
+                validateLocationWithAPI(trimmedValue, (valid) => {
+                    if (!valid) {
+                        showError(errors.currentLocation, "Please enter a valid location.", currentLocationField);
+                        locationValid = false;
+                    } else {
+                        hideError(errors.currentLocation, currentLocationField);
+                        locationValid = true;
+                    }
+                });
+            } else {
+                showError(errors.currentLocation, "Current location is required.", currentLocationField);
+                locationValid = false;
+            }
+        }
+        if (startDateInput && startDateInput.value) {
+            const error = validateStartDate(startDateInput.value);
+            if (error) {
+                showError(errors.startDate, error, startDateInput);
+            } else {
+                hideError(errors.startDate, startDateInput);
+            }
+        }
+        if (endDateInput && endDateInput.value) {
+            const error = validateEndDate(endDateInput.value);
+            if (error) {
+                showError(errors.endDate, error, endDateInput);
+            } else {
+                hideError(errors.endDate, endDateInput);
+            }
+        }
+        if (safetyPreferenceSelect && safetyPreferenceSelect.value) {
+            const error = validateSafetyPreference(safetyPreferenceSelect.value);
+            if (error) {
+                showError(errors.safetyPreference, error, safetyPreferenceSelect);
+            } else {
+                hideError(errors.safetyPreference, safetyPreferenceSelect);
+            }
+        }
+
+        // Initial budget validation
+        if (budgetMinField && budgetMinField.value) {
+            const minError = validateBudgetMin(budgetMinField.value);
+            if (minError) {
+                showError(errors.budgetMin, minError, budgetMinField);
+            } else {
+                hideError(errors.budgetMin, budgetMinField);
+            }
+        }
+        if (budgetMaxField && budgetMaxField.value) {
+            const maxError = validateBudgetMax(budgetMaxField.value, budgetMinField ? budgetMinField.value : '');
+            if (maxError) {
+                showError(errors.budgetMax, maxError, budgetMaxField);
+            } else {
+                hideError(errors.budgetMax, budgetMaxField);
+            }
+        }
     });
+
+    function initAutocomplete() {
+        const currentLocationField = document.getElementById('current-location-field');
+        if (currentLocationField) {
+            const autocomplete = new google.maps.places.Autocomplete(currentLocationField);
+            autocomplete.setFields(['address_components', 'formatted_address']);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    const circle = new google.maps.Circle({
+                        center: geolocation,
+                        radius: Math.pow(2, 31)
+                    });
+                    autocomplete.setBounds(circle.getBounds());
+                });
+            }
+        }
+    }
 </script>

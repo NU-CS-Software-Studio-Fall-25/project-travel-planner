@@ -9,13 +9,13 @@
           <%= form_with url: login_path, method: :post, local: true, id: "login-form" do |form| %>
             <div class="mb-3">
               <%= form.label :email, class: "form-label" %>
-              <%= form.email_field :email, class: "form-control", placeholder: "Enter your email", required: true, id: "login-email-field", maxlength: 75 %>
+              <%= form.email_field :email, class: "form-control", placeholder: "Enter your email", required: true, id: "login-email-field", maxlength: 60 %>
               <div class="invalid-feedback" id="login-email-error"></div>
             </div>
 
             <div class="mb-3">
               <%= form.label :password, class: "form-label" %>
-              <%= form.password_field :password, class: "form-control", placeholder: "Enter your password", required: true, id: "login-password-field", maxlength: 75 %>
+              <%= form.password_field :password, class: "form-control", placeholder: "Enter your password", required: true, id: "login-password-field", maxlength: 60 %>
               <div class="invalid-feedback" id="login-password-error"></div>
             </div>
 
@@ -47,7 +47,7 @@
             password: document.getElementById("login-password-error")
         };
 
-        const MAX_LENGTH = 75;
+        const MAX_LENGTH = 60;
 
         // Validation functions
         function validateEmail(value) {
@@ -75,34 +75,35 @@
         }
 
         // UI update functions
-        function showError(element, message) {
-            element.textContent = message;
-            element.parentElement.classList.add("is-invalid");
-            element.parentElement.classList.remove("is-valid");
+        function showError(errorElement, message, inputElement) {
+            errorElement.textContent = message;
+            inputElement.classList.add("is-invalid");
+            inputElement.classList.remove("is-valid");
         }
 
-        function hideError(element) {
-            element.textContent = "";
-            element.parentElement.classList.remove("is-invalid");
-            element.parentElement.classList.add("is-valid");
+        function hideError(errorElement, inputElement) {
+            errorElement.textContent = "";
+            inputElement.classList.remove("is-invalid");
+            inputElement.classList.add("is-valid");
         }
 
-        // Real-time validation on input
-        emailField.addEventListener("input", () => {
+        // Validation on blur for email
+        emailField.addEventListener("blur", () => {
             const error = validateEmail(emailField.value);
             if (error) {
-                showError(errors.email, error);
+                showError(errors.email, error, emailField);
             } else {
-                hideError(errors.email);
+                hideError(errors.email, emailField);
             }
         });
 
-        passwordField.addEventListener("input", () => {
+        // Validation on blur for password
+        passwordField.addEventListener("blur", () => {
             const error = validatePassword(passwordField.value);
             if (error) {
-                showError(errors.password, error);
+                showError(errors.password, error, passwordField);
             } else {
-                hideError(errors.password);
+                hideError(errors.password, passwordField);
             }
         });
 
@@ -113,14 +114,14 @@
             // Email
             const emailError = validateEmail(emailField.value);
             if (emailError) {
-                showError(errors.email, emailError);
+                showError(errors.email, emailError, emailField);
                 isValid = false;
             }
 
             // Password
             const passwordError = validatePassword(passwordField.value);
             if (passwordError) {
-                showError(errors.password, passwordError);
+                showError(errors.password, passwordError, passwordField);
                 isValid = false;
             }
 
@@ -137,8 +138,13 @@
         [emailField, passwordField].forEach(field => {
             if (field.value) {
                 const validator = field.id === "login-email-field" ? validateEmail : validatePassword;
-                if (!validator(field.value)) {
-                    field.parentElement.classList.add("is-valid");
+                const error = validator(field.value);
+                if (error) {
+                    const errorKey = field.id === "login-email-field" ? "email" : "password";
+                    showError(errors[errorKey], error, field);
+                } else {
+                    const errorKey = field.id === "login-email-field" ? "email" : "password";
+                    hideError(errors[errorKey], field);
                 }
             }
         });
