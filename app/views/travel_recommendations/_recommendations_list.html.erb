@@ -50,6 +50,33 @@
                         </div>
                       </div>
                     </div>
+
+                    <!-- TripAdvisor Images Section -->
+                    <div class="accordion mb-3" id="accordion-images-<%= index %>">
+                      <div class="accordion-item border-0 rounded-3 shadow-sm">
+                        <h2 class="accordion-header" id="heading-images-<%= index %>">
+                          <button class="accordion-button collapsed fw-semibold text-primary bg-white"
+                                  type="button"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target="#collapse-images-<%= index %>"
+                                  aria-expanded="false"
+                                  aria-controls="collapse-images-<%= index %>"
+                                  onclick="loadTripAdvisorImages(<%= index %>, '<%= rec[:destination_city] %>', '<%= rec[:destination_country] %>')">
+                            <i class="bi bi-images me-2"></i> Images of the Place
+                          </button>
+                        </h2>
+                        <div id="collapse-images-<%= index %>" class="accordion-collapse collapse">
+                          <div class="accordion-body">
+                            <div id="images-container-<%= index %>" class="text-center py-3" data-city="<%= rec[:destination_city] %>" data-country="<%= rec[:destination_country] %>">
+                              <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading images...</span>
+                              </div>
+                              <p class="mt-2 text-muted">Loading images from TripAdvisor...</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   <% end %>
                 </div>
 
@@ -260,4 +287,354 @@
     .accordion-button:focus {
         box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.3) !important;
     }
+
+    /* --- TripAdvisor Image Gallery Styles --- */
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .image-gallery-item {
+        position: relative;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .image-gallery-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+
+    .image-gallery-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .quality-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #000;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .quality-badge i {
+        font-size: 0.7rem;
+    }
+
+    .image-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        color: white;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+
+    .tripadvisor-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #34e0a1 0%, #00af87 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tripadvisor-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 175, 135, 0.3);
+        color: white;
+    }
+
+    /* Modal styles for zoomed image */
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-modal.active {
+        display: flex;
+    }
+
+    .image-modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        border-radius: 0.5rem;
+    }
+
+    .image-modal-close {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .image-modal-close:hover,
+    .image-modal-close:focus {
+        color: #bbb;
+    }
+
+    .image-modal-caption {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+        max-width: 80%;
+    }
 </style>
+
+<!-- Image Zoom Modal -->
+<div id="imageModal" class="image-modal" role="dialog" aria-modal="true" aria-labelledby="modal-caption">
+  <span class="image-modal-close" onclick="closeImageModal()" role="button" aria-label="Close image viewer">&times;</span>
+  <img class="image-modal-content" id="modalImage" alt="">
+  <div class="image-modal-caption" id="modal-caption"></div>
+</div>
+
+<script>
+  // Cache for storing fetched images in sessionStorage
+  function getCacheKey(city, country) {
+    return `tripadvisor_${city}_${country}`.replace(/[^a-zA-Z0-9_]/g, '_');
+  }
+
+  function loadTripAdvisorImages(index, destinationCity, destinationCountry) {
+    const container = document.getElementById(`images-container-${index}`);
+    const cacheKey = getCacheKey(destinationCity, destinationCountry);
+    
+    // Check if already loaded in DOM
+    if (container.dataset.loaded === 'true') {
+      return;
+    }
+    
+    // Check sessionStorage cache
+    const cachedData = sessionStorage.getItem(cacheKey);
+    if (cachedData) {
+      try {
+        const data = JSON.parse(cachedData);
+        console.log('📦 Loading from cache:', data);
+        displayImages(container, data, index);
+        container.dataset.loaded = 'true';
+        return;
+      } catch (e) {
+        console.error('Error parsing cached data:', e);
+      }
+    }
+    
+    // Fetch via server-side proxy (to avoid CORS issues)
+    console.log('🔍 Fetching TripAdvisor data via server for:', destinationCity, destinationCountry);
+    const url = `/travel_recommendations/fetch_photos?destination_city=${encodeURIComponent(destinationCity)}&destination_country=${encodeURIComponent(destinationCountry)}`;
+    
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('✅ Received data from server:', data);
+        // Cache the result
+        sessionStorage.setItem(cacheKey, JSON.stringify(data));
+        
+        displayImages(container, data, index);
+        container.dataset.loaded = 'true';
+      })
+      .catch(error => {
+        console.error('❌ Error fetching TripAdvisor images:', error);
+        container.innerHTML = `
+          <div class="alert alert-warning" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Unable to load images at this time. Please try again later.
+            <br><small class="text-muted">Error: ${error.message}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-primary mt-2" onclick="retryLoadImages(${index})">
+            <i class="bi bi-arrow-clockwise me-1"></i> Retry
+          </button>
+        `;
+      });
+  }
+
+  function displayImages(container, data, index) {
+    if (!data.success || !data.photos || data.photos.length === 0) {
+      const city = container.dataset.city || 'this destination';
+      const country = container.dataset.country || '';
+      
+      container.innerHTML = `
+        <div class="alert alert-info" role="alert">
+          <i class="bi bi-info-circle me-2"></i>
+          No images available for ${city}, ${country} at the moment.
+          ${data.error ? `<br><small class="text-muted">Error: ${data.error}</small>` : ''}
+        </div>
+        <button class="btn btn-sm btn-outline-primary mt-2" onclick="retryLoadImages(${index})">
+          <i class="bi bi-arrow-clockwise me-1"></i> Retry
+        </button>
+      `;
+      return;
+    }
+
+    let html = '<div class="image-gallery" role="list">';
+    
+    data.photos.forEach((photo, photoIndex) => {
+      // Add a badge for blessed (high-quality) photos
+      const blessedBadge = photo.is_blessed ? 
+        '<span class="quality-badge" title="High Quality Photo"><i class="bi bi-star-fill"></i></span>' : '';
+      
+      html += `
+        <div class="image-gallery-item" 
+             role="listitem"
+             onclick="openImageModal('${photo.url}', '${escapeHtml(photo.caption)}')"
+             onkeypress="if(event.key==='Enter') openImageModal('${photo.url}', '${escapeHtml(photo.caption)}')"
+             tabindex="0"
+             aria-label="View image: ${escapeHtml(photo.caption)}">
+          ${blessedBadge}
+          <img src="${photo.url}" 
+               alt="${escapeHtml(photo.caption)}"
+               loading="lazy">
+          <div class="image-caption">${escapeHtml(photo.caption)}</div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    
+    // Add TripAdvisor link if available
+    if (data.web_url) {
+      html += `
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <a href="${data.web_url}" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             class="tripadvisor-link"
+             aria-label="Visit ${escapeHtml(data.location_name || 'this location')} on TripAdvisor">
+            <i class="bi bi-box-arrow-up-right"></i>
+            View more on TripAdvisor
+          </a>
+          <button class="btn btn-sm btn-outline-secondary" onclick="retryLoadImages(${index})">
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Images
+          </button>
+        </div>
+      `;
+    }
+    
+    container.innerHTML = html;
+  }
+
+  function retryLoadImages(index) {
+    const container = document.getElementById(`images-container-${index}`);
+    const city = container.dataset.city;
+    const country = container.dataset.country;
+    const cacheKey = getCacheKey(city, country);
+    
+    // Clear cache for this location
+    sessionStorage.removeItem(cacheKey);
+    
+    // Reset loaded flag
+    container.dataset.loaded = 'false';
+    
+    // Show loading state
+    container.innerHTML = `
+      <div class="text-center py-3">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading images...</span>
+        </div>
+        <p class="mt-2 text-muted">Fetching fresh images from TripAdvisor...</p>
+      </div>
+    `;
+    
+    // Reload images
+    loadTripAdvisorImages(index, city, country);
+  }
+
+  function openImageModal(url, caption) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modal-caption');
+    
+    modal.classList.add('active');
+    modalImg.src = url;
+    modalImg.alt = caption;
+    modalCaption.textContent = caption;
+    
+    // Trap focus in modal
+    modal.focus();
+    
+    // Add keyboard support
+    document.addEventListener('keydown', handleModalKeydown);
+  }
+
+  function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('active');
+    document.removeEventListener('keydown', handleModalKeydown);
+  }
+
+  function handleModalKeydown(e) {
+    if (e.key === 'Escape') {
+      closeImageModal();
+    }
+  }
+
+  function escapeHtml(text) {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  // Close modal when clicking outside the image
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          closeImageModal();
+        }
+      });
+    }
+  });
+</script>

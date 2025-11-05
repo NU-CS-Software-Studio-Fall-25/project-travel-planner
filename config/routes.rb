@@ -22,7 +22,11 @@ Rails.application.routes.draw do
   end
 
   # Traditional web routes (for backward compatibility)
-  resources :travel_recommendations, only: [:index, :show, :new, :create]
+  resources :travel_recommendations, only: [:index, :show, :new, :create] do
+    collection do
+      get 'fetch_photos', to: 'travel_recommendations#fetch_photos'
+    end
+  end
   resources :travel_plans
   resources :destinations
   resources :users

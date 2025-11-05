@@ -79,6 +79,22 @@ class TravelRecommendationsController < ApplicationController
     end
   end
 
+  # New action to fetch TripAdvisor photos for a destination
+  def fetch_photos
+    destination_city = params[:destination_city]
+    destination_country = params[:destination_country]
+    
+    unless destination_city.present? && destination_country.present?
+      render json: { success: false, error: 'Missing destination information' }, status: :bad_request
+      return
+    end
+
+    tripadvisor_service = TripadvisorService.new
+    result = tripadvisor_service.get_location_photos(destination_city, destination_country, 7)
+    
+    render json: result
+  end
+
   private
 
   def travel_plan_params
