@@ -3,15 +3,14 @@ class DestinationsController < ApplicationController
 
   # GET /destinations or /destinations.json
   def index
-    @destinations = Destination.all
-    
-    # Separate destinations into domestic and international if user is logged in
-    if current_user && current_user.current_country.present?
-      @domestic_destinations = @destinations.where(country: current_user.current_country)
-      @international_destinations = @destinations.where.not(country: current_user.current_country)
+    all = Destination.all.order(:name)
+
+    if current_user&.current_country.present?
+      @pagy_domestic, @domestic_destinations     = pagy(all.where(country: current_user.current_country), items: 10)
+      @pagy_international, @international_destinations = pagy(all.where.not(country: current_user.current_country), items: 10)
     else
+      @pagy_international, @international_destinations = pagy(all, items: 20)
       @domestic_destinations = []
-      @international_destinations = @destinations
     end
   end
 

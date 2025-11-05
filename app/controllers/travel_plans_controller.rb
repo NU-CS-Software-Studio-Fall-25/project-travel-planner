@@ -1,11 +1,12 @@
 # app/controllers/travel_plans_controller.rb
 class TravelPlansController < ApplicationController
+  include Pagy::Backend if defined?(Pagy::Backend)
   before_action :set_travel_plan, only: %i[ show edit update destroy ]
   before_action :require_login
 
   # GET /travel_plans or /travel_plans.json
   def index
-    @travel_plans = current_user.travel_plans
+    @pagy, @travel_plans = pagy(current_user.travel_plans.order(created_at: :desc), items: 10)
   end
 
   # GET /travel_plans/1 or /travel_plans/1.json
