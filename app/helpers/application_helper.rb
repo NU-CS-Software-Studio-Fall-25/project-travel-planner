@@ -7,7 +7,6 @@ module ApplicationHelper
     # Minimal pagy_nav fallback that renders Previous / Next links.
     # This keeps views from crashing when Pagy frontend isn't available.
     def pagy_nav(pagy, id = nil, pagy_nav_partial: nil)
-      # pagy is expected to respond to .page and .pages in our fallback
       current = (params[:page] || pagy&.page || 1).to_i
       prev_link = nil
       next_link = nil
@@ -26,9 +25,10 @@ module ApplicationHelper
         safe_join([prev_link, next_link].compact, ' ')
       end
     end
+
     # Minimal pagy_bootstrap_nav fallback used when Pagy::Frontend (bootstrap extra)
-# isn't available. It renders simple Bootstrap-style Prev / Next links and
-# preserves other query params.
+    # isn't available. It renders simple Bootstrap-style Prev / Next links and
+    # preserves other query params.
     def pagy_bootstrap_nav(pagy)
       return ''.html_safe unless pagy && pagy.respond_to?(:pages) && (pagy.pages || 1).to_i > 1
 

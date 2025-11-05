@@ -9,6 +9,8 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   before_action :current_user
+
+  # Provide a small pagy_array fallback for array pagination when Pagy isn't available.
   def pagy_array(array, **vars)
     page  = (params[:page] || 1).to_i
     items = vars[:items] || (defined?(Pagy::VARS) ? Pagy::VARS[:items] : 20)
@@ -16,9 +18,7 @@ class ApplicationController < ActionController::Base
     offset = (page - 1) * items
     pages = items > 0 ? (total.to_f / items).ceil : 1
 
-    # Minimal pagy-like object used by views/controllers expecting a Pagy object:
     pagy_obj = Struct.new(:count, :page, :items, :pages).new(total, page, items, pages)
-
     page_collection = Array(array)[offset, items] || []
 
     [pagy_obj, page_collection]
@@ -39,7 +39,6 @@ class ApplicationController < ActionController::Base
       items = vars[:items] || (defined?(Pagy::VARS) ? Pagy::VARS[:items] : 20)
       total = collection.respond_to?(:count) ? collection.count : Array(collection).size
       offset = (page - 1) * items
-      # Build fallback pagy object
       pages = items > 0 ? (total.to_f / items).ceil : 1
       pagy_obj = PagyFallback.new(total, page, items, pages)
 
