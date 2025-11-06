@@ -1,0 +1,26 @@
+<% if places.present? && places.any? %>
+  <div class="card mt-4">
+    <div class="card-header">
+      <strong>Nearby attractions & activities</strong>
+    </div>
+    <div class="card-body">
+      <p class="small text-muted">Powered by TripAdvisor (via RapidAPI). Results are cached for performance.</p>
+      <div class="row">
+        <% places.each do |p| %>
+          <div class="col-md-6 mb-3">
+            <div class="d-flex">
+              <% if p[:photo].present? %>
+                <img src="<%= p[:photo] %>" alt="<%= p[:name] %>" style="width:90px;height:70px;object-fit:cover;margin-right:10px;border-radius:4px">
+              <% end %>
+              <div>
+                <a href="<%= p[:url] || '#' %>" target="_blank" rel="noopener"><strong><%= p[:name] %></strong></a>
+                <div class="small text-muted"><%= p[:rating] ? "Rating: #{p[:rating]}" : "" %></div>
+                <div class="small text-muted"><%= p[:address] %></div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

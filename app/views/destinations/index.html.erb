@@ -43,6 +43,7 @@
           <% end %>
         </tbody>
       </table>
+      <%= pagy_nav(@pagy_domestic) if defined?(@pagy_domestic) %> 
     </div>
   <% end %>
 
@@ -86,6 +87,7 @@
           <% end %>
         </tbody>
       </table>
+      <%= pagy_nav(@pagy_international) if defined?(@pagy_international) %> 
     </div>
   <% else %>
     <div class="alert alert-info text-center">

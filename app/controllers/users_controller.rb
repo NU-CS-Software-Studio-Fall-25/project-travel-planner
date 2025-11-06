@@ -7,7 +7,8 @@ class UsersController < ApplicationController
 
   # GET /users or /users.json
   def index
-    @users = User.all
+    # order users (change as desired)
+    @pagy, @users = pagy(User.order(:name), items: 25)
   end
 
   # GET /users/1 or /users/1.json

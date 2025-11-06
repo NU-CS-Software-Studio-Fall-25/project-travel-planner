@@ -6,8 +6,11 @@ class TravelRecommendationsController < ApplicationController
     # Load last recommendations from the current user's database record
     # Convert string keys to symbol keys for view compatibility
     stored_recommendations = current_user.recommendations_json || []
-    @recommendations = stored_recommendations.map { |rec| rec.deep_symbolize_keys }
-    
+    # Convert to symbolized keys for view compatibility (you already do that)
+    recs = stored_recommendations.map { |rec| rec.deep_symbolize_keys }
+
+    @pagy, @recommendations = pagy_array(recs, items: 5)
+
     # Load all countries from the database for the dropdown
     @countries = CountrySafetyScore.where(year: 2025).order(:country_name).pluck(:country_name).uniq
     
@@ -59,7 +62,7 @@ class TravelRecommendationsController < ApplicationController
           locals: { recommendations: @recommendations }
         )
       end
-      format.html { render :index }
+      format.html { redirect_to travel_recommendations_path, notice: "Recommendations generated." }
     end
   end
 
