@@ -605,6 +605,54 @@
         if (currentLocationField) {
             const autocomplete = new google.maps.places.Autocomplete(currentLocationField);
             autocomplete.setFields(['address_components', 'formatted_address']);
+            
+            // Listen for place selection to extract standardized country name
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                
+                if (!place.address_components) {
+                    return;
+                }
+                
+                // Extract country from address_components (language-independent)
+                let city = '';
+                let state = '';
+                let country = '';
+                
+                for (const component of place.address_components) {
+                    const types = component.types;
+                    
+                    // Get city
+                    if (types.includes('locality')) {
+                        city = component.long_name;
+                    }
+                    // Get state/province
+                    if (types.includes('administrative_area_level_1')) {
+                        state = component.short_name; // Use short_name for state abbreviations
+                    }
+                    // Get country (always in English via short_name or long_name)
+                    if (types.includes('country')) {
+                        country = component.long_name; // Use long_name for full country name in English
+                    }
+                }
+                
+                // Construct a standardized location string: "City, State, Country"
+                let standardizedLocation = '';
+                if (city && state && country) {
+                    standardizedLocation = `${city}, ${state}, ${country}`;
+                } else if (city && country) {
+                    standardizedLocation = `${city}, ${country}`;
+                } else if (country) {
+                    standardizedLocation = country;
+                }
+                
+                // Update the field with standardized location (English country name)
+                if (standardizedLocation) {
+                    currentLocationField.value = standardizedLocation;
+                    console.log('Standardized location:', standardizedLocation);
+                }
+            });
+            
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const geolocation = {
