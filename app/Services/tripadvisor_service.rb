@@ -156,11 +156,36 @@ class TripadvisorService
     
     data = JSON.parse(response.body)
     
-    # Get the first location from search results
+    # Get the first location from search results that is NOT a tour/activity
+    # Filter out tours, activities, and services - we only want actual places
     if data['data']&.any?
-      location_id = data['data'].first['location_id']
-      Rails.logger.info "Found location ID: #{location_id} for #{search_query}"
-      return location_id
+      # Filter results to find actual destinations (not tours/activities)
+      actual_locations = data['data'].reject do |loc|
+        name = loc['name'].to_s.downcase
+        # Skip if it's clearly a tour, activity, transfer, or service
+        name.include?('tour') ||
+        name.include?('transfer') ||
+        name.include?('activity') ||
+        name.include?('shuttle') ||
+        name.include?('service') ||
+        name.include?('trip') ||
+        name.include?('from ') ||  # "Tour from Calgary"
+        name.include?(' to ')      # "Transfer to Airport"
+      end
+      
+      Rails.logger.info "Filtered out #{data['data'].length - actual_locations.length} tours/activities"
+      Rails.logger.info "Found #{actual_locations.length} actual locations"
+      
+      if actual_locations.any?
+        location_id = actual_locations.first['location_id']
+        Rails.logger.info "Selected location ID: #{location_id} (#{actual_locations.first['name']})"
+        return location_id
+      else
+        # If all results were tours, just use the first one anyway
+        location_id = data['data'].first['location_id']
+        Rails.logger.warn "All results were tours/activities, using first: #{location_id}"
+        return location_id
+      end
     end
     
     Rails.logger.warn "No location found for: #{search_query}"
