@@ -15,19 +15,22 @@ A single integrated travel platform that combines **OpenAI**, **Google Maps/Flig
 - **User Input** – Collect user data such as nationality, budget, travel dates, and interests.  
 - **Filtering** – Automatically filter destinations based on **visa requirements**, **safety**, and **seasonal conditions**.  
 - **AI Recommendations** – Use **OpenAI API** with prompt engineering to generate **personalized**, **accessible** travel suggestions.  
+- **TripAdvisor Integration** – Display **destination photos** with descriptive alt text for accessibility, enabling users to visually explore recommended locations with **7+ high-quality images** per destination.
 - **Data Integration** –  
   - *Google Maps/Flights:* distance, flight options, hotels  
-  - *TripAdvisor:* attractions and local activities  
-- **Output** – Display a list of feasible destinations with **visa info**, **safety level**, and **top activities**.
+  - *TripAdvisor API:* destination photos, attractions, and local activities with quality filtering  
+- **Output** – Display a list of feasible destinations with **visa info**, **safety level**, **top activities**, and **visual previews**.
 
 ## ✨ Features
 
 - **User Authentication**: Secure signup/login with password encryption
 - **Personalized Profiles**: Store travel preferences, budget range, passport country, and safety preferences
 - **AI-Powered Recommendations**: Get destination suggestions based on your profile
+- **Destination Photos**: Browse 7+ TripAdvisor photos with zoom functionality and accessibility features
 - **Destination Management**: Browse and manage travel destinations
 - **Travel Planning**: Create and manage travel plans
 - **Responsive Design**: Beautiful, mobile-friendly interface with Bootstrap
+- **Accessibility**: Alternative text for images, keyboard navigation, and screen reader support
 - **API Support**: RESTful API endpoints for all resources
 
 ## 🛠 Technology Stack
@@ -36,6 +39,10 @@ A single integrated travel platform that combines **OpenAI**, **Google Maps/Flig
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap 5.3
 - **Database**: SQLite (development), PostgreSQL (production ready)
 - **Authentication**: bcrypt for secure password hashing
+- **External APIs**: 
+  - **OpenAI**: AI-powered travel recommendations
+  - **TripAdvisor Content API**: Destination photos and attraction information
+  - **Google Maps/Flights**: Location and travel data (planned)
 - **Styling**: Bootstrap 5 with custom CSS gradients
 - **API**: RESTful JSON APIs with jbuilder
 
@@ -48,6 +55,9 @@ Before running this application, make sure you have the following installed:
 - **Bundler**: For managing Ruby gems
 - **Node.js**: For asset compilation (if needed)
 - **Git**: For version control
+- **API Keys**: 
+  - TripAdvisor API key (for destination photos)
+  - OpenAI API key (for AI recommendations)
 
 ## 🚀 Installation & Setup
 
@@ -78,7 +88,24 @@ rails db:migrate
 rails db:seed
 ```
 
-### 4. Start the Application
+### 4. Environment Variables Setup
+
+Create a `.env` file in the root directory with your API keys:
+
+```bash
+# .env
+TRIPADVISOR_API_KEY=your_tripadvisor_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+**TripAdvisor API Setup:**
+1. Sign up at [TripAdvisor Content API](https://www.tripadvisor.com/developers)
+2. Create a new API project and get your API key
+3. Configure API restrictions:
+   - **For local development**: Add IP addresses `127.0.0.1/32` and your public IP
+   - **For Heroku production**: Add HTTP referrer `travel-planner-cs397-9396d2cb2102.herokuapp.com/*`
+
+### 5. Start the Application
 ```bash
 # Start the Rails server
 rails server
@@ -124,16 +151,21 @@ app/
 │   ├── sessions_controller.rb       # Login/logout
 │   ├── users_controller.rb          # User management
 │   ├── home_controller.rb           # Landing page
+│   ├── travel_recommendations_controller.rb  # AI recommendations & TripAdvisor integration
 │   └── api/v1/                      # API endpoints
 ├── models/               # Data models and validations
 │   ├── user.rb                      # User authentication & preferences
 │   ├── destination.rb               # Travel destinations
 │   ├── travel_plan.rb               # User travel plans
 │   └── recommendation.rb            # Travel recommendations
+├── Services/             # External API integrations
+│   ├── openai_service.rb            # OpenAI API wrapper
+│   └── tripadvisor_service.rb       # TripAdvisor API wrapper
 ├── views/                # HTML templates
 │   ├── layouts/application.html.erb # Main layout with navigation
 │   ├── users/                       # User profile pages
 │   ├── sessions/                    # Login forms
+│   ├── travel_recommendations/      # Recommendation pages with photos
 │   └── home/                        # Landing page
 public/
 └── index.html            # Static landing page (alternative entry point)
@@ -210,6 +242,23 @@ The application provides RESTful API endpoints:
 - `POST /api/v1/users` - Create new user (include password fields)
 - `GET /api/v1/destinations` - List destinations
 - `POST /api/v1/travel_recommendations` - Get recommendations
+- `GET /travel_recommendations/fetch_photos` - Get TripAdvisor photos for a destination
+
+### TripAdvisor Integration
+
+The application uses TripAdvisor's Content API to enhance destination recommendations with:
+- **7+ high-quality photos** per destination
+- **Smart ad filtering** to show only user-contributed photos
+- **Quality scoring** that prioritizes blessed/featured photos
+- **Multi-source collection** from city landmarks and attractions
+- **Accessibility features** including alt text, keyboard navigation, and zoom modal
+- **SessionStorage caching** for persistent photo galleries across page navigation
+
+**Features:**
+- Click any photo to zoom with full-screen modal
+- Gold star badges indicate high-quality, featured photos
+- Direct links to TripAdvisor for additional information
+- Refresh button to clear cache and reload photos
 
 ## 👥 Contributing
 

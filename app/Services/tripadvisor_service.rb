@@ -268,7 +268,16 @@ class TripadvisorService
     
     request = Net::HTTP::Get.new(uri)
     request['Accept'] = 'application/json'
-    # Don't add Referer or Origin headers - they might cause issues with IP restrictions
+    
+    # Use domain restriction for production (Heroku), IP restriction for development
+    if Rails.env.production?
+      # For Heroku: Use domain-based restriction
+      request['Referer'] = 'https://travel-planner-cs397-9396d2cb2102.herokuapp.com/'
+      Rails.logger.info "Using domain restriction with Referer: #{request['Referer']}"
+    else
+      # For local development: Use IP-based restriction (no Referer needed)
+      Rails.logger.info "Using IP restriction for local development"
+    end
     
     Rails.logger.info "Making request to: #{uri}"
     
