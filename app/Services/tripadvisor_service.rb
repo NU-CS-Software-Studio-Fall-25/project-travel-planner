@@ -13,6 +13,14 @@ class TripadvisorService
   # Search for a location and get photos
   # destination_city should be like "Burlington, Vermont" or "Paris, France"
   def get_location_photos(destination_city, destination_country, limit = 7)
+    Rails.logger.info "="*80
+    Rails.logger.info "TripAdvisor API Request Started"
+    Rails.logger.info "Destination City: '#{destination_city}'"
+    Rails.logger.info "Destination Country: '#{destination_country}'"
+    Rails.logger.info "Limit: #{limit}"
+    Rails.logger.info "API Key present: #{@api_key.present?}"
+    Rails.logger.info "="*80
+    
     return default_error_response unless @api_key.present?
 
     begin
@@ -128,6 +136,10 @@ class TripadvisorService
     # Construct search query
     search_query = "#{destination_city}, #{destination_country}"
     
+    Rails.logger.info "---"
+    Rails.logger.info "Searching TripAdvisor for location..."
+    Rails.logger.info "Search Query: '#{search_query}'"
+    
     uri = URI("#{BASE_URL}/location/search")
     params = {
       key: @api_key,
@@ -136,7 +148,8 @@ class TripadvisorService
     }
     uri.query = URI.encode_www_form(params)
 
-    Rails.logger.info "TripAdvisor Search URL: #{uri}"
+    Rails.logger.info "Full Search URL: #{uri}"
+    Rails.logger.info "Encoded Query Parameter: '#{URI.encode_www_form_component(search_query)}'"
     
     response = make_request(uri)
     return nil unless response
@@ -272,7 +285,8 @@ class TripadvisorService
     # Use domain restriction for production (Heroku), IP restriction for development
     if Rails.env.production?
       # For Heroku: Use domain-based restriction
-      request['Referer'] = 'https://travel-planner-cs397-9396d2cb2102.herokuapp.com/'
+      # The Referer must match your domain restriction exactly
+      request['Referer'] = 'https://travel-planner-cs397-9396d2cb2102.herokuapp.com'
       Rails.logger.info "Using domain restriction with Referer: #{request['Referer']}"
     else
       # For local development: Use IP-based restriction (no Referer needed)
