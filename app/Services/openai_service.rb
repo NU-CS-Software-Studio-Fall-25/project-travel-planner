@@ -60,6 +60,87 @@ class OpenaiService
 
   private
 
+  # Determine the user's current country for domestic travel
+  # Parses country from current_location (expected from Google Maps API)
+  # Falls back to passport_country if parsing fails
+  def get_current_country
+    current_location = @preferences[:current_location].to_s.strip
+    
+    if current_location.present?
+      # Google Maps typically formats addresses as: "City, State/Province, Country"
+      # Examples: "Chicago, IL, USA", "Toronto, ON, Canada", "London, UK", "Paris, France"
+      
+      parts = current_location.split(',').map(&:strip)
+      
+      # If there are 3 or more parts, the last part is usually the country
+      if parts.length >= 3
+        country = parts.last
+        # Normalize common country name variations
+        country_mapping = {
+          "USA" => "United States",
+          "US" => "United States",
+          "U.S." => "United States",
+          "U.S.A." => "United States",
+          "UK" => "United Kingdom",
+          "U.K." => "United Kingdom"
+        }
+        country = country_mapping[country] || country
+        Rails.logger.info "Detected country from current_location: #{country} (from: #{current_location})"
+        return country
+      elsif parts.length == 2
+        # Format might be "City, Country" (e.g., "Paris, France", "London, England")
+        potential_country = parts.last
+        # Check if it looks like a country (not a state abbreviation)
+        if potential_country.length > 2 || ["UK", "US"].include?(potential_country)
+          country_mapping = {
+            "USA" => "United States",
+            "US" => "United States",
+            "UK" => "United Kingdom",
+            "England" => "United Kingdom",
+            "Scotland" => "United Kingdom",
+            "Wales" => "United Kingdom",
+            "Northern Ireland" => "United Kingdom"
+          }
+          country = country_mapping[potential_country] || potential_country
+          Rails.logger.info "Detected country from current_location (2-part): #{country} (from: #{current_location})"
+          return country
+        end
+      end
+      
+      # Fallback: Check for US states in the location string (in case format is different)
+      us_states = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+                   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+                   "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+                   "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
+                   "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+                   "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+                   "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+                   "Wisconsin", "Wyoming", "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+                   "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS",
+                   "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA",
+                   "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
+      
+      if us_states.any? { |state| current_location.include?(state) }
+        Rails.logger.info "Detected USA from current_location (state found): #{current_location}"
+        return "United States"
+      end
+      
+      # Check for Canadian provinces
+      canadian_provinces = ["Alberta", "British Columbia", "Manitoba", "New Brunswick", 
+                           "Newfoundland and Labrador", "Nova Scotia", "Ontario", "Prince Edward Island",
+                           "Quebec", "Saskatchewan", "AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK"]
+      
+      if canadian_provinces.any? { |province| current_location.include?(province) }
+        Rails.logger.info "Detected Canada from current_location (province found): #{current_location}"
+        return "Canada"
+      end
+    end
+    
+    # Fallback to passport_country if we can't determine from current_location
+    Rails.logger.info "Could not parse country from current_location '#{current_location}', using passport_country: #{@preferences[:passport_country]}"
+    @preferences[:passport_country]
+  end
+
   # Get eligible countries based on user's safety preference from GPI database
   def get_safe_countries(safety_preference)
     return CountrySafetyScore.all if safety_preference.blank?
@@ -67,25 +148,36 @@ class OpenaiService
     countries = CountrySafetyScore.for_safety_level(safety_preference)
 
     # Filter by trip scope if needed
-    if @preferences[:trip_scope] == "Domestic" && @preferences[:passport_country].present?
-      # For domestic trips, check if home country meets safety criteria
-      home_country = CountrySafetyScore.find_by(country_name: @preferences[:passport_country], year: 2025)
+    if @preferences[:trip_scope] == "Domestic"
+      # For domestic trips, use the country inferred from current_location
+      # (domestic = within the country they're currently in)
+      current_country = get_current_country
+      
+      if current_country.present?
+        # For domestic trips, check if current country meets safety criteria
+        country_record = CountrySafetyScore.find_by(country_name: current_country, year: 2025)
 
-      if home_country && countries.exists?(country_name: @preferences[:passport_country])
-        # Home country meets the safety criteria
-        countries = countries.where(country_name: @preferences[:passport_country])
-      elsif home_country
-        # Home country exists but doesn't meet safety criteria - include it anyway for domestic trips
-        # but note the actual safety level
-        Rails.logger.warn "Domestic trip: Including #{@preferences[:passport_country]} (GPI: #{home_country.gpi_score}, #{home_country.safety_level}) even though it doesn't meet '#{safety_preference}' criteria"
-        countries = CountrySafetyScore.where(country_name: @preferences[:passport_country])
+        if country_record && countries.exists?(country_name: current_country)
+          # Current country meets the safety criteria
+          countries = countries.where(country_name: current_country)
+        elsif country_record
+          # Current country exists but doesn't meet safety criteria - include it anyway for domestic trips
+          # but note the actual safety level
+          Rails.logger.warn "Domestic trip: Including #{current_country} (GPI: #{country_record.gpi_score}, #{country_record.safety_level}) even though it doesn't meet '#{safety_preference}' criteria"
+          countries = CountrySafetyScore.where(country_name: current_country)
+        else
+          # Current country not in database - return empty to trigger appropriate message
+          countries = CountrySafetyScore.none
+        end
       else
-        # Home country not in database - return empty to trigger appropriate message
         countries = CountrySafetyScore.none
       end
-    elsif @preferences[:trip_scope] == "International" && @preferences[:passport_country].present?
-      # For international trips, exclude the user's home country
-      countries = countries.where.not(country_name: @preferences[:passport_country])
+    elsif @preferences[:trip_scope] == "International"
+      # For international trips, exclude the country they're currently in
+      current_country = get_current_country
+      if current_country.present?
+        countries = countries.where.not(country_name: current_country)
+      end
     end
 
     countries

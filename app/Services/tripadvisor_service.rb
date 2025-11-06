@@ -13,6 +13,14 @@ class TripadvisorService
   # Search for a location and get photos
   # destination_city should be like "Burlington, Vermont" or "Paris, France"
   def get_location_photos(destination_city, destination_country, limit = 7)
+    Rails.logger.info "="*80
+    Rails.logger.info "TripAdvisor API Request Started"
+    Rails.logger.info "Destination City: '#{destination_city}'"
+    Rails.logger.info "Destination Country: '#{destination_country}'"
+    Rails.logger.info "Limit: #{limit}"
+    Rails.logger.info "API Key present: #{@api_key.present?}"
+    Rails.logger.info "="*80
+    
     return default_error_response unless @api_key.present?
 
     begin
@@ -128,6 +136,10 @@ class TripadvisorService
     # Construct search query
     search_query = "#{destination_city}, #{destination_country}"
     
+    Rails.logger.info "---"
+    Rails.logger.info "Searching TripAdvisor for location..."
+    Rails.logger.info "Search Query: '#{search_query}'"
+    
     uri = URI("#{BASE_URL}/location/search")
     params = {
       key: @api_key,
@@ -136,18 +148,44 @@ class TripadvisorService
     }
     uri.query = URI.encode_www_form(params)
 
-    Rails.logger.info "TripAdvisor Search URL: #{uri}"
+    Rails.logger.info "Full Search URL: #{uri}"
+    Rails.logger.info "Encoded Query Parameter: '#{URI.encode_www_form_component(search_query)}'"
     
     response = make_request(uri)
     return nil unless response
     
     data = JSON.parse(response.body)
     
-    # Get the first location from search results
+    # Get the first location from search results that is NOT a tour/activity
+    # Filter out tours, activities, and services - we only want actual places
     if data['data']&.any?
-      location_id = data['data'].first['location_id']
-      Rails.logger.info "Found location ID: #{location_id} for #{search_query}"
-      return location_id
+      # Filter results to find actual destinations (not tours/activities)
+      actual_locations = data['data'].reject do |loc|
+        name = loc['name'].to_s.downcase
+        # Skip if it's clearly a tour, activity, transfer, or service
+        name.include?('tour') ||
+        name.include?('transfer') ||
+        name.include?('activity') ||
+        name.include?('shuttle') ||
+        name.include?('service') ||
+        name.include?('trip') ||
+        name.include?('from ') ||  # "Tour from Calgary"
+        name.include?(' to ')      # "Transfer to Airport"
+      end
+      
+      Rails.logger.info "Filtered out #{data['data'].length - actual_locations.length} tours/activities"
+      Rails.logger.info "Found #{actual_locations.length} actual locations"
+      
+      if actual_locations.any?
+        location_id = actual_locations.first['location_id']
+        Rails.logger.info "Selected location ID: #{location_id} (#{actual_locations.first['name']})"
+        return location_id
+      else
+        # If all results were tours, just use the first one anyway
+        location_id = data['data'].first['location_id']
+        Rails.logger.warn "All results were tours/activities, using first: #{location_id}"
+        return location_id
+      end
     end
     
     Rails.logger.warn "No location found for: #{search_query}"
@@ -272,7 +310,8 @@ class TripadvisorService
     # Use domain restriction for production (Heroku), IP restriction for development
     if Rails.env.production?
       # For Heroku: Use domain-based restriction
-      request['Referer'] = 'https://travel-planner-cs397-9396d2cb2102.herokuapp.com/'
+      # The Referer must match your domain restriction exactly
+      request['Referer'] = 'https://travel-planner-cs397-9396d2cb2102.herokuapp.com'
       Rails.logger.info "Using domain restriction with Referer: #{request['Referer']}"
     else
       # For local development: Use IP-based restriction (no Referer needed)

@@ -87,13 +87,24 @@ class TravelRecommendationsController < ApplicationController
     destination_city = params[:destination_city]
     destination_country = params[:destination_country]
     
+    Rails.logger.info "="*80
+    Rails.logger.info "FETCH_PHOTOS Controller - Received Parameters:"
+    Rails.logger.info "destination_city param: '#{destination_city}'"
+    Rails.logger.info "destination_country param: '#{destination_country}'"
+    Rails.logger.info "All params: #{params.inspect}"
+    Rails.logger.info "="*80
+    
     unless destination_city.present? && destination_country.present?
+      Rails.logger.error "Missing destination information!"
       render json: { success: false, error: 'Missing destination information' }, status: :bad_request
       return
     end
 
     tripadvisor_service = TripadvisorService.new
     result = tripadvisor_service.get_location_photos(destination_city, destination_country, 7)
+    
+    Rails.logger.info "Result success: #{result[:success]}"
+    Rails.logger.info "Result photos count: #{result[:photos]&.length || 0}"
     
     render json: result
   end
