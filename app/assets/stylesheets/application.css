@@ -11,15 +11,41 @@
 
 /* Travel Planner Custom Styles */
 
+/* Accessibility: Base font and line-height */
 body {
   background-color: #f8f9fa;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* Content area spacing - not navbar */
+main.container {
+  max-width: 1400px;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+/* Accessibility: Heading spacing */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  margin-bottom: 0.75em;
+}
+
+/* Accessibility: Paragraph spacing */
+p {
+  line-height: 1.6;
+  margin-bottom: 1em;
 }
 
 .hero-section {
   text-align: center;
   padding: 4rem 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('/hero-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: white;
   border-radius: 10px;
   margin-bottom: 3rem;
@@ -29,12 +55,20 @@ body {
   font-size: 3.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .hero-section .lead {
   font-size: 1.25rem;
   margin-bottom: 2rem;
-  opacity: 0.9;
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.hero-section .lead span {
+  color: white !important;
 }
 
 .cta-buttons .btn {
@@ -54,11 +88,44 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 100%;
   margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.75);
+  z-index: 1;
+}
+
+.feature-card .card-body {
+  position: relative;
+  z-index: 2;
+}
+
+.feature-card-visa {
+  background-image: url('/feature_visa.jpg');
+}
+
+.feature-card-ai {
+  background-image: url('/feature_ai.jpg');
+}
+
+.feature-card-planning {
+  background-image: url('/feature_planning.jpg');
 }
 
 .feature-card h3 {
   color: #495057;
   margin-bottom: 1rem;
+  font-weight: bold;
 }
 
 .quick-actions {
@@ -97,14 +164,80 @@ body {
 }
 
 .jumbotron {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: transparent;
   color: white;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  border: none;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.jumbotron h2 {
+  color: white;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.jumbotron p {
+  color: white;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
 }
 
 .jumbotron .btn {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   font-weight: 600;
+  box-shadow: none;
+}
+
+.jumbotron .btn-success {
+  background: transparent;
+  color: white;
+  border: 3px solid #ffc0cb;
+  animation: glow-border 3s ease-in-out infinite;
+  position: relative;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 12px rgba(255, 192, 203, 0.5);
+}
+
+@keyframes glow-border {
+  0%, 100% {
+    border-color: rgba(255, 192, 203, 0.8);
+    box-shadow: 0 0 12px rgba(255, 192, 203, 0.5),
+                0 0 25px rgba(255, 218, 224, 0.3);
+  }
+  50% {
+    border-color: rgba(255, 192, 203, 1);
+    box-shadow: 0 0 20px rgba(255, 192, 203, 0.7),
+                0 0 35px rgba(255, 218, 224, 0.5),
+                0 0 50px rgba(255, 230, 235, 0.3);
+  }
+}
+
+.jumbotron .btn-success:hover {
+  background: rgba(255, 192, 203, 0.15);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(255, 192, 203, 0.7),
+              0 0 35px rgba(255, 218, 224, 0.5);
+}
+
+.jumbotron .btn-outline-primary {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+  border-radius: 0.5rem;
+}
+
+.jumbotron .btn-outline-primary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.jumbotron .btn-outline-primary:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  transform: translateY(-2px);
 }
 
 .feature-card {
@@ -160,4 +293,32 @@ body {
 .tier-card-inner:hover {
     border-color: #9cc5ff;
     box-shadow: 0 0 5px rgba(13, 110, 253, 0.2);
+}
+
+/* Accessibility: Support text zoom up to 200% */
+@media screen and (min-width: 1px) {
+  html {
+    /* Allow browser text zoom */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Prevent horizontal scroll on zoom */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Ensure containers adapt to zoom */
+  .container {
+    max-width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  
+  /* Make images responsive on zoom */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }
