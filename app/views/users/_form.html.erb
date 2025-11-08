@@ -326,7 +326,10 @@
   <% if user.new_record? %>
     <div class="mb-3">
       <%= form.label :password, class: "form-label" %>
-      <%= form.password_field :password, class: "form-control", placeholder: "Create a password (minimum 6 characters)", required: true, id: "password-field", maxlength: 75 %>
+    <%= form.password_field :password, class: "form-control", placeholder: "Create a password (min 7 chars; include upper, lower, digit & special @#$%&!*)", required: true, id: "password-field", maxlength: 75 %>
+      <small class="form-text text-muted">
+        Password must be at least 7 characters and include: one uppercase letter, one lowercase letter, one digit, and one special character (@#$%&!*)
+      </small>
       <div class="invalid-feedback" id="password-error"></div>
     </div>
 
@@ -441,11 +444,15 @@
             if (!value) {
                 return "Password is required.";
             }
-            if (value.length < 6) {
-                return "Password must be at least 6 characters long.";
+            if (value.length < 7) {
+                return "Password must be at least 7 characters long.";
             }
             if (value.length > MAX_LENGTH) {
                 return `Password cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            const pwRegex = /(?=.{7,})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#\$%&!\*])/;
+            if (!pwRegex.test(value)) {
+                return "Password must include one uppercase, one lowercase, one digit and one special character (@#$%&!*).";
             }
             return null;
         }
