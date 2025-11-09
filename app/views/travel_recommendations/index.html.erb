@@ -128,7 +128,35 @@
   <%= render 'recommendations_list', recommendations: @recommendations %>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places&callback=initAutocomplete" async defer></script>
+<%# Load Google Maps API only once %>
+<script>
+  (function() {
+    // Check if Google Maps is already loaded
+    if (typeof google !== 'undefined' && google.maps) {
+      console.log('Google Maps already loaded, initializing...');
+      if (typeof initAutocomplete === 'function') {
+        initAutocomplete();
+      }
+      return;
+    }
+
+    // Check if script is already being loaded
+    if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+      console.log('Google Maps script already loading...');
+      return;
+    }
+
+    // Load the script
+    const script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places&callback=initAutocomplete';
+    script.async = true;
+    script.defer = true;
+    script.onerror = function() {
+      console.error('Failed to load Google Maps API');
+    };
+    document.head.appendChild(script);
+  })();
+</script>
 
 <%# The JavaScript for saving form state and validation logic %>
 <script>
@@ -600,11 +628,32 @@
         }
     });
 
-    function initAutocomplete() {
+    // Define initAutocomplete globally so Google Maps callback can find it
+    // Make it idempotent to handle multiple calls
+    window.initAutocomplete = function() {
+        // Prevent multiple initializations
+        if (window.autocompleteInitialized) {
+            console.log('Autocomplete already initialized');
+            return;
+        }
+        
         const currentLocationField = document.getElementById('current-location-field');
-        if (currentLocationField) {
+        if (!currentLocationField) {
+            console.log('Current location field not found, waiting for DOM...');
+            return;
+        }
+        
+        // Check if Google Maps is loaded
+        if (typeof google === 'undefined' || !google.maps) {
+            console.log('Google Maps not loaded yet');
+            return;
+        }
+        
+        try {
             const autocomplete = new google.maps.places.Autocomplete(currentLocationField);
             autocomplete.setFields(['address_components', 'formatted_address']);
+            window.autocompleteInitialized = true;
+            console.log('✅ Google Maps Autocomplete initialized');
             
             // Listen for place selection to extract standardized country name
             autocomplete.addListener('place_changed', function() {
@@ -666,6 +715,29 @@
                     autocomplete.setBounds(circle.getBounds());
                 });
             }
+        } catch (error) {
+            console.error('Error initializing Google Maps Autocomplete:', error);
+            window.autocompleteInitialized = false;
         }
+    };
+
+    // Try to initialize if Google Maps is already loaded (for Turbo navigation)
+    if (typeof google !== 'undefined' && google.maps) {
+        window.initAutocomplete();
     }
+
+    // Re-initialize on Turbo navigation (mark as not initialized)
+    document.addEventListener('turbo:before-cache', () => {
+        window.autocompleteInitialized = false;
+    });
+
+    // Attempt to initialize when returning to this page via Turbo
+    document.addEventListener('turbo:load', () => {
+        if (document.getElementById('current-location-field')) {
+            window.autocompleteInitialized = false;
+            if (typeof google !== 'undefined' && google.maps && typeof window.initAutocomplete === 'function') {
+                window.initAutocomplete();
+            }
+        }
+    });
 </script>
