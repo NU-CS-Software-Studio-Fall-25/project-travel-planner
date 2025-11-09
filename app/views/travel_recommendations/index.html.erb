@@ -401,28 +401,47 @@
             });
         }
 
+        // Function to update end date minimum based on start date
+        function updateEndDateMin() {
+            if (startDateInput.value && startDateInput.value.length === 10) {
+                const startDate = new Date(startDateInput.value);
+                const minEndDate = new Date(startDate);
+                minEndDate.setDate(minEndDate.getDate() + 1);
+                endDateInput.min = minEndDate.toISOString().split('T')[0];
+            } else {
+                // If no start date, set min to today
+                const today = new Date();
+                endDateInput.min = today.toISOString().split('T')[0];
+            }
+        }
+
         // Date validation logic
         if (startDateInput && endDateInput) {
-            startDateInput.addEventListener('change', function() {
-                const startDate = new Date(this.value);
-                if (this.value) {
-                    // Set minimum end date to the day after start date
-                    const minEndDate = new Date(startDate);
-                    minEndDate.setDate(minEndDate.getDate() + 1);
-                    endDateInput.min = minEndDate.toISOString().split('T')[0];
+            // Initialize end date min on page load (in case of cached values)
+            updateEndDateMin();
 
-                    // If end date is before start date, clear it
-                    if (endDateInput.value && new Date(endDateInput.value) <= startDate) {
-                        endDateInput.value = '';
-                    }
-                }
+            // Update when start date changes
+            startDateInput.addEventListener('change', function() {
+                updateEndDateMin();
             });
 
-            endDateInput.addEventListener('change', function() {
+            // Update when end date is focused (handles direct clicks)
+            endDateInput.addEventListener('focus', function() {
+                updateEndDateMin();
+            });
+
+            // Validate end date only on blur to avoid interrupting manual typing
+            endDateInput.addEventListener('blur', function() {
+                // Only validate if we have a complete, valid date (YYYY-MM-DD format with 10 characters)
+                if (!this.value || this.value.length < 10) {
+                    return; // Incomplete date, skip validation
+                }
+
                 const startDate = new Date(startDateInput.value);
                 const endDate = new Date(this.value);
 
-                if (startDateInput.value && endDate <= startDate) {
+                // Check if dates are valid and end date is not after start date
+                if (startDateInput.value && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime()) && endDate <= startDate) {
                     alert('End date must be after start date!');
                     this.value = '';
                 }
