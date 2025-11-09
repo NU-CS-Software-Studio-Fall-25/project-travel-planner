@@ -109,6 +109,10 @@
                     </li>
 
                     <li class="list-group-item"><i class="bi bi-geo-alt me-1 text-info"></i><strong>Travel Style:</strong> <%= rec[:travel_style] %></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span><i class="bi bi-people-fill me-1 text-primary"></i><strong>Travelers</strong></span>
+                      <span class="badge bg-primary rounded-pill"><%= rec[:number_of_travelers] || 1 %> <%= (rec[:number_of_travelers] || 1) == 1 ? 'person' : 'people' %></span>
+                    </li>
                     <li class="list-group-item"><i class="bi bi-pass me-1 text-primary"></i><strong>Visa Info:</strong> <%= rec[:visa_info] %></li>
                   </ul>
 
@@ -198,7 +202,7 @@
                 <%= hidden_field_tag 'travel_plan[length_of_stay]', rec[:length_of_stay] %>
                 <%= hidden_field_tag 'travel_plan[travel_month]', rec[:travel_month] %>
                 <%= hidden_field_tag 'travel_plan[trip_scope]', rec[:trip_scope] %>
-                <%= hidden_field_tag 'travel_plan[trip_type]', rec[:trip_type] %>
+                <%= hidden_field_tag 'travel_plan[number_of_travelers]', rec[:number_of_travelers] %>
                 <%= hidden_field_tag 'travel_plan[general_purpose]', rec[:general_purpose] %>
                 <%= hidden_field_tag 'travel_plan[visa_info]', rec[:visa_info] %>
                 <%= hidden_field_tag 'travel_plan[status]', 'planned' %>

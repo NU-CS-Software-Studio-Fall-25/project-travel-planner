@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_010018) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
   create_table "country_safety_scores", force: :cascade do |t|
     t.string "country_name", null: false
     t.decimal "gpi_score", precision: 5, scale: 3, null: false
@@ -79,6 +79,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_010018) do
     t.json "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
+    t.integer "number_of_travelers", default: 1
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
   end

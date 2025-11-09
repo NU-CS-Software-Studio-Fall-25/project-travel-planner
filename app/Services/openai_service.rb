@@ -50,7 +50,7 @@ class OpenaiService
         length_of_stay: @preferences[:length_of_stay]&.to_i || 4,
         travel_month: @preferences[:travel_month] || "Unknown",
         trip_scope: @preferences[:trip_scope] || "Unknown",
-        trip_type: @preferences[:trip_type] || "Unknown",
+        number_of_travelers: @preferences[:number_of_travelers]&.to_i || 1,
         general_purpose: @preferences[:general_purpose] || "Unknown",
         start_date: @preferences[:start_date],
         end_date: @preferences[:end_date]
@@ -254,7 +254,7 @@ class OpenaiService
     2. Be suitable for travel #{date_range} (consider weather, seasonal events, holidays, and typical conditions for this specific time period)
     3. Fit within the budget range of $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (budget_min and budget_max MUST be within this range)
     4. Match the #{@preferences[:trip_scope]} scope (only suggest #{@preferences[:trip_scope]} destinations)
-    5. Be appropriate for #{@preferences[:trip_type]} travelers
+    5. Be appropriate for #{@preferences[:number_of_travelers] || 1} travelers (budget calculations MUST account for this number of people)
     6. Follow the #{@preferences[:travel_style]} travel style
   
     ⚠️ CRITICAL SAFETY REQUIREMENT - YOU MUST FOLLOW THIS STRICTLY:
@@ -288,31 +288,33 @@ class OpenaiService
   
     - "budget_min": Minimum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
     - "budget_max": Maximum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
-    - "budget_breakdown": A JSON object with these detailed keys:
+    - "budget_breakdown": A JSON object with these detailed keys (ALL COSTS MUST BE TOTAL FOR #{@preferences[:number_of_travelers] || 1} TRAVELERS):
           {
             "flights": {
-                "description": "Round-trip flight details including exact route (from #{@preferences[:passport_country]}’s major airport, e.g., JFK or LAX, to destination airport, e.g., CDG Paris or OSL Oslo)",
-                "cost": <numeric value>
+                "description": "Round-trip flight details including exact route (from #{@preferences[:passport_country]}'s major airport, e.g., JFK or LAX, to destination airport, e.g., CDG Paris or OSL Oslo) × #{@preferences[:number_of_travelers] || 1} travelers",
+                "cost_per_person": <numeric value>,
+                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers>
             },
             "hotel": {
-                "description": "Hotel name or type (e.g., 4-star boutique, beachfront resort) and nightly rate with total for #{length_of_stay} nights",
-                "cost_per_night": <numeric value>,
-                "total_cost": <numeric value>
+                "description": "Hotel name or type (e.g., 4-star boutique, beachfront resort) and nightly rate with total for #{length_of_stay} nights for #{@preferences[:number_of_travelers] || 1} travelers",
+                "cost_per_night": <numeric value for accommodating all #{@preferences[:number_of_travelers] || 1} travelers>,
+                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers for entire stay>
             },
             "food": {
-                "description": "Average per-day cost of meals and drinks with local cuisine examples",
-                "cost_per_day": <numeric value>,
-                "total_cost": <numeric value>
+                "description": "Average per-day cost of meals and drinks with local cuisine examples for #{@preferences[:number_of_travelers] || 1} travelers",
+                "cost_per_day_per_person": <numeric value>,
+                "cost_per_day_total": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers>,
+                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers for entire trip>
             },
             "activities": {
-                "description": "List each major paid activity (e.g., guided tour, museum ticket, adventure excursion) with individual cost lines and then sum total",
-                "total_cost": <numeric value>
+                "description": "List each major paid activity (e.g., guided tour, museum ticket, adventure excursion) with individual cost per person and total for #{@preferences[:number_of_travelers] || 1} travelers",
+                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers>
             },
             "car_rental": {
-                "description": "Vehicle type (e.g., compact, SUV) and total rental cost for duration of stay",
+                "description": "Vehicle type (e.g., compact, SUV, minivan based on #{@preferences[:number_of_travelers] || 1} travelers) and total rental cost for duration of stay",
                 "total_cost": <numeric value>
             },
-            "total_trip_cost": "Sum of all above categories; must match budget_max approximately"
+            "total_trip_cost": "Sum of all above categories for ALL #{@preferences[:number_of_travelers] || 1} travelers; must match budget_max approximately"
           }
   
     - "safety_score": The actual GPI safety score for this country (you can reference the list above for accurate scores).
@@ -321,16 +323,16 @@ class OpenaiService
     - "length_of_stay": Must be exactly #{length_of_stay} (as a number).  
     - "travel_month": "#{travel_month}".  
     - "trip_scope": Must be "#{@preferences[:trip_scope]}".  
-    - "trip_type": Must be "#{@preferences[:trip_type]}".  
+    - "number_of_travelers": Must be #{@preferences[:number_of_travelers] || 1} (as a number).  
     - "general_purpose": "#{@preferences[:general_purpose]}"
   
     User Preferences Summary:
     - Trip Name Idea: #{@preferences[:name]}
     - Passport Country: #{@preferences[:passport_country]}
-    - Budget Range: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
+    - Budget Range: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (TOTAL for all #{@preferences[:number_of_travelers] || 1} travelers)
     - Travel Dates: #{date_range}
     - Length of Stay: #{length_of_stay} days
-    - Trip Type: #{@preferences[:trip_type]}
+    - Number of Travelers: #{@preferences[:number_of_travelers] || 1} people
     - Travel Style: #{@preferences[:travel_style]}
     - Purpose: #{@preferences[:general_purpose]}
     - Safety Requirement: #{safety_preference} (only from pre-approved country list)
@@ -341,9 +343,11 @@ class OpenaiService
     - Each day MUST have exactly ONE detailed paragraph of at least 6 complete sentences (no bullet points or short entries)
     - Each day's text should be approximately 100+ words
     - The budget_breakdown MUST include realistic flight routes, nightly hotel costs, per-day food costs, detailed activity costs, rental car info, and a total_trip_cost line.
+    - ALL BUDGET CALCULATIONS MUST BE FOR #{@preferences[:number_of_travelers] || 1} TRAVELERS (multiply per-person costs accordingly)
+    - Hotel costs should reflect appropriate room configuration for #{@preferences[:number_of_travelers] || 1} travelers (e.g., single room, double room, family suite, multiple rooms)
     - All destinations MUST be suitable for travel #{date_range}
     - Consider any holidays, festivals, or special events during this time period
-    - Budget estimates MUST fall within $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]}
+    - Budget estimates MUST fall within $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (TOTAL for all #{@preferences[:number_of_travelers] || 1} travelers)
     - Only suggest #{@preferences[:trip_scope]} destinations
     - ONLY recommend countries from the provided safety-approved list above
   
@@ -388,7 +392,7 @@ class OpenaiService
           length_of_stay: dest[:length_of_stay]&.to_i || @preferences[:length_of_stay]&.to_i,
           travel_month: dest[:travel_month] || @preferences[:travel_month],
           trip_scope: dest[:trip_scope] || @preferences[:trip_scope],
-          trip_type: dest[:trip_type] || @preferences[:trip_type],
+          number_of_travelers: dest[:number_of_travelers]&.to_i || @preferences[:number_of_travelers]&.to_i || 1,
           general_purpose: dest[:general_purpose] || @preferences[:general_purpose],
           start_date: @preferences[:start_date],
           end_date: @preferences[:end_date]
@@ -415,7 +419,7 @@ class OpenaiService
          length_of_stay: @preferences[:length_of_stay]&.to_i || 4,
          travel_month: @preferences[:travel_month] || "Unknown",
          trip_scope: @preferences[:trip_scope] || "Unknown",
-         trip_type: @preferences[:trip_type] || "Unknown",
+         number_of_travelers: @preferences[:number_of_travelers]&.to_i || 1,
          general_purpose: @preferences[:general_purpose] || "Unknown",
          start_date: @preferences[:start_date],
          end_date: @preferences[:end_date]

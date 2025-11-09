@@ -76,6 +76,17 @@
             <%= f.select :travel_style, ["Adventure", "Leisure", "Luxury", "Backpacking"], {}, class: "form-select", id: "travel_style" %>
           </div>
 
+          <div class="col-md-6">
+            <%= f.label :number_of_travelers, "Number of Travelers", class: "form-label" %>
+            <%= f.select :number_of_travelers,
+                         [["1 person", 1], ["2 people", 2], ["3 people", 3], ["4 people", 4], 
+                          ["5 people", 5], ["6 people", 6], ["7-10 people", 8], ["10+ people", 12]],
+                         {},
+                         class: "form-select",
+                         id: "number-of-travelers-field" %>
+            <small class="text-muted">This affects budget calculations</small>
+          </div>
+
           <!-- Safety Preference with GPI Integration -->
           <div class="col-md-6">
             <%= f.label :safety_preference, "Acceptable Safety Levels", class: "form-label" %>
@@ -104,10 +115,6 @@
           <div class="col-md-6">
             <%= f.label :trip_scope, class: "form-label" %>
             <%= f.select :trip_scope, ["International", "Domestic"], {}, class: "form-select" %>
-          </div>
-          <div class="col-md-6">
-            <%= f.label :trip_type, class: "form-label" %>
-            <%= f.select :trip_type, ["Solo", "Couple", "Family", "Group"], {}, class: "form-select" %>
           </div>
 
           <div class="col-12">

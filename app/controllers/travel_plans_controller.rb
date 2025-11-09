@@ -126,7 +126,7 @@ class TravelPlansController < ApplicationController
     params.require(:travel_plan).permit(
       :name, :description, :details, :budget_min, :budget_max,
       :safety_score, :safety_level, :travel_style, :length_of_stay, :travel_month,
-      :trip_scope, :trip_type, :general_purpose, :status, :notes,
+      :trip_scope, :number_of_travelers, :general_purpose, :status, :notes,
       :visa_info, :safety_preference, :start_date, :end_date, 
       :passport_country, :current_location, :destination_country,
       itinerary: {}, budget_breakdown: {}, safety_levels: []
