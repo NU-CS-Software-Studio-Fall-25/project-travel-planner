@@ -135,6 +135,31 @@
   <%= render 'recommendations_list', recommendations: @recommendations %>
 </div>
 
+<%# Loading Animation Overlay %>
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-content">
+    <div class="magnifier-container">
+      <svg class="magnifier-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Main magnifier circle -->
+        <circle cx="11" cy="11" r="7" stroke="#3B82F6" stroke-width="2"/>
+        <!-- Handle -->
+        <path d="M16 16L21 21" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+        <!-- Inner gradient circle -->
+        <circle cx="11" cy="11" r="4" fill="#3B82F6" opacity="0.2"/>
+        <!-- Glare effect to show rotation -->
+        <path d="M8 8 L9 9" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+        <circle cx="9" cy="9" r="1.5" fill="white" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="loading-message" id="loading-message">
+      Searching for the best travel locations<span class="loading-dots"></span>
+    </div>
+    <div class="loading-submessage">
+      This may take a few moments while we analyze your preferences
+    </div>
+  </div>
+</div>
+
 <%# Load Google Maps API only once %>
 <script>
   (function() {
@@ -560,6 +585,76 @@
 
             // Clear localStorage on successful submit
             localStorage.removeItem(storageKey);
+            
+            // Show loading animation
+            showLoadingAnimation();
+        });
+
+        // Loading Animation Control
+        let messageInterval;
+        const loadingMessages = [
+            "Searching for the best travel locations",
+            "Finding you a nice retreat",
+            "Analyzing safety and weather conditions",
+            "Discovering hidden gems for you",
+            "Calculating perfect itineraries",
+            "Curating personalized recommendations",
+            "Exploring amazing destinations",
+            "Planning your dream vacation"
+        ];
+        
+        function showLoadingAnimation() {
+            const overlay = document.getElementById('loading-overlay');
+            const messageEl = document.getElementById('loading-message');
+            
+            if (overlay) {
+                overlay.classList.add('active');
+                
+                // Rotate through messages
+                let currentIndex = 0;
+                messageInterval = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % loadingMessages.length;
+                    if (messageEl) {
+                        messageEl.innerHTML = loadingMessages[currentIndex] + '<span class="loading-dots"></span>';
+                    }
+                }, 5000); // Change message every 5 seconds
+            }
+        }
+        
+        function hideLoadingAnimation() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            if (messageInterval) {
+                clearInterval(messageInterval);
+                messageInterval = null;
+            }
+        }
+        
+        // Hide loading animation when page loads (in case of back navigation)
+        document.addEventListener('turbo:load', () => {
+            hideLoadingAnimation();
+        });
+        
+        // Listen for Turbo Stream render events (when AJAX response arrives)
+        document.addEventListener('turbo:before-stream-render', (event) => {
+            console.log('Turbo stream about to render, hiding loading animation');
+            hideLoadingAnimation();
+        });
+        
+        // Additional backup - hide when frame loads
+        document.addEventListener('turbo:frame-render', (event) => {
+            console.log('Turbo frame rendered:', event.target.id);
+            hideLoadingAnimation();
+        });
+        
+        // Another backup - listen for successful form submission response
+        document.addEventListener('turbo:submit-end', (event) => {
+            if (event.detail.success) {
+                console.log('Form submitted successfully, hiding loading animation');
+                setTimeout(() => hideLoadingAnimation(), 500);
+            }
         });
 
         // Load saved form data from localStorage
