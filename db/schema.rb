@@ -39,6 +39,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
     t.string "city"
   end
 
+  create_table "recommendation_feedbacks", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "destination_city", null: false
+    t.string "destination_country", null: false
+    t.string "trip_type"
+    t.string "travel_style"
+    t.integer "budget_min"
+    t.integer "budget_max"
+    t.integer "length_of_stay"
+    t.string "feedback_type", null: false
+    t.text "reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "destination_city", "destination_country"], name: "index_feedbacks_on_user_and_destination", unique: true
+    t.index ["user_id"], name: "index_recommendation_feedbacks_on_user_id"
+  end
+
   create_table "recommendations", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "destination_id", null: false
@@ -71,14 +88,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
     t.string "general_purpose"
     t.string "trip_scope"
     t.string "trip_type"
-    t.text "itinerary"
-    t.text "details"
-    t.text "description"
     t.integer "safety_score"
     t.string "visa_info"
     t.json "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
+    t.text "description"
+    t.text "details"
+    t.json "itinerary"
+    t.integer "number_of_people", default: 1
     t.integer "number_of_travelers", default: 1
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
@@ -95,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
     t.string "subscription_tier", default: "free", null: false
   end
 
+  add_foreign_key "recommendation_feedbacks", "users"
   add_foreign_key "recommendations", "destinations"
   add_foreign_key "recommendations", "users"
   add_foreign_key "travel_plans", "destinations"

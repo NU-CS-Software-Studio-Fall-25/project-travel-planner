@@ -15,15 +15,15 @@
           <div class="card border-0 shadow-lg rounded-5 overflow-hidden hover-zoom">
 
             <div class="card-header p-4 text-white" style="background: linear-gradient(135deg, #3B82F6 0%, #1E3A8A 100%);">
-              <h4 class="mb-1 fw-bold"><%= rec[:name] %></h4>
-              <small class="text-white-50"><%= rec[:destination_country] %></small>
+              <h4 class="mb-1 fw-bold"><%= sanitize(rec[:name], tags: []) %></h4>
+              <small class="text-white-50"><%= sanitize(rec[:destination_country], tags: []) %></small>
             </div>
 
             <div class="card-body p-4">
               <div class="row">
                 <div class="col-md-8">
-                  <p class="mb-3"><strong>Description:</strong> <%= rec[:description] %></p>
-                  <p class="mb-3"><strong>Details:</strong> <%= rec[:details] %></p>
+                  <p class="mb-3"><strong>Description:</strong> <%= sanitize(rec[:description], tags: %w[br strong em]) %></p>
+                  <p class="mb-3"><strong>Details:</strong> <%= sanitize(rec[:details], tags: %w[br strong em]) %></p>
 
                   <% if rec[:itinerary].is_a?(Hash) && rec[:itinerary].present? %>
                     <div class="accordion mb-3" id="accordion-itinerary-<%= index %>">
@@ -42,8 +42,8 @@
                           <div class="accordion-body">
                             <% rec[:itinerary].each do |day, description| %>
                               <div class="mb-2">
-                                <strong><%= day.to_s.humanize %>:</strong>
-                                <p class="mb-1 text-muted"><%= description %></p>
+                                <strong><%= sanitize(day.to_s.humanize, tags: []) %>:</strong>
+                                <p class="mb-1 text-muted"><%= sanitize(description, tags: %w[br strong em]) %></p>
                               </div>
                             <% end %>
                           </div>
@@ -61,13 +61,16 @@
                                   data-bs-target="#collapse-images-<%= index %>"
                                   aria-expanded="false"
                                   aria-controls="collapse-images-<%= index %>"
-                                  onclick="loadTripAdvisorImages(<%= index %>, '<%= rec[:destination_city] %>', '<%= rec[:destination_country] %>')">
+                                  data-city="<%= h(rec[:destination_city]) %>"
+                                  data-country="<%= h(rec[:destination_country]) %>"
+                                  data-index="<%= index %>"
+                                  onclick="loadTripAdvisorImages(this.dataset.index, this.dataset.city, this.dataset.country)">
                             <i class="bi bi-images me-2"></i> Images of the Place
                           </button>
                         </h2>
                         <div id="collapse-images-<%= index %>" class="accordion-collapse collapse">
                           <div class="accordion-body">
-                            <div id="images-container-<%= index %>" class="text-center py-3" data-city="<%= rec[:destination_city] %>" data-country="<%= rec[:destination_country] %>">
+                            <div id="images-container-<%= index %>" class="text-center py-3" data-city="<%= h(rec[:destination_city]) %>" data-country="<%= h(rec[:destination_country]) %>">
                               <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading images...</span>
                               </div>
@@ -108,12 +111,12 @@
                       <span class="<%= badge_class %>"><%= safety_level %></span>
                     </li>
 
-                    <li class="list-group-item"><i class="bi bi-geo-alt me-1 text-info"></i><strong>Travel Style:</strong> <%= rec[:travel_style] %></li>
+                    <li class="list-group-item"><i class="bi bi-geo-alt me-1 text-info"></i><strong>Travel Style:</strong> <%= sanitize(rec[:travel_style], tags: []) %></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                       <span><i class="bi bi-people-fill me-1 text-primary"></i><strong>Travelers</strong></span>
-                      <span class="badge bg-primary rounded-pill"><%= rec[:number_of_travelers] || 1 %> <%= (rec[:number_of_travelers] || 1) == 1 ? 'person' : 'people' %></span>
+                      <span class="badge bg-primary rounded-pill"><%= (rec[:number_of_travelers] || 1).to_i %> <%= (rec[:number_of_travelers] || 1).to_i == 1 ? 'person' : 'people' %></span>
                     </li>
-                    <li class="list-group-item"><i class="bi bi-pass me-1 text-primary"></i><strong>Visa Info:</strong> <%= rec[:visa_info] %></li>
+                    <li class="list-group-item"><i class="bi bi-pass me-1 text-primary"></i><strong>Visa Info:</strong> <%= sanitize(rec[:visa_info], tags: []) %></li>
                   </ul>
 
                   <% if rec[:budget_breakdown].present? %>
@@ -135,30 +138,30 @@
                               <div class="budget-item mb-4 p-3 bg-white shadow-sm rounded-4 border-start border-4 border-primary-subtle">
                                 <h5 class="fw-bold text-primary mb-2 d-flex align-items-center">
                                   <i class="bi bi-dot fs-3 lh-1 me-1 text-primary"></i>
-                                  <%= category.to_s.titleize %>
+                                  <%= sanitize(category.to_s.titleize, tags: []) %>
                                 </h5>
 
                                 <% if data.is_a?(Hash) %>
                                   <% if data[:description].present? %>
                                     <p class="mb-2">
                                       <span class="fw-semibold text-dark">Description:</span>
-                                      <span class="text-muted"><%= data[:description] %></span>
+                                      <span class="text-muted"><%= sanitize(data[:description].to_s, tags: []) %></span>
                                     </p>
                                   <% end %>
 
                                   <% data.each do |key, value| %>
                                     <% next if key.to_s == "description" %>
                                     <p class="mb-1">
-                                      <span class="fw-semibold text-dark"><%= key.to_s.humanize %>:</span>
+                                      <span class="fw-semibold text-dark"><%= sanitize(key.to_s.humanize, tags: []) %>:</span>
                                       <% if value.is_a?(Numeric) %>
-                                        <span class="text-muted">$<%= number_with_delimiter(value) %></span>
+                                        <span class="text-muted">$<%= number_with_delimiter(value.to_i) %></span>
                                       <% else %>
-                                        <span class="text-muted"><%= value %></span>
+                                        <span class="text-muted"><%= sanitize(value.to_s, tags: []) %></span>
                                       <% end %>
                                     </p>
                                   <% end %>
                                 <% else %>
-                                  <p class="mb-0"><span class="fw-semibold text-dark">Cost:</span> $<%= number_with_delimiter(data) %></p>
+                                  <p class="mb-0"><span class="fw-semibold text-dark">Cost:</span> $<%= number_with_delimiter(data.to_i) %></p>
                                 <% end %>
                               </div>
                             <% end %>
@@ -183,48 +186,80 @@
               </div>
             </div>
 
-            <div class="card-footer bg-light d-flex justify-content-end gap-2">
-              <form action="<%= travel_plans_path %>" method="post" data-turbo-stream="true"
-                    onsubmit="event.target.querySelector('button[type=submit]').disabled = true;
-                      event.target.querySelector('button[type=submit]').classList.replace('btn-primary', 'btn-success');
-                      event.target.querySelector('button[type=submit]').innerHTML = '✓ Saved';">
-                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                <%= hidden_field_tag 'travel_plan[name]', rec[:name] %>
-                <%= hidden_field_tag 'travel_plan[destination_name]', rec[:name] %>
-                <%= hidden_field_tag 'travel_plan[destination_city]', rec[:destination_city] %>
-                <%= hidden_field_tag 'travel_plan[destination_country]', rec[:destination_country] %>
-                <%= hidden_field_tag 'travel_plan[description]', rec[:description] %>
-                <%= hidden_field_tag 'travel_plan[details]', rec[:details] %>
-                <%= hidden_field_tag 'travel_plan[budget_min]', rec[:budget_min] %>
-                <%= hidden_field_tag 'travel_plan[budget_max]', rec[:budget_max] %>
-                <%= hidden_field_tag 'travel_plan[safety_level]', rec[:safety_level] %>
-                <%= hidden_field_tag 'travel_plan[travel_style]', rec[:travel_style] %>
-                <%= hidden_field_tag 'travel_plan[length_of_stay]', rec[:length_of_stay] %>
-                <%= hidden_field_tag 'travel_plan[travel_month]', rec[:travel_month] %>
-                <%= hidden_field_tag 'travel_plan[trip_scope]', rec[:trip_scope] %>
-                <%= hidden_field_tag 'travel_plan[number_of_travelers]', rec[:number_of_travelers] %>
-                <%= hidden_field_tag 'travel_plan[general_purpose]', rec[:general_purpose] %>
-                <%= hidden_field_tag 'travel_plan[visa_info]', rec[:visa_info] %>
-                <%= hidden_field_tag 'travel_plan[status]', 'planned' %>
-                <%= hidden_field_tag 'travel_plan[start_date]', rec[:start_date] if rec[:start_date].present? %>
-                <%= hidden_field_tag 'travel_plan[end_date]', rec[:end_date] if rec[:end_date].present? %>
-                <% if rec[:itinerary].is_a?(Hash) %>
-                  <% rec[:itinerary].each do |day, description| %>
-                    <%= hidden_field_tag "travel_plan[itinerary][#{day}]", description %>
-                  <% end %>
-                <% end %>
-                <% if rec[:budget_breakdown].is_a?(Hash) %>
-                  <% rec[:budget_breakdown].each do |item, cost| %>
-                    <%= hidden_field_tag "travel_plan[budget_breakdown][#{item}]", cost %>
-                  <% end %>
-                <% end %>
-                <button type="submit" class="btn btn-primary btn-sm">
-                  <i class="bi bi-bookmark-plus me-1"></i> Save
+            <div class="card-footer bg-light d-flex justify-content-between align-items-center gap-2">
+              <!-- Like/Dislike Buttons -->
+              <div class="btn-group" role="group" aria-label="Recommendation feedback">
+                <button type="button" 
+                        class="btn btn-sm btn-outline-success like-btn"
+                        data-recommendation-id="<%= index %>"
+                        data-city="<%= h(rec[:destination_city]) %>"
+                        data-country="<%= h(rec[:destination_country]) %>"
+                        data-trip-type="<%= h(rec[:trip_scope]) %>"
+                        data-travel-style="<%= h(rec[:travel_style]) %>"
+                        data-budget-min="<%= rec[:budget_min].to_i %>"
+                        data-budget-max="<%= rec[:budget_max].to_i %>"
+                        data-length-of-stay="<%= rec[:length_of_stay].to_i %>"
+                        title="Like this recommendation">
+                  ❤️ Like
                 </button>
-              </form>
-              <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.col-12').remove();">
-                <i class="bi bi-trash me-1"></i> Delete
-              </button>
+                <button type="button" 
+                        class="btn btn-sm btn-outline-danger dislike-btn"
+                        data-recommendation-id="<%= index %>"
+                        data-city="<%= h(rec[:destination_city]) %>"
+                        data-country="<%= h(rec[:destination_country]) %>"
+                        data-trip-type="<%= h(rec[:trip_scope]) %>"
+                        data-travel-style="<%= h(rec[:travel_style]) %>"
+                        data-budget-min="<%= rec[:budget_min].to_i %>"
+                        data-budget-max="<%= rec[:budget_max].to_i %>"
+                        data-length-of-stay="<%= rec[:length_of_stay].to_i %>"
+                        title="Dislike this recommendation">
+                  👎 Dislike
+                </button>
+              </div>
+
+              <div class="d-flex gap-2">
+                <form action="<%= travel_plans_path %>" method="post" data-turbo-stream="true"
+                      onsubmit="event.target.querySelector('button[type=submit]').disabled = true;
+                        event.target.querySelector('button[type=submit]').classList.replace('btn-primary', 'btn-success');
+                        event.target.querySelector('button[type=submit]').innerHTML = '✓ Saved';">
+                  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                  <%= hidden_field_tag 'travel_plan[name]', rec[:name] %>
+                  <%= hidden_field_tag 'travel_plan[destination_name]', rec[:name] %>
+                  <%= hidden_field_tag 'travel_plan[destination_city]', rec[:destination_city] %>
+                  <%= hidden_field_tag 'travel_plan[destination_country]', rec[:destination_country] %>
+                  <%= hidden_field_tag 'travel_plan[description]', rec[:description] %>
+                  <%= hidden_field_tag 'travel_plan[details]', rec[:details] %>
+                  <%= hidden_field_tag 'travel_plan[budget_min]', rec[:budget_min] %>
+                  <%= hidden_field_tag 'travel_plan[budget_max]', rec[:budget_max] %>
+                  <%= hidden_field_tag 'travel_plan[safety_level]', rec[:safety_level] %>
+                  <%= hidden_field_tag 'travel_plan[travel_style]', rec[:travel_style] %>
+                  <%= hidden_field_tag 'travel_plan[length_of_stay]', rec[:length_of_stay] %>
+                  <%= hidden_field_tag 'travel_plan[travel_month]', rec[:travel_month] %>
+                  <%= hidden_field_tag 'travel_plan[trip_scope]', rec[:trip_scope] %>
+                  <%= hidden_field_tag 'travel_plan[number_of_travelers]', rec[:number_of_travelers] %>
+                  <%= hidden_field_tag 'travel_plan[general_purpose]', rec[:general_purpose] %>
+                  <%= hidden_field_tag 'travel_plan[visa_info]', rec[:visa_info] %>
+                  <%= hidden_field_tag 'travel_plan[status]', 'planned' %>
+                  <%= hidden_field_tag 'travel_plan[start_date]', rec[:start_date] if rec[:start_date].present? %>
+                  <%= hidden_field_tag 'travel_plan[end_date]', rec[:end_date] if rec[:end_date].present? %>
+                  <% if rec[:itinerary].is_a?(Hash) %>
+                    <% rec[:itinerary].each do |day, description| %>
+                      <%= hidden_field_tag "travel_plan[itinerary][#{day}]", description %>
+                    <% end %>
+                  <% end %>
+                  <% if rec[:budget_breakdown].is_a?(Hash) %>
+                    <% rec[:budget_breakdown].each do |item, cost| %>
+                      <%= hidden_field_tag "travel_plan[budget_breakdown][#{item}]", cost %>
+                    <% end %>
+                  <% end %>
+                  <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-bookmark-plus me-1"></i> Save
+                  </button>
+                </form>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.col-12').remove();">
+                  <i class="bi bi-trash me-1"></i> Delete
+                </button>
+              </div>
             </div>
 
           </div>
@@ -641,5 +676,127 @@
         }
       });
     }
+
+    // Initialize like/dislike button handlers
+    initializeFeedbackButtons();
   });
+
+  // Like/Dislike Functionality
+  function initializeFeedbackButtons() {
+    document.querySelectorAll('.like-btn, .dislike-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const feedbackType = this.classList.contains('like-btn') ? 'like' : 'dislike';
+        const recommendationData = {
+          destination_city: this.dataset.city,
+          destination_country: this.dataset.country,
+          trip_type: this.dataset.tripType,
+          travel_style: this.dataset.travelStyle,
+          budget_min: parseInt(this.dataset.budgetMin) || 0,
+          budget_max: parseInt(this.dataset.budgetMax) || 0,
+          length_of_stay: parseInt(this.dataset.lengthOfStay) || 0,
+          feedback_type: feedbackType
+        };
+
+        // Send feedback to server
+        submitFeedback(recommendationData, this);
+      });
+    });
+  }
+
+  function submitFeedback(data, buttonElement) {
+    // Disable both buttons while processing
+    const card = buttonElement.closest('.card-footer');
+    const likeBtn = card.querySelector('.like-btn');
+    const dislikeBtn = card.querySelector('.dislike-btn');
+    const originalLikeHTML = likeBtn.innerHTML;
+    const originalDislikeHTML = dislikeBtn.innerHTML;
+
+    likeBtn.disabled = true;
+    dislikeBtn.disabled = true;
+
+    fetch('/recommendation_feedbacks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+      },
+      body: JSON.stringify({ recommendation_feedback: data })
+    })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        // Update button states based on feedback type
+        if (result.feedback_type === 'like') {
+          likeBtn.classList.remove('btn-outline-success');
+          likeBtn.classList.add('btn-success');
+          likeBtn.innerHTML = '<i class="bi bi-hand-thumbs-up-fill"></i> Liked';
+          
+          dislikeBtn.classList.remove('btn-danger');
+          dislikeBtn.classList.add('btn-outline-danger');
+          dislikeBtn.innerHTML = '<i class="bi bi-hand-thumbs-down"></i> Dislike';
+        } else {
+          dislikeBtn.classList.remove('btn-outline-danger');
+          dislikeBtn.classList.add('btn-danger');
+          dislikeBtn.innerHTML = '<i class="bi bi-hand-thumbs-down-fill"></i> Disliked';
+          
+          likeBtn.classList.remove('btn-success');
+          likeBtn.classList.add('btn-outline-success');
+          likeBtn.innerHTML = '<i class="bi bi-hand-thumbs-up"></i> Like';
+        }
+        
+        // Show success message
+        showFeedbackMessage(card, result.message, 'success');
+      } else {
+        // Show error message
+        showFeedbackMessage(card, result.errors ? result.errors.join(', ') : 'Failed to save feedback', 'danger');
+        
+        // Reset button states
+        likeBtn.innerHTML = originalLikeHTML;
+        dislikeBtn.innerHTML = originalDislikeHTML;
+      }
+    })
+    .catch(error => {
+      console.error('Error submitting feedback:', error);
+      showFeedbackMessage(card, 'An error occurred. Please try again.', 'danger');
+      
+      // Reset button states
+      likeBtn.innerHTML = originalLikeHTML;
+      dislikeBtn.innerHTML = originalDislikeHTML;
+    })
+    .finally(() => {
+      likeBtn.disabled = false;
+      dislikeBtn.disabled = false;
+    });
+  }
+
+  function showFeedbackMessage(container, message, type) {
+    // Remove any existing messages
+    const existingAlert = container.querySelector('.feedback-alert');
+    if (existingAlert) {
+      existingAlert.remove();
+    }
+
+    // Create new alert
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show feedback-alert mt-2 mb-0`;
+    alert.style.fontSize = '0.875rem';
+    alert.innerHTML = `
+      ${escapeHtml(message)}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Insert after the button group
+    container.insertBefore(alert, container.lastElementChild);
+
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+      if (alert.parentNode) {
+        alert.remove();
+      }
+    }, 3000);
+  }
+
 </script>

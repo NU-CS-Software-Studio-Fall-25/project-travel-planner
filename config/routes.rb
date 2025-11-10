@@ -30,6 +30,11 @@ Rails.application.routes.draw do
   resources :travel_plans
   resources :destinations
   resources :users
+  resources :recommendation_feedbacks, only: [:create, :destroy, :index] do
+    collection do
+      delete 'remove', to: 'recommendation_feedbacks#remove'
+    end
+  end
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

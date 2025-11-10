@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :travel_plans, dependent: :destroy
   has_many :recommendations, dependent: :destroy
   has_many :destinations, through: :travel_plans
+  has_many :recommendation_feedbacks, dependent: :destroy
 
   # Serialize recommendations_json as JSON
   serialize :recommendations_json, coder: JSON
