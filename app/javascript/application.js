@@ -221,3 +221,17 @@ document.addEventListener('turbo:load', function() {
     }, 3000);
   }
 });
+
+// Listen for successful Turbo Stream submissions (for delete confirmations)
+document.addEventListener('turbo:submit-end', function(event) {
+  const form = event.target;
+  
+  // Check if this was a DELETE request
+  if (form.querySelector('input[name="_method"][value="delete"]')) {
+    if (event.detail.success) {
+      console.log('Recommendation deleted successfully');
+    } else {
+      console.error('Failed to delete recommendation');
+    }
+  }
+});
