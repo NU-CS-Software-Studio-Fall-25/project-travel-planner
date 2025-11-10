@@ -1,0 +1,145 @@
+<div class="container mt-4">
+  <h2>My Recommendation Feedback</h2>
+  
+  <div class="row mt-4">
+    <!-- Liked Destinations -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4><i class="bi bi-hand-thumbs-up-fill"></i> Liked Destinations</h4>
+        </div>
+        <div class="card-body">
+          <% if @liked.any? %>
+            <div class="list-group">
+              <% @liked.each do |feedback| %>
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h5 class="mb-1"><%= sanitize(feedback.destination_city) %>, <%= sanitize(feedback.destination_country) %></h5>
+                      <p class="mb-1">
+                        <small class="text-muted">
+                          <%= sanitize(feedback.trip_type) %> | 
+                          <%= sanitize(feedback.travel_style) %> | 
+                          <%= feedback.length_of_stay %> days
+                        </small>
+                      </p>
+                      <% if feedback.reason.present? %>
+                        <p class="mb-1"><%= sanitize(feedback.reason, tags: %w[br strong em]) %></p>
+                      <% end %>
+                      <small class="text-muted"><%= time_ago_in_words(feedback.created_at) %> ago</small>
+                    </div>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-danger remove-feedback-btn"
+                            data-feedback-id="<%= feedback.id %>">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-muted">You haven't liked any destinations yet.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disliked Destinations -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h4><i class="bi bi-hand-thumbs-down-fill"></i> Disliked Destinations</h4>
+        </div>
+        <div class="card-body">
+          <% if @disliked.any? %>
+            <div class="list-group">
+              <% @disliked.each do |feedback| %>
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h5 class="mb-1"><%= sanitize(feedback.destination_city) %>, <%= sanitize(feedback.destination_country) %></h5>
+                      <p class="mb-1">
+                        <small class="text-muted">
+                          <%= sanitize(feedback.trip_type) %> | 
+                          <%= sanitize(feedback.travel_style) %> | 
+                          <%= feedback.length_of_stay %> days
+                        </small>
+                      </p>
+                      <% if feedback.reason.present? %>
+                        <p class="mb-1"><%= sanitize(feedback.reason, tags: %w[br strong em]) %></p>
+                      <% end %>
+                      <small class="text-muted"><%= time_ago_in_words(feedback.created_at) %> ago</small>
+                    </div>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-danger remove-feedback-btn"
+                            data-feedback-id="<%= feedback.id %>">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-muted">You haven't disliked any destinations yet.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Escape HTML to prevent XSS in JavaScript
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
+// Remove feedback handler
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.remove-feedback-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const feedbackId = parseInt(this.getAttribute('data-feedback-id'), 10);
+      
+      // Validate feedbackId is a valid number
+      if (!feedbackId || isNaN(feedbackId)) {
+        alert('Invalid feedback ID');
+        return;
+      }
+      
+      if (!confirm('Are you sure you want to remove this feedback?')) {
+        return;
+      }
+      
+      fetch(`/recommendation_feedbacks/${feedbackId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          const message = escapeHtml(data.message || 'Unknown error');
+          alert('Failed to remove feedback: ' + message);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        const errorMsg = escapeHtml(error.message || 'Unknown error');
+        alert('An error occurred while removing feedback: ' + errorMsg);
+      });
+    });
+  });
+});
+</script>
