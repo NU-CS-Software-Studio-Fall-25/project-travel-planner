@@ -1,8 +1,131 @@
 # app/controllers/travel_plans_controller.rb
+require 'prawn'
 class TravelPlansController < ApplicationController
   include Pagy::Backend if defined?(Pagy::Backend)
   before_action :set_travel_plan, only: %i[ show edit update destroy ]
   before_action :require_login
+
+  def download_pdf
+    travel_plan = TravelPlan.find(params[:id])
+
+    pdf = Prawn::Document.new(page_size: 'A4', margin: 50)
+    ttf_path = File.join(Prawn::DATADIR, 'fonts', 'DejaVuSans.ttf')
+    if File.exist?(ttf_path)
+      pdf.font_families.update("DejaVuSans" => { normal: ttf_path })
+      pdf.font "DejaVuSans"
+    else
+      # Use a built-in PDF base font (no external file required)
+      pdf.font "Helvetica"
+    end
+
+    # Header
+    pdf.text (travel_plan.name.presence || "#{travel_plan.destination.name} Trip"), size: 20, style: :bold
+    pdf.move_down 6
+    pdf.text "#{travel_plan.destination_country.presence || travel_plan.destination&.country}", size: 12, color: "555555"
+    pdf.stroke_horizontal_rule
+    pdf.move_down 12
+
+    # Trip summary
+    pdf.text "Trip Summary", size: 14, style: :bold
+    pdf.move_down 6
+    pdf.text "Dates: #{travel_plan.start_date&.strftime('%B %d, %Y') || 'N/A'} - #{travel_plan.end_date&.strftime('%B %d, %Y') || 'N/A'}"
+    pdf.text "Status: #{travel_plan.status&.titleize || 'N/A'}"
+    pdf.text "Travel Style: #{travel_plan.travel_style || 'N/A'}" if travel_plan.travel_style.present?
+    pdf.move_down 8
+
+    # Description & Details
+    if travel_plan.description.present?
+      pdf.text "Description", style: :bold
+      pdf.move_down 4
+      pdf.text travel_plan.description, inline_format: true
+      pdf.move_down 8
+    end
+
+    if travel_plan.details.present?
+      pdf.text "Details", style: :bold
+      pdf.move_down 4
+      pdf.text travel_plan.details, inline_format: true
+      pdf.move_down 8
+    end
+
+    # Itinerary
+    if travel_plan.itinerary.present? && travel_plan.itinerary.is_a?(Hash) && travel_plan.itinerary.any?
+      pdf.start_new_page if pdf.cursor < 150
+      pdf.text "Itinerary", size: 14, style: :bold
+      pdf.move_down 8
+      travel_plan.itinerary.each do |day, desc|
+        pdf.text "#{day.to_s.humanize}", style: :bold, size: 11
+        pdf.move_down 4
+        pdf.text (desc || ''), size: 10
+        pdf.move_down 8
+      end
+    end
+
+    # Budget breakdown
+    if travel_plan.budget_breakdown.present?
+      pdf.start_new_page if pdf.cursor < 150
+      pdf.text "Budget Breakdown", size: 14, style: :bold
+      pdf.move_down 8
+
+      travel_plan.budget_breakdown.each do |category, data|
+        next if category.to_s.match?(/total.*trip|total_trip|total trip cost|total_trip_cost|total_trip/i)
+
+        pdf.stroke_horizontal_rule
+        pdf.move_down 6
+        pdf.text category.to_s.titleize, style: :bold, size: 12
+        pdf.move_down 6
+
+        if data.is_a?(Hash)
+          %i[cost cost_per_person cost_per_day_per_person cost_per_day cost_per_night cost_per_day_total total_cost].each do |k|
+            if data[k].present?
+              value = data[k].to_s.gsub(/[^\d\.]/,'')
+              formatted = value.present? ? sprintf("$%0.2f", value.to_f) : "N/A"
+              pdf.text "#{k.to_s.humanize}: #{formatted}"
+            end
+          end
+          if data[:description].present? || data["description"].present?
+            pdf.move_down 4
+            pdf.text "Note: #{(data[:description] || data['description']).to_s}", size: 10, color: "555555"
+          end
+        else
+          s = data.to_s
+          # extract simple numbers/descriptions
+          if (m = s.match(/description\s+(.+)/i))
+            pdf.text "Note: #{m[1].strip}", size: 10, color: "555555"
+          end
+          if (num = s[/\b(\d{1,3}(?:,\d{3})*|\d+)\b/])
+            pdf.text "Cost: $#{num.gsub(/[^\d]/,'')}"
+          end
+        end
+
+        pdf.move_down 8
+      end
+
+      # total trip cost if provided
+      total_key_value =
+        travel_plan.budget_breakdown["total_trip_cost"] ||
+        travel_plan.budget_breakdown["total trip cost"] ||
+        travel_plan.budget_breakdown["Total trip cost"] ||
+        travel_plan.budget_breakdown["total"] ||
+        travel_plan.budget_breakdown["total_trip"] ||
+        travel_plan.budget_breakdown["Total"]
+
+      if total_key_value.present?
+        total_num = total_key_value.to_s.gsub(/[^\d\.]/, '')
+        pdf.move_down 6
+        pdf.text "Total Trip Cost: #{ sprintf("$%0.2f", total_num.to_f) }", style: :bold, size: 12
+      end
+    end
+
+    # Footer meta
+    pdf.number_pages "Generated: #{Time.current.strftime('%Y-%m-%d %H:%M')}", at: [pdf.bounds.left, 10], size: 8, align: :left
+    filename = "#{(travel_plan.name.presence || "travel_plan_#{travel_plan.id}")}.pdf"
+
+    send_data pdf.render,
+              filename: filename,
+              type: 'application/pdf',
+              disposition: 'attachment'
+  end
 
   # GET /travel_plans or /travel_plans.json
   def index

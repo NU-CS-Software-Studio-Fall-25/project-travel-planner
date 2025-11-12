@@ -36,6 +36,12 @@ Rails.application.routes.draw do
     end
   end
 
+  # Add member route for PDF download
+  resources :travel_plans do
+    member do
+      get :download_pdf
+    end
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
