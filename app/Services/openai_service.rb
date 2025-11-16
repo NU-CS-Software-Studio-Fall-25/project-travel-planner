@@ -1,20 +1,147 @@
 # app/Services/openai_service.rb
 
 class OpenaiService
+  MAX_ITERATIONS = 3 # Maximum attempts to find an acceptable destination
+  FLIGHT_BUDGET_THRESHOLD = 0.5 # Flight should not exceed 50% of max budget
+
   def initialize(preferences)
     @client = OpenAI::Client.new(api_key: ENV.fetch('OPENAI_API_KEY'))
     @preferences = preferences
+    @serpapi_service = SerpapiFlightService.new(preferences)
+    @rejected_cities = []
   end
 
   def get_recommendations
-    prompt = build_prompt
-    Rails.logger.info prompt
+    Rails.logger.info "=== Starting Iterative Recommendation Process ==="
+    
+    # Iterate to find an acceptable destination
+    MAX_ITERATIONS.times do |iteration|
+      Rails.logger.info "=== Iteration #{iteration + 1}/#{MAX_ITERATIONS} ==="
+      
+      # Step 1: Get city recommendation from OpenAI
+      city_result = get_city_recommendation
+      
+      if city_result[:error]
+        Rails.logger.error "Failed to get city recommendation: #{city_result[:error]}"
+        next
+      end
+      
+      destination_city = city_result[:city]
+      destination_country = city_result[:country]
+      
+      Rails.logger.info "OpenAI recommended: #{destination_city}, #{destination_country}"
+      
+      # Step 2: Check flight price with SerpAPI
+      flight_result = @serpapi_service.get_flight_price(destination_city, destination_country)
+      
+      if !flight_result[:success]
+        Rails.logger.warn "Flight search failed: #{flight_result[:error]}"
+        @rejected_cities << {
+          city: destination_city,
+          country: destination_country,
+          reason: "Flight search unavailable: #{flight_result[:error]}"
+        }
+        next
+      end
+      
+      flight_price = flight_result[:price]
+      max_budget = @preferences[:budget_max].to_f
+      flight_budget_limit = max_budget * FLIGHT_BUDGET_THRESHOLD
+      
+      Rails.logger.info "Flight Price: $#{flight_price}, Budget Limit (50%): $#{flight_budget_limit}"
+      
+      # Step 3: Validate flight price
+      if flight_price > flight_budget_limit
+        Rails.logger.warn "Flight too expensive: $#{flight_price} > $#{flight_budget_limit}"
+        @rejected_cities << {
+          city: destination_city,
+          country: destination_country,
+          reason: "Flight cost $#{flight_price} exceeds 50% of budget ($#{flight_budget_limit})"
+        }
+        next
+      end
+      
+      # Step 4: Flight is acceptable! Get full travel plan
+      Rails.logger.info "✓ Acceptable destination found: #{destination_city}"
+      
+      full_plan = get_full_travel_plan(destination_city, destination_country, flight_result)
+      
+      if full_plan[:error]
+        Rails.logger.error "Failed to get full plan: #{full_plan[:error]}"
+        @rejected_cities << {
+          city: destination_city,
+          country: destination_country,
+          reason: "Failed to generate travel plan: #{full_plan[:error]}"
+        }
+        next
+      end
+      
+      return full_plan[:recommendations]
+    end
+    
+    # If we get here, we failed to find an acceptable destination
+    Rails.logger.error "=== Failed to find acceptable destination after #{MAX_ITERATIONS} attempts ==="
+    
+    return [{
+      name: "No Suitable Destination Found",
+      destination_country: "N/A",
+      description: "We couldn't find a suitable travel destination within your budget after checking #{MAX_ITERATIONS} options.",
+      details: build_rejection_summary,
+      itinerary: {},
+      budget_min: 0,
+      budget_max: 0,
+      budget_breakdown: {},
+      safety_level: "level_1",
+      travel_style: @preferences[:travel_style] || "N/A",
+      visa_info: "N/A",
+      length_of_stay: @preferences[:length_of_stay]&.to_i || 4,
+      travel_month: @preferences[:travel_month] || "Unknown",
+      trip_scope: @preferences[:trip_scope] || "Unknown",
+      number_of_travelers: @preferences[:number_of_travelers]&.to_i || 1,
+      general_purpose: @preferences[:general_purpose] || "Unknown",
+      start_date: @preferences[:start_date],
+      end_date: @preferences[:end_date]
+    }]
+  end
 
+  private
+
+  # Get city recommendation from OpenAI (first phase)
+  def get_city_recommendation
+    prompt = build_city_prompt
+    
     begin
-      Rails.logger.info "=== OpenAI API Call Starting ==="
-      Rails.logger.info "API Key present: #{ENV['OPENAI_API_KEY'].present?}"
-      Rails.logger.info "API Key length: #{ENV['OPENAI_API_KEY']&.length}"
+      Rails.logger.info "=== Requesting City Recommendation from OpenAI ==="
+      
+      response = @client.chat.completions.create(
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 500,
+        response_format: { type: "json_object" }
+      )
+      
+      raw_content = response.choices.first&.message&.content
+      parsed = JSON.parse(raw_content, symbolize_names: true)
+      
+      {
+        city: parsed[:city],
+        country: parsed[:country]
+      }
+      
+    rescue => e
+      Rails.logger.error "Error getting city recommendation: #{e.message}"
+      { error: e.message }
+    end
+  end
 
+  # Get full travel plan from OpenAI (second phase - after flight validation)
+  def get_full_travel_plan(destination_city, destination_country, flight_result)
+    prompt = build_full_plan_prompt(destination_city, destination_country, flight_result)
+    
+    begin
+      Rails.logger.info "=== Requesting Full Travel Plan from OpenAI ==="
+      
       response = @client.chat.completions.create(
         model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
@@ -22,43 +149,190 @@ class OpenaiService
         max_tokens: 5000,
         response_format: { type: "json_object" }
       )
-
-      Rails.logger.info "=== OpenAI Response Received ==="
-      Rails.logger.info "Response: #{response.inspect}"
-
-      # Parse the response and return it
-      parse_response(response)
+      
+      parsed_recommendations = parse_response(response)
+      
+      # Inject actual flight price into the recommendations
+      parsed_recommendations.each do |rec|
+        if rec[:budget_breakdown].is_a?(Hash)
+          # Ensure flight_result[:price] is a number
+          flight_price = flight_result[:price].to_f
+          travelers = (@preferences[:number_of_travelers] || 1).to_i
+          
+          rec[:budget_breakdown][:flights] = {
+            description: "Round-trip flight from #{flight_result[:details][:departure_airport]} to #{flight_result[:details][:arrival_airport]} × #{travelers} travelers via #{flight_result[:details][:airline]}",
+            cost_per_person: (flight_price / travelers).round(2),
+            total_cost: flight_price.round(2),
+            duration: flight_result[:details][:duration].to_s,
+            stops: flight_result[:details][:stops].to_i
+          }
+        end
+      end
+      
+      { recommendations: parsed_recommendations }
+      
     rescue => e
-      Rails.logger.error "=== OpenAI API Error ==="
-      Rails.logger.error "Error class: #{e.class}"
-      Rails.logger.error "Error message: #{e.message}"
-      Rails.logger.error "Backtrace: #{e.backtrace.first(5).join("\n")}"
-
-      # Return an error recommendation
-      [{
-        name: "API Error",
-        destination_country: "Error",
-        description: "Failed to get recommendations from OpenAI: #{e.message}",
-        details: "Please check your API key and try again. Error: #{e.class}",
-        itinerary: {},
-        budget_min: 0,
-        budget_max: 0,
-        budget_breakdown: {},
-        safety_level: "level_1",
-        travel_style: "N/A",
-        visa_info: "N/A",
-        length_of_stay: @preferences[:length_of_stay]&.to_i || 4,
-        travel_month: @preferences[:travel_month] || "Unknown",
-        trip_scope: @preferences[:trip_scope] || "Unknown",
-        number_of_travelers: @preferences[:number_of_travelers]&.to_i || 1,
-        general_purpose: @preferences[:general_purpose] || "Unknown",
-        start_date: @preferences[:start_date],
-        end_date: @preferences[:end_date]
-      }]
+      Rails.logger.error "Error getting full plan: #{e.message}"
+      { error: e.message }
     end
   end
 
-  private
+  # Build prompt for city recommendation only
+  def build_city_prompt
+    safety_context = build_safety_context(@preferences[:safety_preference])
+    
+    rejected_list = if @rejected_cities.empty?
+                      "None yet"
+                    else
+                      @rejected_cities.map { |r| "#{r[:city]}, #{r[:country]} (#{r[:reason]})" }.join("\n")
+                    end
+    
+    <<~PROMPT
+      You are a professional travel planner. Based on the user's preferences, suggest ONE destination city that matches their requirements.
+      
+      CRITICAL SAFETY REQUIREMENT:
+      User's Safety Preference: "#{@preferences[:safety_preference] || 'Generally Safe'}"
+      
+      YOU CAN ONLY RECOMMEND DESTINATIONS FROM THE FOLLOWING #{safety_context[:country_count]} COUNTRIES:
+      #{safety_context[:country_list]}
+      
+      Previously Rejected Cities (DO NOT recommend these again):
+      #{rejected_list}
+      
+      User Requirements:
+      - Travel Dates: #{@preferences[:start_date]} to #{@preferences[:end_date]}
+      - Budget: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (TOTAL for #{@preferences[:number_of_travelers] || 1} travelers)
+      - Trip Scope: #{@preferences[:trip_scope]}
+      - Travel Style: #{@preferences[:travel_style]}
+      - Purpose: #{@preferences[:general_purpose]}
+      - From: #{@preferences[:current_location]} (#{@preferences[:passport_country]})
+      
+      Return ONLY a JSON object with:
+      {
+        "city": "City Name",
+        "country": "Country Name"
+      }
+      
+      The city must be in one of the allowed countries above, have reasonable flight connections, and match the user's preferences.
+      DO NOT suggest any city from the rejected list.
+    PROMPT
+  end
+
+  # Build prompt for full travel plan with known destination and flight price
+  def build_full_plan_prompt(destination_city, destination_country, flight_result)
+    start_date = @preferences[:start_date].present? ? Date.parse(@preferences[:start_date].to_s) : nil
+    end_date = @preferences[:end_date].present? ? Date.parse(@preferences[:end_date].to_s) : nil
+    length_of_stay = @preferences[:length_of_stay] ||
+                     (start_date && end_date ? (end_date - start_date).to_i + 1 : 4)
+    travel_month = @preferences[:travel_month] || (start_date ? start_date.strftime("%B") : "")
+    
+    date_range = if start_date && end_date
+                   "#{start_date.strftime('%B %d, %Y')} to #{end_date.strftime('%B %d, %Y')}"
+                 elsif travel_month.present?
+                   "during #{travel_month}"
+                 else
+                   "within the next few months"
+                 end
+    
+    flight_cost = flight_result[:price]
+    remaining_budget_max = @preferences[:budget_max].to_f - flight_cost
+    remaining_budget_min = [@preferences[:budget_min].to_f - flight_cost, 0].max
+    
+    <<~PROMPT
+      You are a professional travel planner. Create a detailed travel plan for #{destination_city}, #{destination_country}.
+      
+      CONFIRMED FLIGHT INFORMATION:
+      - Flight Cost: $#{flight_cost} (already booked/confirmed)
+      - Route: #{flight_result[:details][:departure_airport]} to #{flight_result[:details][:arrival_airport]}
+      - Airline: #{flight_result[:details][:airline]}
+      
+      REMAINING BUDGET for accommodation, food, activities, and transportation:
+      - Minimum: $#{remaining_budget_min.round(2)}
+      - Maximum: $#{remaining_budget_max.round(2)}
+      
+      User Preferences:
+      - Travel Dates: #{date_range}
+      - Length of Stay: #{length_of_stay} days
+      - Number of Travelers: #{@preferences[:number_of_travelers] || 1} people
+      - Travel Style: #{@preferences[:travel_style]}
+      - Purpose: #{@preferences[:general_purpose]}
+      
+      Return a JSON object with a "destinations" key containing an array with ONE destination object:
+      
+      {
+        "destinations": [{
+          "name": "Creative trip name (e.g., '#{destination_city} Adventure')",
+          "destination_city": "#{destination_city}",
+          "destination_country": "#{destination_country}",
+          "description": "One-paragraph summary of the trip",
+          "details": "Additional tips and seasonal information",
+          "itinerary": {
+            "Day 1": "Detailed paragraph (6+ sentences, 100+ words) for day 1",
+            "Day 2": "Detailed paragraph (6+ sentences, 100+ words) for day 2",
+            ...
+            "Day #{length_of_stay}": "Detailed paragraph (6+ sentences, 100+ words) for day #{length_of_stay}"
+          },
+          "budget_min": #{@preferences[:budget_min]},
+          "budget_max": #{@preferences[:budget_max]},
+          "budget_breakdown": {
+            "hotel": {
+              "description": "Hotel details for #{length_of_stay} nights",
+              "cost_per_night": <number for all #{@preferences[:number_of_travelers] || 1} travelers>,
+              "total_cost": <number>
+            },
+            "food": {
+              "description": "Meals budget per day",
+              "cost_per_day_per_person": <number>,
+              "cost_per_day_total": <number for all travelers>,
+              "total_cost": <number for entire trip>
+            },
+            "activities": {
+              "description": "Main activities with costs",
+              "total_cost": <number>
+            },
+            "car_rental": {
+              "description": "Transportation details",
+              "total_cost": <number>
+            },
+            "total_trip_cost": "Total of all categories (must equal budget_max)"
+          },
+          "travel_style": "#{@preferences[:travel_style]}",
+          "visa_info": "Visa requirements for #{@preferences[:passport_country]} citizens",
+          "length_of_stay": #{length_of_stay},
+          "travel_month": "#{travel_month}",
+          "trip_scope": "#{@preferences[:trip_scope]}",
+          "number_of_travelers": #{@preferences[:number_of_travelers] || 1},
+          "general_purpose": "#{@preferences[:general_purpose]}"
+        }]
+      }
+      
+      IMPORTANT:
+      - Flight cost of $#{flight_cost} is already confirmed and will be added separately
+      - Budget breakdown should focus on: hotel, food, activities, car_rental
+      - Each itinerary day MUST be one detailed paragraph with 6+ sentences
+      - Total costs must fit within remaining budget of $#{remaining_budget_min.round(2)} - $#{remaining_budget_max.round(2)}
+    PROMPT
+  end
+
+  # Build summary of rejected cities for user feedback
+  def build_rejection_summary
+    return "No destinations checked yet." if @rejected_cities.empty?
+    
+    summary = "We checked the following destinations but they didn't meet your budget requirements:\n\n"
+    
+    @rejected_cities.each_with_index do |rejected, index|
+      summary += "#{index + 1}. #{rejected[:city]}, #{rejected[:country]}\n"
+      summary += "   Reason: #{rejected[:reason]}\n\n"
+    end
+    
+    summary += "\nSuggestions:\n"
+    summary += "- Try increasing your budget\n"
+    summary += "- Consider different travel dates (off-peak seasons are cheaper)\n"
+    summary += "- Look for destinations closer to your location\n"
+    summary += "- Reduce the number of travelers\n"
+    
+    summary
+  end
 
   # Determine the user's current country for domestic travel
   # Parses country from current_location (expected from Google Maps API)
@@ -223,136 +497,6 @@ class OpenaiService
       top_country: top_countries.first,
       restriction_note: safety_note
     }
-  end
-
-  def build_prompt
-    # Calculate date information
-    start_date = @preferences[:start_date].present? ? Date.parse(@preferences[:start_date].to_s) : nil
-    end_date = @preferences[:end_date].present? ? Date.parse(@preferences[:end_date].to_s) : nil
-    length_of_stay = @preferences[:length_of_stay] ||
-                     (start_date && end_date ? (end_date - start_date).to_i + 1 : 4)
-    travel_month = @preferences[:travel_month] || (start_date ? start_date.strftime("%B") : "")
-
-    # Format dates for the prompt
-    date_range = if start_date && end_date
-                   "#{start_date.strftime('%B %d, %Y')} to #{end_date.strftime('%B %d, %Y')}"
-                 elsif travel_month.present?
-                   "during #{travel_month}"
-                 else
-                   "within the next few months"
-                 end
-
-    # Get safety context from GPI database
-    safety_preference = @preferences[:safety_preference]
-    safety_context = build_safety_context(safety_preference)
-
-    <<~PROMPT
-    You are a professional travel planner. Based on the following travel preferences, suggest one travel destinations that STRICTLY match ALL the user's requirements.
-  
-    CRITICAL REQUIREMENTS - ALL recommendations MUST:
-    1. Have itineraries for EXACTLY #{length_of_stay} days (no more, no less)
-    2. Be suitable for travel #{date_range} (consider weather, seasonal events, holidays, and typical conditions for this specific time period)
-    3. Fit within the budget range of $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (budget_min and budget_max MUST be within this range)
-    4. Match the #{@preferences[:trip_scope]} scope (only suggest #{@preferences[:trip_scope]} destinations)
-    5. Be appropriate for #{@preferences[:number_of_travelers] || 1} travelers (budget calculations MUST account for this number of people)
-    6. Follow the #{@preferences[:travel_style]} travel style
-  
-    ⚠️ CRITICAL SAFETY REQUIREMENT - YOU MUST FOLLOW THIS STRICTLY:
-  
-    User's Safety Preference: "#{safety_preference || 'Generally Safe'}"
-    #{safety_context[:restriction_note]}
-  
-    YOU CAN ONLY RECOMMEND DESTINATIONS FROM THE FOLLOWING #{safety_context[:country_count]} COUNTRIES:
-    #{safety_context[:country_list]}
-  
-    DO NOT recommend any country that is NOT in the above list. These countries have been pre-screened based on the 2025 Global Peace Index (GPI) to meet the user's safety requirements.
-  
-    Top countries by safety (for your reference):
-     #{safety_context[:country_details]}
-  
-    The user selected "#{safety_preference}" which means they want destinations that are #{safety_context[:top_country]&.safety_description&.downcase || 'safe for travel'}.
-  
-    Return the response as a valid JSON object with a single key "destinations" that is an array where each object has the following keys:
-  
-    - "name": A creative name for this specific trip (e.g., "Costa Rican Jungle Adventure").
-    - "destination_city": The primary city or location name for this destination. For better accuracy, include the state/province for cities in large countries (e.g., "Burlington, Vermont" or "Burlington, Wisconsin" for USA; "Paris, Texas" or just "Paris" for France). This should be a real, geocodable location name, NOT a creative name.
-    - "destination_country": The country of the recommended destination. MUST be from the allowed country list above.
-    - "description": A one-paragraph summary of the trip, mentioning why it's perfect for #{date_range}.
-    - "details": Additional trip details, notes, or tips. Include seasonal information for the travel dates.
-    - "itinerary": A detailed, day-by-day travel itinerary for EXACTLY #{length_of_stay} days. 
-       • Create keys "Day 1", "Day 2", up to "Day #{length_of_stay}".  
-       • Each day MUST include **exactly one full paragraph (no lists)**.  
-       • Each paragraph MUST contain **at least 6 complete sentences**, each describing **distinct morning, afternoon, evening, and cultural/dining activities**, ensuring detail equivalent to 100+ words.  
-       • If any day's paragraph is under 6 sentences, the output will be rejected.  
-       • Focus on realism and storytelling — the itinerary should read like a high-quality travel magazine description, not a summary.
-  
-    - "budget_min": Minimum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
-    - "budget_max": Maximum trip cost (number). MUST be between $#{@preferences[:budget_min]} and $#{@preferences[:budget_max]}.
-    - "budget_breakdown": A JSON object with these detailed keys (ALL COSTS MUST BE TOTAL FOR #{@preferences[:number_of_travelers] || 1} TRAVELERS):
-          {
-            "flights": {
-                "description": "Round-trip flight details including exact route (from #{@preferences[:passport_country]}'s major airport, e.g., JFK or LAX, to destination airport, e.g., CDG Paris or OSL Oslo) × #{@preferences[:number_of_travelers] || 1} travelers",
-                "cost_per_person": <numeric value>,
-                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers>
-            },
-            "hotel": {
-                "description": "Hotel name or type (e.g., 4-star boutique, beachfront resort) and nightly rate with total for #{length_of_stay} nights for #{@preferences[:number_of_travelers] || 1} travelers",
-                "cost_per_night": <numeric value for accommodating all #{@preferences[:number_of_travelers] || 1} travelers>,
-                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers for entire stay>
-            },
-            "food": {
-                "description": "Average per-day cost of meals and drinks with local cuisine examples for #{@preferences[:number_of_travelers] || 1} travelers",
-                "cost_per_day_per_person": <numeric value>,
-                "cost_per_day_total": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers>,
-                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers for entire trip>
-            },
-            "activities": {
-                "description": "List each major paid activity (e.g., guided tour, museum ticket, adventure excursion) with individual cost per person and total for #{@preferences[:number_of_travelers] || 1} travelers",
-                "total_cost": <numeric value for all #{@preferences[:number_of_travelers] || 1} travelers>
-            },
-            "car_rental": {
-                "description": "Vehicle type (e.g., compact, SUV, minivan based on #{@preferences[:number_of_travelers] || 1} travelers) and total rental cost for duration of stay",
-                "total_cost": <numeric value>
-            },
-            "total_trip_cost": "Sum of all above categories for ALL #{@preferences[:number_of_travelers] || 1} travelers; must match budget_max approximately"
-          }
-  
-    - "safety_score": The actual GPI safety score for this country (you can reference the list above for accurate scores).
-    - "travel_style": Primary travel style matching "#{@preferences[:travel_style]}".  
-    - "visa_info": Visa requirements for citizens from #{@preferences[:passport_country]}.  
-    - "length_of_stay": Must be exactly #{length_of_stay} (as a number).  
-    - "travel_month": "#{travel_month}".  
-    - "trip_scope": Must be "#{@preferences[:trip_scope]}".  
-    - "number_of_travelers": Must be #{@preferences[:number_of_travelers] || 1} (as a number).  
-    - "general_purpose": "#{@preferences[:general_purpose]}"
-  
-    User Preferences Summary:
-    - Trip Name Idea: #{@preferences[:name]}
-    - Passport Country: #{@preferences[:passport_country]}
-    - Budget Range: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (TOTAL for all #{@preferences[:number_of_travelers] || 1} travelers)
-    - Travel Dates: #{date_range}
-    - Length of Stay: #{length_of_stay} days
-    - Number of Travelers: #{@preferences[:number_of_travelers] || 1} people
-    - Travel Style: #{@preferences[:travel_style]}
-    - Purpose: #{@preferences[:general_purpose]}
-    - Safety Requirement: #{safety_preference} (only from pre-approved country list)
-    - Scope: #{@preferences[:trip_scope]}
-  
-    IMPORTANT:
-    - The itinerary MUST have exactly #{length_of_stay} days
-    - Each day MUST have exactly ONE detailed paragraph of at least 6 complete sentences (no bullet points or short entries)
-    - Each day's text should be approximately 100+ words
-    - The budget_breakdown MUST include realistic flight routes, nightly hotel costs, per-day food costs, detailed activity costs, rental car info, and a total_trip_cost line.
-    - ALL BUDGET CALCULATIONS MUST BE FOR #{@preferences[:number_of_travelers] || 1} TRAVELERS (multiply per-person costs accordingly)
-    - Hotel costs should reflect appropriate room configuration for #{@preferences[:number_of_travelers] || 1} travelers (e.g., single room, double room, family suite, multiple rooms)
-    - All destinations MUST be suitable for travel #{date_range}
-    - Consider any holidays, festivals, or special events during this time period
-    - Budget estimates MUST fall within $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (TOTAL for all #{@preferences[:number_of_travelers] || 1} travelers)
-    - Only suggest #{@preferences[:trip_scope]} destinations
-    - ONLY recommend countries from the provided safety-approved list above
-  
-    Return ONLY the JSON object, with no other text before or after it.
-  PROMPT
   end
 
   def parse_response(response)
