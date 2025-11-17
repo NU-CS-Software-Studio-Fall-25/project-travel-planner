@@ -1,0 +1,71 @@
+<div class="destination-header">
+  <div class="destination-hero">
+    <div class="destination-hero-content">
+      <div class="destination-title-section">
+        <h1 class="destination-name"><%= destination.name %></h1>
+        <p class="destination-location">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+          </svg>
+          <%= destination.country %>
+        </p>
+      </div>
+
+      <div class="destination-quick-info">
+        <div class="quick-info-item">
+          <span class="quick-info-label">Safety Score</span>
+          <span class="quick-info-value">
+            <span class="badge <%= safety_badge_class(destination.safety_score) %>">
+              <%= destination.safety_score %>/10
+            </span>
+          </span>
+        </div>
+        
+        <div class="quick-info-item">
+          <span class="quick-info-label">Best Season</span>
+          <span class="quick-info-value"><%= destination.best_season || 'Year-round' %></span>
+        </div>
+        
+        <div class="quick-info-item">
+          <span class="quick-info-label">Avg. Cost</span>
+          <span class="quick-info-value"><%= number_to_currency(destination.average_cost) %></span>
+        </div>
+        
+        <% if destination.visa_required %>
+        <div class="quick-info-item">
+          <span class="quick-info-label">Visa</span>
+          <span class="quick-info-value">
+            <span class="badge bg-warning text-dark">Required</span>
+          </span>
+        </div>
+        <% end %>
+      </div>
+
+      <div class="destination-actions">
+        <%= link_to travel_plans_path(destination_id: destination.id), 
+                    class: "btn btn-primary btn-lg destination-cta",
+                    title: "Create a travel plan for this destination" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-plus" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z"/>
+            <path d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"/>
+          </svg>
+          Plan Your Trip
+        <% end %>
+        
+        <% if tripadvisor_url(destination).present? %>
+          <%= link_to tripadvisor_url(destination), 
+                      class: "btn btn-outline-success destination-secondary-action",
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      title: "Visit TripAdvisor to search for #{destination.name}, view photos, read reviews, and discover popular attractions" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16" aria-hidden="true">
+              <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+              <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+            </svg>
+            Explore on TripAdvisor
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
