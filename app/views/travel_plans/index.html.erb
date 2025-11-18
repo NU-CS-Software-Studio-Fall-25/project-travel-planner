@@ -20,7 +20,7 @@
                   <% if travel_plan.description.present? %>
                     <p><strong>Description:</strong> <%= travel_plan.description %></p>
                   <% end %>
-                  
+
                   <% if travel_plan.details.present? %>
                     <p><strong>Details:</strong> <%= travel_plan.details %></p>
                   <% end %>
@@ -56,7 +56,7 @@
                     </div>
                   <% end %>
                 </div>
-                
+
                 <div class="col-md-4">
                   <ul class="list-group list-group-flush">
                     <% if travel_plan.budget_min.present? && travel_plan.budget_max.present? %>
@@ -64,7 +64,7 @@
                         <strong>Budget:</strong> $<%= number_with_precision(travel_plan.budget_min, precision: 0, delimiter: ",") %> - $<%= number_with_precision(travel_plan.budget_max, precision: 0, delimiter: ",") %>
                       </li>
                     <% end %>
-                    
+
                     <% if travel_plan.safety_score.present? %>
                       <% safety_level = safety_score_to_level(travel_plan.safety_score) %>
                       <li class="list-group-item">
@@ -74,11 +74,11 @@
                         </span>
                       </li>
                     <% end %>
-                    
+
                     <% if travel_plan.travel_style.present? %>
                       <li class="list-group-item"><strong>Travel Style:</strong> <%= travel_plan.travel_style %></li>
                     <% end %>
-                    
+
                     <% if travel_plan.visa_info.present? %>
                       <li class="list-group-item"><strong>Visa Info:</strong> <%= travel_plan.visa_info %></li>
                     <% end %>
@@ -102,6 +102,13 @@
                         <div id="collapse-budget-<%= travel_plan.id %>" class="accordion-collapse collapse">
                           <div class="accordion-body p-4 bg-light rounded-4">
 
+                            <%# compute trip_days once %>
+                            <% trip_days = if travel_plan.start_date && travel_plan.end_date
+                                             ((travel_plan.end_date - travel_plan.start_date).to_i + 1)
+                                           else
+                                             1
+                                           end %>
+
                             <% travel_plan.budget_breakdown.each do |category, data| %>
                               <% next if category.to_s.match?(/total.*trip|total_trip|total trip cost|total_trip_cost|total_trip/i) %>
 
@@ -120,26 +127,38 @@
                                     </p>
                                   <% end %>
 
-                                  <% [:cost, :cost_per_day, :cost_per_night, :total_cost].each do |sym| %>
+                                  <%# support new keys in hash entries %>
+                                  <% [:cost, :cost_per_person, :cost_per_day_per_person, :cost_per_day, :cost_per_night, :cost_per_day_total, :total_cost].each do |sym| %>
                                     <% if data[sym].present? %>
-                                      <% num = data[sym].to_s.gsub(/[^\d]/, '').to_i %>
+                                      <% raw_val = data[sym].to_s.gsub(/[^\d.]/, '') %>
+                                      <% num = raw_val.present? ? raw_val.to_f : nil %>
                                       <% label =
                                            case sym
                                            when :cost then "Cost"
+                                           when :cost_per_person then "Cost per person"
+                                           when :cost_per_day_per_person then "Cost per day/person"
                                            when :cost_per_day then "Cost per day"
                                            when :cost_per_night then "Cost per night"
+                                           when :cost_per_day_total then "Cost per day (total)"
                                            when :total_cost then "Total cost"
                                            end %>
+
                                       <p class="mb-1">
                                         <span class="fw-semibold text-dark"><%= label %>:</span>
-                                        <span class="text-muted">$<%= number_with_delimiter(num) %></span>
+                                        <% if num %>
+                                          <span class="text-muted">
+                                            $<%= number_with_delimiter(num % 1 == 0 ? num.to_i : num.round(2)) %>
+                                          </span>
+                                        <% else %>
+                                          <span class="text-muted">N/A</span>
+                                        <% end %>
                                       </p>
                                     <% end %>
                                   <% end %>
 
                                 <% else %>
                                   <% s = data.to_s.dup %>
-                                  <% desc = s[/description\s+(.+?)(?=\s+(?:cost(?:_per_day|_per_night)?|cost_per_day|cost_per_night|total_cost)\s*(?:\$?[\d,])|\z)/i, 1]&.strip %>
+                                  <% desc = s[/description\s+(.+?)(?=\s+(?:cost(?:_per_day|_per_night|_per_person|_per_day_per_person|_per_day_total)?|cost_per_day|cost_per_night|cost_per_person|cost_per_day_per_person|cost_per_day_total|total_cost)\s*(?:\$?[\d,])|\z)/i, 1]&.strip %>
                                   <% if desc.present? %>
                                     <p class="mb-2">
                                       <span class="fw-semibold text-dark">Description:</span>
@@ -149,43 +168,65 @@
 
                                   <% extract_num = ->(regex) do
                                     m = s[regex, 1]
-                                    m.present? ? m.gsub(/[^\d]/, '').to_i : nil
+                                    m.present? ? m.gsub(/[^\d.]/, '').to_f : nil
                                   end %>
 
-                                  <% cost_val = extract_num.call(/\bcost\s*\$?([\d,]+)/i) %>
-                                  <% cost_per_day_val = extract_num.call(/\bcost_per_day\s*\$?([\d,]+)/i) %>
-                                  <% cost_per_night_val = extract_num.call(/\bcost_per_night\s*\$?([\d,]+)/i) %>
-                                  <% total_cost_val = extract_num.call(/\btotal_cost\s*\$?([\d,]+)/i) || extract_num.call(/\btotal\s*cost\s*\$?([\d,]+)/i) %>
+                                  <% cost_val = extract_num.call(/\bcost\s*\$?([\d,\.]+)/i) %>
+                                  <% cost_per_person_val = extract_num.call(/\bcost[_\s]*per[_\s]*person\s*\$?([\d,\.]+)/i) || extract_num.call(/\bcost_per_person\s*\$?([\d,\.]+)/i) %>
+                                  <% cost_per_day_per_person_val = extract_num.call(/\bcost[_\s]*per[_\s]*day[_\s]*per[_\s]*person\s*\$?([\d,\.]+)/i) || extract_num.call(/\bcost_per_day_per_person\s*\$?([\d,\.]+)/i) %>
+                                  <% cost_per_day_total_val = extract_num.call(/\bcost[_\s]*per[_\s]*day[_\s]*total\s*\$?([\d,\.]+)/i) || extract_num.call(/\bcost_per_day_total\s*\$?([\d,\.]+)/i) %>
+                                  <% cost_per_night_val = extract_num.call(/\bcost[_\s]*per[_\s]*night\s*\$?([\d,\.]+)/i) || extract_num.call(/\bcost_per_night\s*\$?([\d,\.]+)/i) %>
+                                  <% total_cost_val = extract_num.call(/\btotal[_\s]*cost\s*\$?([\d,\.]+)/i) || extract_num.call(/\btotal_cost\s*\$?([\d,\.]+)/i) %>
 
                                   <% if cost_val.present? %>
                                     <p class="mb-1">
                                       <span class="fw-semibold text-dark">Cost:</span>
-                                      <span class="text-muted">$<%= number_with_delimiter(cost_val) %></span>
+                                      <span class="text-muted">$<%= number_with_delimiter(cost_val % 1 == 0 ? cost_val.to_i : cost_val.round(2)) %></span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if cost_per_person_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Cost per person:</span>
+                                      <span class="text-muted">
+                                        $<%= number_with_delimiter(cost_per_person_val % 1 == 0 ? cost_per_person_val.to_i : cost_per_person_val.round(2)) %>
+                                      </span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if cost_per_day_per_person_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Cost per day/person:</span>
+                                      <span class="text-muted">
+                                        $<%= number_with_delimiter(cost_per_day_per_person_val % 1 == 0 ? cost_per_day_per_person_val.to_i : cost_per_day_per_person_val.round(2)) %>
+                                      </span>
+                                    </p>
+                                  <% end %>
+
+                                  <% if cost_per_day_total_val.present? %>
+                                    <p class="mb-1">
+                                      <span class="fw-semibold text-dark">Cost per day (total):</span>
+                                      <span class="text-muted">
+                                        $<%= number_with_delimiter(cost_per_day_total_val % 1 == 0 ? cost_per_day_total_val.to_i : cost_per_day_total_val.round(2)) %>
+                                      </span>
                                     </p>
                                   <% end %>
 
                                   <% if cost_per_night_val.present? %>
                                     <p class="mb-1">
                                       <span class="fw-semibold text-dark">Cost per night:</span>
-                                      <span class="text-muted">$<%= number_with_delimiter(cost_per_night_val) %></span>
-                                    </p>
-                                  <% end %>
-
-                                  <% if cost_per_day_val.present? %>
-                                    <p class="mb-1">
-                                      <span class="fw-semibold text-dark">Cost per day:</span>
-                                      <span class="text-muted">$<%= number_with_delimiter(cost_per_day_val) %></span>
+                                      <span class="text-muted">$<%= number_with_delimiter(cost_per_night_val % 1 == 0 ? cost_per_night_val.to_i : cost_per_night_val.round(2)) %></span>
                                     </p>
                                   <% end %>
 
                                   <% if total_cost_val.present? %>
                                     <p class="mb-1">
                                       <span class="fw-semibold text-dark">Total cost:</span>
-                                      <span class="text-muted">$<%= number_with_delimiter(total_cost_val) %></span>
+                                      <span class="text-muted">$<%= number_with_delimiter(total_cost_val % 1 == 0 ? total_cost_val.to_i : total_cost_val.round(2)) %></span>
                                     </p>
                                   <% end %>
 
-                                  <% if cost_val.blank? && cost_per_day_val.blank? && cost_per_night_val.blank? && total_cost_val.blank? %>
+                                  <% if cost_val.blank? && cost_per_person_val.blank? && cost_per_day_per_person_val.blank? && cost_per_day_total_val.blank? && cost_per_night_val.blank? && total_cost_val.blank? %>
                                     <% simple_num = s[/\b(\d{1,3}(?:,\d{3})*|\d+)\b/] %>
                                     <% if simple_num.present? %>
                                       <% num = simple_num.gsub(/[^\d]/, '').to_i %>
@@ -195,11 +236,11 @@
                                       </p>
                                     <% end %>
                                   <% end %>
-
                                 <% end %>
                               </div>
                             <% end %>
 
+                            <%# if a total key exists in budget_breakdown show it %>
                             <% total_key_value =
                                  travel_plan.budget_breakdown["total_trip_cost"] ||
                                  travel_plan.budget_breakdown["total trip cost"] ||
@@ -230,9 +271,10 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="card-footer bg-white d-flex justify-content-between">
               <%= link_to "View Details", travel_plan, class: "btn btn-primary" %>
+              <%= link_to "Download PDF", download_pdf_travel_plan_path(travel_plan), class: "btn btn-outline-success", target: "_blank", rel: "noopener" %>
               <div class="d-flex gap-2">
                 <%= link_to "Edit", edit_travel_plan_path(travel_plan), class: "btn btn-outline-secondary" %>
                 <%= button_to "Delete", travel_plan, method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "Are you sure you want to delete this travel plan?" } } %>

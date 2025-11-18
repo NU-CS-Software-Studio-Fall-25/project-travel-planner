@@ -76,6 +76,17 @@
             <%= f.select :travel_style, ["Adventure", "Leisure", "Luxury", "Backpacking"], {}, class: "form-select", id: "travel_style" %>
           </div>
 
+          <div class="col-md-6">
+            <%= f.label :number_of_travelers, "Number of Travelers", class: "form-label" %>
+            <%= f.select :number_of_travelers,
+                         [["1 person", 1], ["2 people", 2], ["3 people", 3], ["4 people", 4], 
+                          ["5 people", 5], ["6 people", 6], ["7-10 people", 8], ["10+ people", 12]],
+                         {},
+                         class: "form-select",
+                         id: "number-of-travelers-field" %>
+            <small class="text-muted">This affects budget calculations</small>
+          </div>
+
           <!-- Safety Preference with GPI Integration -->
           <div class="col-md-6">
             <%= f.label :safety_preference, "Acceptable Safety Levels", class: "form-label" %>
@@ -105,10 +116,6 @@
             <%= f.label :trip_scope, class: "form-label" %>
             <%= f.select :trip_scope, ["International", "Domestic"], {}, class: "form-select" %>
           </div>
-          <div class="col-md-6">
-            <%= f.label :trip_type, class: "form-label" %>
-            <%= f.select :trip_type, ["Solo", "Couple", "Family", "Group"], {}, class: "form-select" %>
-          </div>
 
           <div class="col-12">
             <%= f.label :general_purpose, "Purpose of Trip (Optional)", class: "form-label" %>
@@ -128,7 +135,60 @@
   <%= render 'recommendations_list', recommendations: @recommendations %>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places&callback=initAutocomplete" async defer></script>
+<%# Loading Animation Overlay %>
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-content">
+    <div class="magnifier-container">
+      <svg class="magnifier-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Main magnifier circle -->
+        <circle cx="11" cy="11" r="7" stroke="#3B82F6" stroke-width="2"/>
+        <!-- Handle -->
+        <path d="M16 16L21 21" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+        <!-- Inner gradient circle -->
+        <circle cx="11" cy="11" r="4" fill="#3B82F6" opacity="0.2"/>
+        <!-- Glare effect to show rotation -->
+        <path d="M8 8 L9 9" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+        <circle cx="9" cy="9" r="1.5" fill="white" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="loading-message" id="loading-message">
+      Searching for the best travel locations<span class="loading-dots"></span>
+    </div>
+    <div class="loading-submessage">
+      This may take a few moments while we analyze your preferences
+    </div>
+  </div>
+</div>
+
+<%# Load Google Maps API only once %>
+<script>
+  (function() {
+    // Check if Google Maps is already loaded
+    if (typeof google !== 'undefined' && google.maps) {
+      console.log('Google Maps already loaded, initializing...');
+      if (typeof initAutocomplete === 'function') {
+        initAutocomplete();
+      }
+      return;
+    }
+
+    // Check if script is already being loaded
+    if (document.querySelector('script[src*="maps.googleapis.com"]')) {
+      console.log('Google Maps script already loading...');
+      return;
+    }
+
+    // Load the script
+    const script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&libraries=places&callback=initAutocomplete';
+    script.async = true;
+    script.defer = true;
+    script.onerror = function() {
+      console.error('Failed to load Google Maps API');
+    };
+    document.head.appendChild(script);
+  })();
+</script>
 
 <%# The JavaScript for saving form state and validation logic %>
 <script>
@@ -373,28 +433,47 @@
             });
         }
 
+        // Function to update end date minimum based on start date
+        function updateEndDateMin() {
+            if (startDateInput.value && startDateInput.value.length === 10) {
+                const startDate = new Date(startDateInput.value);
+                const minEndDate = new Date(startDate);
+                minEndDate.setDate(minEndDate.getDate() + 1);
+                endDateInput.min = minEndDate.toISOString().split('T')[0];
+            } else {
+                // If no start date, set min to today
+                const today = new Date();
+                endDateInput.min = today.toISOString().split('T')[0];
+            }
+        }
+
         // Date validation logic
         if (startDateInput && endDateInput) {
-            startDateInput.addEventListener('change', function() {
-                const startDate = new Date(this.value);
-                if (this.value) {
-                    // Set minimum end date to the day after start date
-                    const minEndDate = new Date(startDate);
-                    minEndDate.setDate(minEndDate.getDate() + 1);
-                    endDateInput.min = minEndDate.toISOString().split('T')[0];
+            // Initialize end date min on page load (in case of cached values)
+            updateEndDateMin();
 
-                    // If end date is before start date, clear it
-                    if (endDateInput.value && new Date(endDateInput.value) <= startDate) {
-                        endDateInput.value = '';
-                    }
-                }
+            // Update when start date changes
+            startDateInput.addEventListener('change', function() {
+                updateEndDateMin();
             });
 
-            endDateInput.addEventListener('change', function() {
+            // Update when end date is focused (handles direct clicks)
+            endDateInput.addEventListener('focus', function() {
+                updateEndDateMin();
+            });
+
+            // Validate end date only on blur to avoid interrupting manual typing
+            endDateInput.addEventListener('blur', function() {
+                // Only validate if we have a complete, valid date (YYYY-MM-DD format with 10 characters)
+                if (!this.value || this.value.length < 10) {
+                    return; // Incomplete date, skip validation
+                }
+
                 const startDate = new Date(startDateInput.value);
                 const endDate = new Date(this.value);
 
-                if (startDateInput.value && endDate <= startDate) {
+                // Check if dates are valid and end date is not after start date
+                if (startDateInput.value && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime()) && endDate <= startDate) {
                     alert('End date must be after start date!');
                     this.value = '';
                 }
@@ -506,6 +585,76 @@
 
             // Clear localStorage on successful submit
             localStorage.removeItem(storageKey);
+            
+            // Show loading animation
+            showLoadingAnimation();
+        });
+
+        // Loading Animation Control
+        let messageInterval;
+        const loadingMessages = [
+            "Searching for the best travel locations",
+            "Finding you a nice retreat",
+            "Analyzing safety and weather conditions",
+            "Discovering hidden gems for you",
+            "Calculating perfect itineraries",
+            "Curating personalized recommendations",
+            "Exploring amazing destinations",
+            "Planning your dream vacation"
+        ];
+        
+        function showLoadingAnimation() {
+            const overlay = document.getElementById('loading-overlay');
+            const messageEl = document.getElementById('loading-message');
+            
+            if (overlay) {
+                overlay.classList.add('active');
+                
+                // Rotate through messages
+                let currentIndex = 0;
+                messageInterval = setInterval(() => {
+                    currentIndex = (currentIndex + 1) % loadingMessages.length;
+                    if (messageEl) {
+                        messageEl.innerHTML = loadingMessages[currentIndex] + '<span class="loading-dots"></span>';
+                    }
+                }, 5000); // Change message every 5 seconds
+            }
+        }
+        
+        function hideLoadingAnimation() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            if (messageInterval) {
+                clearInterval(messageInterval);
+                messageInterval = null;
+            }
+        }
+        
+        // Hide loading animation when page loads (in case of back navigation)
+        document.addEventListener('turbo:load', () => {
+            hideLoadingAnimation();
+        });
+        
+        // Listen for Turbo Stream render events (when AJAX response arrives)
+        document.addEventListener('turbo:before-stream-render', (event) => {
+            console.log('Turbo stream about to render, hiding loading animation');
+            hideLoadingAnimation();
+        });
+        
+        // Additional backup - hide when frame loads
+        document.addEventListener('turbo:frame-render', (event) => {
+            console.log('Turbo frame rendered:', event.target.id);
+            hideLoadingAnimation();
+        });
+        
+        // Another backup - listen for successful form submission response
+        document.addEventListener('turbo:submit-end', (event) => {
+            if (event.detail.success) {
+                console.log('Form submitted successfully, hiding loading animation');
+                setTimeout(() => hideLoadingAnimation(), 500);
+            }
         });
 
         // Load saved form data from localStorage
@@ -600,11 +749,32 @@
         }
     });
 
-    function initAutocomplete() {
+    // Define initAutocomplete globally so Google Maps callback can find it
+    // Make it idempotent to handle multiple calls
+    window.initAutocomplete = function() {
+        // Prevent multiple initializations
+        if (window.autocompleteInitialized) {
+            console.log('Autocomplete already initialized');
+            return;
+        }
+        
         const currentLocationField = document.getElementById('current-location-field');
-        if (currentLocationField) {
+        if (!currentLocationField) {
+            console.log('Current location field not found, waiting for DOM...');
+            return;
+        }
+        
+        // Check if Google Maps is loaded
+        if (typeof google === 'undefined' || !google.maps) {
+            console.log('Google Maps not loaded yet');
+            return;
+        }
+        
+        try {
             const autocomplete = new google.maps.places.Autocomplete(currentLocationField);
             autocomplete.setFields(['address_components', 'formatted_address']);
+            window.autocompleteInitialized = true;
+            console.log('✅ Google Maps Autocomplete initialized');
             
             // Listen for place selection to extract standardized country name
             autocomplete.addListener('place_changed', function() {
@@ -666,6 +836,29 @@
                     autocomplete.setBounds(circle.getBounds());
                 });
             }
+        } catch (error) {
+            console.error('Error initializing Google Maps Autocomplete:', error);
+            window.autocompleteInitialized = false;
         }
+    };
+
+    // Try to initialize if Google Maps is already loaded (for Turbo navigation)
+    if (typeof google !== 'undefined' && google.maps) {
+        window.initAutocomplete();
     }
+
+    // Re-initialize on Turbo navigation (mark as not initialized)
+    document.addEventListener('turbo:before-cache', () => {
+        window.autocompleteInitialized = false;
+    });
+
+    // Attempt to initialize when returning to this page via Turbo
+    document.addEventListener('turbo:load', () => {
+        if (document.getElementById('current-location-field')) {
+            window.autocompleteInitialized = false;
+            if (typeof google !== 'undefined' && google.maps && typeof window.initAutocomplete === 'function') {
+                window.initAutocomplete();
+            }
+        }
+    });
 </script>

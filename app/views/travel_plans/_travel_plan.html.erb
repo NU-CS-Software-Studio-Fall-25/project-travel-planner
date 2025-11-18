@@ -56,7 +56,7 @@
           <div>
             <strong class="text-muted d-block small">Status</strong>
             <div class="mt-2">
-              <% 
+              <%
                 status_colors = {
                   "planned" => "secondary",
                   "booked" => "primary",
@@ -68,6 +68,78 @@
               <span class="badge bg-<%= badge_color %> fs-6">
                 <%= travel_plan.status&.upcase || "PLANNED" %>
               </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Trip Details Card %>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0">
+            <svg class="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+              <path fill-rule="evenodd" d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z"/>
+              <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+            </svg>
+            Trip Details
+          </h6>
+        </div>
+        <div class="card-body">
+          <% if travel_plan.number_of_travelers.present? %>
+            <div class="mb-3">
+              <strong class="text-muted d-block small">Number of Travelers</strong>
+              <div class="h5">
+                <span class="badge bg-primary fs-6">
+                  <%= travel_plan.number_of_travelers %> <%= travel_plan.number_of_travelers == 1 ? 'person' : 'people' %>
+                </span>
+              </div>z
+            </div>
+          <% end %>
+          <% if travel_plan.travel_style.present? %>
+            <div class="mb-3">
+              <strong class="text-muted d-block small">Travel Style</strong>
+              <div class="h5"><%= travel_plan.travel_style %></div>
+            </div>
+          <% end %>
+          <% if travel_plan.trip_scope.present? %>
+            <div>
+              <strong class="text-muted d-block small">Trip Scope</strong>
+              <div class="h5"><%= travel_plan.trip_scope %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# Budget Overview Card %>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white">
+          <h6 class="mb-0">
+            <svg class="me-2" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+              <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/>
+            </svg>
+            Budget Overview
+          </h6>
+        </div>
+        <div class="card-body">
+          <% if travel_plan.number_of_travelers && travel_plan.number_of_travelers > 1 %>
+            <div class="alert alert-info mb-3 py-2 small">
+              <svg class="me-1" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+              </svg>
+              Budget for <%= travel_plan.number_of_travelers %> travelers
+            </div>
+          <% end %>
+          <div>
+            <strong class="text-muted d-block small">Budget Range</strong>
+            <div class="h5">
+              $<%= number_with_delimiter((travel_plan.budget_min || 0).to_i) %> -
+              $<%= number_with_delimiter((travel_plan.budget_max || 0).to_i) %>
             </div>
           </div>
         </div>
@@ -156,30 +228,48 @@
                   <% next if category.to_s.downcase.include?("total_trip_cost") %> <!-- Skip total trip cost -->
 
                   <%
-                    # Convert to string for pattern matching
                     text = amount.to_s
 
-                    # Match cost patterns in priority order
                     extracted_cost = nil
-                    if text =~ /total_cost\s+(\d+(?:\.\d+)?)/
+                    unit_text = nil
+
+                    # Match patterns in priority order, including per-person and per-day-per-person variants
+                    if text =~ /total[_\s]*cost[:\s]*\$?(\d+(?:\.\d+)?)/i
                       extracted_cost = $1
-                    elsif text =~ /cost_per_night\s+(\d+(?:\.\d+)?)/
+                      unit_text = nil
+                    elsif text =~ /cost[_\s]*per[_\s]*person[:\s]*\$?(\d+(?:\.\d+)?)/i
                       extracted_cost = $1
-                    elsif text =~ /cost_per_day\s+(\d+(?:\.\d+)?)/
+                      unit_text = "per person"
+                    elsif text =~ /cost[_\s]*per[_\s]*day[_\s]*per[_\s]*person[:\s]*\$?(\d+(?:\.\d+)?)/i
                       extracted_cost = $1
-                    elsif text =~ /cost\s+(\d+(?:\.\d+)?)/
+                      unit_text = "per day/person"
+                    elsif text =~ /cost[_\s]*per[_\s]*day[_\s]*total[:\s]*\$?(\d+(?:\.\d+)?)/i
                       extracted_cost = $1
+                      unit_text = "per day total"
+                    elsif text =~ /cost[_\s]*per[_\s]*night[:\s]*\$?(\d+(?:\.\d+)?)/i
+                      extracted_cost = $1
+                      unit_text = "per night"
+                    elsif text =~ /cost[_\s]*per[_\s]*day[:\s]*\$?(\d+(?:\.\d+)?)/i
+                      extracted_cost = $1
+                      unit_text = "per day"
+                    elsif text =~ /cost[:\s]*\$?(\d+(?:\.\d+)?)/i
+                      extracted_cost = $1
+                      unit_text = nil
                     else
+                      # Fallback: strip non-numeric characters
                       extracted_cost = text.gsub(/[^\d.]/, '')
                     end
 
-                    formatted_cost = "$#{number_with_delimiter(extracted_cost.to_f.round, delimiter: ',')}"
+                    # Build human-friendly formatted cost (keep decimals removed for badge)
+                    display_amount = extracted_cost.to_f
+                    display_label = "$#{number_with_delimiter(display_amount.round, delimiter: ',')}"
+                    display_label += " #{unit_text}" if unit_text.present?
                   %>
 
                   <div class="col-md-6">
                     <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
                       <span class="fw-semibold"><%= category.to_s.titleize %></span>
-                      <span class="badge bg-success"><%= formatted_cost %></span>
+                      <span class="badge bg-success"><%= display_label %></span>
                     </div>
                   </div>
                 <% end %>
@@ -187,24 +277,48 @@
               <hr>
 
               <%
+                # Compute total sum. Respect new keys:
+                # - cost_per_person -> multiply by number_of_travelers when available
+                # - cost_per_day_per_person -> multiply by number_of_travelers * trip_days when available
+                # - cost_per_day_total -> multiply by trip_days when available
+                trip_days = if travel_plan.start_date && travel_plan.end_date
+                              ((travel_plan.end_date - travel_plan.start_date).to_i + 1)
+                            else
+                              1
+                            end
+
                 total = travel_plan.budget_breakdown.sum do |key, value|
                   next 0 if key.to_s.downcase.include?("total_trip_cost")
 
                   text = value.to_s
-                  if text =~ /total_cost\s+(\d+(?:\.\d+)?)/
+
+                  if text =~ /total[_\s]*cost[:\s]*\$?(\d+(?:\.\d+)?)/i
                     $1.to_f
-                  elsif text =~ /cost_per_night\s+(\d+(?:\.\d+)?)/
+                  elsif text =~ /cost[_\s]*per[_\s]*person[:\s]*\$?(\d+(?:\.\d+)?)/i
+                    cost = $1.to_f
+                    if travel_plan.number_of_travelers.present?
+                      cost * travel_plan.number_of_travelers.to_f
+                    else
+                      cost
+                    end
+                  elsif text =~ /cost[_\s]*per[_\s]*day[_\s]*per[_\s]*person[:\s]*\$?(\d+(?:\.\d+)?)/i
+                    cost = $1.to_f
+                    travelers = travel_plan.number_of_travelers.present? ? travel_plan.number_of_travelers.to_f : 1.0
+                    cost * travelers * trip_days
+                  elsif text =~ /cost[_\s]*per[_\s]*day[_\s]*total[:\s]*\$?(\d+(?:\.\d+)?)/i
+                    cost = $1.to_f
+                    cost * trip_days
+                  elsif text =~ /cost[_\s]*per[_\s]*night[:\s]*\$?(\d+(?:\.\d+)?)/i
                     $1.to_f
-                  elsif text =~ /cost_per_day\s+(\d+(?:\.\d+)?)/
+                  elsif text =~ /cost[_\s]*per[_\s]*day[:\s]*\$?(\d+(?:\.\d+)?)/i
                     $1.to_f
-                  elsif text =~ /cost\s+(\d+(?:\.\d+)?)/
+                  elsif text =~ /cost[:\s]*\$?(\d+(?:\.\d+)?)/i
                     $1.to_f
                   else
                     text.gsub(/[^\d.]/, '').to_f
                   end
                 end
 
-                # Remove trailing .0 if the number is whole
                 formatted_total = total % 1 == 0 ? total.to_i : total.round(2)
               %>
 
@@ -221,5 +335,6 @@
         </div>
       </div>
     <% end %>
+
   </div>
 </div>

@@ -29,6 +29,8 @@ A single integrated travel platform that combines **OpenAI**, **Google Maps/Flig
 - **Destination Photos**: Browse 7+ TripAdvisor photos with zoom functionality and accessibility features
 - **Destination Management**: Browse and manage travel destinations
 - **Travel Planning**: Create and manage travel plans
+- **Progressive Web App (PWA)**: Install on mobile devices for app-like experience with offline support
+- **Offline Functionality**: Access previously viewed content without internet connection
 - **Responsive Design**: Beautiful, mobile-friendly interface with Bootstrap
 - **Accessibility**: Alternative text for images, keyboard navigation, and screen reader support
 - **API Support**: RESTful API endpoints for all resources

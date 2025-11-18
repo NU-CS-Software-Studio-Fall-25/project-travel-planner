@@ -1,8 +1,230 @@
 # app/controllers/travel_plans_controller.rb
+require 'prawn'
+require 'prawn/table'
 class TravelPlansController < ApplicationController
   include Pagy::Backend if defined?(Pagy::Backend)
   before_action :set_travel_plan, only: %i[ show edit update destroy ]
   before_action :require_login
+
+  # ruby
+  def download_pdf
+    travel_plan = TravelPlan.find(params[:id])
+    trip_days = if travel_plan.start_date && travel_plan.end_date
+                  ((travel_plan.end_date - travel_plan.start_date).to_i + 1)
+                else
+                  1
+                end
+    travelers = travel_plan.number_of_travelers.to_i.nonzero? || 1
+
+    # Leave extra bottom margin for footer (top, right, bottom, left)
+    pdf = Prawn::Document.new(page_size: 'A4', margin: [50, 50, 80, 50])
+
+    # Safe font selection (use TTF if available, otherwise a built-in)
+    ttf_path = File.join(Prawn::DATADIR, 'fonts', 'DejaVuSans.ttf')
+    if File.exist?(ttf_path)
+      pdf.font_families.update("DejaVuSans" => { normal: ttf_path })
+      pdf.font "DejaVuSans"
+    else
+      pdf.font "Helvetica"
+    end
+
+    # Header
+    pdf.text (travel_plan.name.presence || "#{travel_plan.destination&.name || 'Trip'}"), size: 20, style: :bold
+    pdf.move_down 6
+    if travel_plan.destination&.country
+      pdf.text "#{travel_plan.destination.country}", size: 10, color: "555555"
+    end
+    pdf.move_down 8
+    pdf.stroke_horizontal_rule
+    pdf.move_down 12
+
+    # Trip summary
+    pdf.text "Trip Summary", size: 14, style: :bold
+    pdf.move_down 6
+    pdf.text "Dates: #{travel_plan.start_date&.strftime('%B %d, %Y') || 'N/A'} - #{travel_plan.end_date&.strftime('%B %d, %Y') || 'N/A'}"
+    pdf.text "Status: #{travel_plan.status&.titleize || 'N/A'}"
+    pdf.text "Travel Style: #{travel_plan.travel_style}" if travel_plan.travel_style.present?
+    pdf.move_down 8
+
+    # Description/Notes
+    if travel_plan.description.present?
+      pdf.text "Description", style: :bold
+      pdf.move_down 4
+      pdf.text travel_plan.description.to_s, size: 10
+      pdf.move_down 8
+    end
+    if travel_plan.notes.present?
+      pdf.text "Notes", style: :bold
+      pdf.move_down 4
+      pdf.text travel_plan.notes.to_s, size: 10
+      pdf.move_down 8
+    end
+
+    # Itinerary
+    if travel_plan.itinerary.present?
+      pdf.start_new_page if pdf.cursor < 180
+      pdf.text "Itinerary", size: 14, style: :bold
+      pdf.move_down 8
+      if travel_plan.itinerary.is_a?(Hash)
+        travel_plan.itinerary.each do |day, activities|
+          pdf.text day.to_s.titleize, style: :bold, size: 11
+          pdf.move_down 4
+          if activities.is_a?(Array)
+            activities.each { |a| pdf.text "\u2022 #{a}", size: 10, indent_paragraphs: 8 }
+          else
+            pdf.text activities.to_s, size: 10, indent_paragraphs: 8
+          end
+          pdf.move_down 8
+          pdf.start_new_page if pdf.cursor < 140
+        end
+      else
+        pdf.text travel_plan.itinerary.to_s, size: 10
+      end
+    end
+
+    # Budget breakdown: build structured rows
+    if travel_plan.budget_breakdown.present?
+      pdf.start_new_page if pdf.cursor < 180
+      pdf.text "Budget Breakdown", size: 14, style: :bold
+      pdf.move_down 8
+
+      rows = [["Category", "Unit Price", "Quantity", "Total", "Note"]]
+      grand_total = 0.0
+
+      travel_plan.budget_breakdown.each do |category, data|
+        next if category.to_s.downcase.include?("total_trip_cost") || category.to_s.strip.empty?
+
+        unit = nil
+        qty = 1
+        total = nil
+        note = nil
+
+        if data.is_a?(Hash)
+          # extract numeric values (prefer explicit keys)
+          # keys may be symbols or strings
+          h = data.transform_keys(&:to_s)
+          # parse potential unit costs
+          unit_candidates = %w[cost cost_per_person cost_per_day_per_person cost_per_day cost_per_night cost_per_day_total cost_per_night cost_per_day_per_person]
+          unit_key = unit_candidates.find { |k| h[k].present? }
+          if unit_key
+            unit_value = h[unit_key].to_s.gsub(/[^\d\.]/, '').to_f
+          else
+            unit_value = nil
+          end
+
+          # total cost explicit
+          if h["total_cost"].present? && (v = h["total_cost"].to_s.gsub(/[^\d\.]/, '')).present?
+            total = v.to_f
+          end
+
+          # description note
+          note = (h["description"] || h["note"] || "").to_s.strip
+
+          # determine quantity based on which unit key present
+          case unit_key
+          when "cost_per_person"
+            qty = travelers
+            unit = unit_value ? sprintf("$%0.2f / person", unit_value) : nil
+          when "cost_per_day_per_person", "cost_per_day_per_person"
+            qty = travelers * trip_days
+            unit = unit_value ? sprintf("$%0.2f / day/person", unit_value) : nil
+          when "cost_per_day_total", "cost_per_day_total"
+            qty = trip_days
+            unit = unit_value ? sprintf("$%0.2f / day (total)", unit_value) : nil
+          when "cost_per_night"
+            # nights: typical convention = days - 1, but fallback to days
+            nights = [trip_days - 1, 1].max
+            qty = nights
+            unit = unit_value ? sprintf("$%0.2f / night", unit_value) : nil
+          when "cost_per_day"
+            qty = trip_days
+            unit = unit_value ? sprintf("$%0.2f / day", unit_value) : nil
+          when "cost"
+            qty = 1
+            unit = unit_value ? sprintf("$%0.2f", unit_value) : nil
+          else
+            # fallback: try to parse any number-like tokens for a total or unit
+            if unit_value && unit_value > 0
+              unit = sprintf("$%0.2f", unit_value)
+              qty = 1
+            end
+          end
+
+          # compute total if still nil
+          if total.nil?
+            if unit && unit_value
+              total = unit_value * qty
+            else
+              # fallback: try to locate any numeric in values
+              any_num = h.values.map { |v| v.to_s.gsub(/[^\d\.]/, '') }.find(&:present?)
+              total = any_num.to_f if any_num
+            end
+          end
+        else
+          # data is a string: try to parse total_cost or numbers
+          s = data.to_s
+          if (m = s.match(/total[_\s]*cost[:\s]*\$?(\d+(?:\.\d+)?)/i))
+            total = m[1].to_f
+          elsif (m = s.match(/cost[_\s]*per[_\s]*person[:\s]*\$?(\d+(?:\.\d+)?)/i))
+            unit = sprintf("$%0.2f / person", m[1].to_f)
+            qty = travelers
+            total = m[1].to_f * qty
+          elsif (m = s.match(/cost[:\s]*\$?(\d+(?:\.\d+)?)/i))
+            unit = sprintf("$%0.2f", m[1].to_f)
+            qty = 1
+            total = m[1].to_f
+          else
+            # final fallback: pick first numeric token as total
+            num = s.gsub(/[^\d\.]/, '')
+            total = num.present? ? num.to_f : 0.0
+          end
+          # note: keep human-readable portion but strip raw keys like _ or `total_cost`
+          note = s.gsub(/(_|\b(total[_\s]*cost|cost[_\s]*per[_\s]*person|cost[_\s]*per[_\s]*day[_\s]*per[_\s]*person|cost[_\s]*per[_\s]*day|cost[_\s]*per[_\s]*night)\b[:\s]*\$?\d*\.?\d*)/i, '').strip
+        end
+
+        unit_display = unit || "-"
+        qty_display = qty.to_i == qty ? qty.to_i : qty
+        total ||= 0.0
+        grand_total += total
+
+        rows << [
+          category.to_s.titleize,
+          unit_display,
+          qty_display.to_s,
+          sprintf("$%0.2f", total),
+          (note.presence || "-")
+        ]
+      end
+
+      # Render table
+      pdf.table(rows, header: true, width: pdf.bounds.width) do
+        row(0).font_style = :bold
+        row(0).background_color = 'f0f0f0'
+        columns(1..3).align = :right
+        self.row_colors = ['FFFFFF', 'F9F9F9']
+        self.cell_style = { borders: [:bottom], border_width: 0.5, border_color: 'DDDDDD', padding: [6,8,6,8], size: 10 }
+      end
+
+      pdf.move_down 8
+      pdf.text "Grand Total: #{sprintf('$%0.2f', grand_total)}", size: 12, style: :bold, align: :right
+    end
+
+    # Footer: rendered on every page in reserved bottom area to avoid overlap
+    timestamp = Time.current.strftime('%Y-%m-%d %H:%M')
+    pdf.repeat(:all) do
+      pdf.bounding_box([pdf.bounds.left, pdf.bounds.bottom + 50], width: pdf.bounds.width) do
+        pdf.stroke_horizontal_rule
+        pdf.move_down 4
+        pdf.font_size 8
+        pdf.text "Generated: #{timestamp}", align: :left
+        pdf.text "Page <page> of <total>", align: :right, inline_format: true
+      end
+    end
+
+    filename = "#{(travel_plan.name.presence || "travel_plan_#{travel_plan.id}")}.pdf"
+    send_data pdf.render, filename: filename, type: 'application/pdf', disposition: 'attachment'
+  end
+
 
   # GET /travel_plans or /travel_plans.json
   def index
@@ -126,7 +348,7 @@ class TravelPlansController < ApplicationController
     params.require(:travel_plan).permit(
       :name, :description, :details, :budget_min, :budget_max,
       :safety_score, :safety_level, :travel_style, :length_of_stay, :travel_month,
-      :trip_scope, :trip_type, :general_purpose, :status, :notes,
+      :trip_scope, :number_of_travelers, :general_purpose, :status, :notes,
       :visa_info, :safety_preference, :start_date, :end_date, 
       :passport_country, :current_location, :destination_country,
       itinerary: {}, budget_breakdown: {}, safety_levels: []

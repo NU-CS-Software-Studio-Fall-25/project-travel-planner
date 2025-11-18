@@ -51,11 +51,15 @@
 
     <div class="col-12">
       <%= form.label :notes, "Trip Notes", class: "form-label" %>
-      <%= form.text_area :notes, 
-          class: "form-control", 
-          rows: 5,
-          placeholder: "Add any notes, reminders, or special requirements for this trip..." %>
-      <small class="text-muted">Optional: Add details about accommodations, activities, or anything you want to remember</small>
+      <%= form.text_area :notes,
+                         class: "form-control",
+                         rows: 5,
+                         placeholder: "Add any notes, reminders, or special requirements for this trip...",
+                         id: "trip-notes-field" %>
+      <small class="text-muted">Optional: Add details about accommodations, activities, or anything you want to remember (Max 300 characters)</small>
+      <div id="notes-error" class="text-danger mt-1" style="display: none; font-size: 0.8rem;">
+        Max character length reached. Cannot enter more characters.
+      </div>
     </div>
 
     <div class="col-12 mt-4">
@@ -64,3 +68,26 @@
     </div>
   </div>
 <% end %>
+
+<script>
+    function initTripForm() {
+        const notesField = document.getElementById("trip-notes-field");
+        const errorDiv = document.getElementById("notes-error");
+        const maxLength = 500;
+
+        if (!notesField) return;
+
+        notesField.addEventListener("input", function() {
+            if (this.value.length >= maxLength) {
+                this.value = this.value.slice(0, maxLength);
+                errorDiv.style.display = "block";
+            } else {
+                errorDiv.style.display = "none";
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", initTripForm);
+    document.addEventListener("turbolinks:load", initTripForm);
+    document.addEventListener("turbo:load", initTripForm);
+</script>

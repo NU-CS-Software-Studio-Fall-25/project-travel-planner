@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   end
 
   # Traditional web routes (for backward compatibility)
-  resources :travel_recommendations, only: [:index, :show, :new, :create] do
+  resources :travel_recommendations, only: [:index, :show, :new, :create, :destroy] do
     collection do
       get 'fetch_photos', to: 'travel_recommendations#fetch_photos'
     end
@@ -30,7 +30,18 @@ Rails.application.routes.draw do
   resources :travel_plans
   resources :destinations
   resources :users
+  resources :recommendation_feedbacks, only: [:create, :destroy, :index] do
+    collection do
+      delete 'remove', to: 'recommendation_feedbacks#remove'
+    end
+  end
 
+  # Add member route for PDF download
+  resources :travel_plans do
+    member do
+      get :download_pdf
+    end
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -39,8 +50,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
   # root "posts#index"
