@@ -31,7 +31,10 @@ class OpenaiService
       
       Rails.logger.info "OpenAI recommended: #{destination_city}, #{destination_country}"
       
-      # Step 2: Check flight price with SerpAPI
+      # Step 2: Get visa information (NEW - only for international travel)
+      visa_result = get_visa_info(destination_country)
+      
+      # Step 3: Check flight price with SerpAPI
       flight_result = @serpapi_service.get_flight_price(destination_city, destination_country)
       
       if !flight_result[:success]
@@ -50,7 +53,7 @@ class OpenaiService
       
       Rails.logger.info "Flight Price: $#{flight_price}, Budget Limit (50%): $#{flight_budget_limit}"
       
-      # Step 3: Validate flight price
+      # Step 4: Validate flight price
       if flight_price > flight_budget_limit
         Rails.logger.warn "Flight too expensive: $#{flight_price} > $#{flight_budget_limit}"
         @rejected_cities << {
@@ -61,10 +64,10 @@ class OpenaiService
         next
       end
       
-      # Step 4: Flight is acceptable! Get full travel plan
+      # Step 5: Flight is acceptable! Get full travel plan with visa info
       Rails.logger.info "✓ Acceptable destination found: #{destination_city}"
       
-      full_plan = get_full_travel_plan(destination_city, destination_country, flight_result)
+      full_plan = get_full_travel_plan(destination_city, destination_country, flight_result, visa_result)
       
       if full_plan[:error]
         Rails.logger.error "Failed to get full plan: #{full_plan[:error]}"
@@ -136,8 +139,8 @@ class OpenaiService
   end
 
   # Get full travel plan from OpenAI (second phase - after flight validation)
-  def get_full_travel_plan(destination_city, destination_country, flight_result)
-    prompt = build_full_plan_prompt(destination_city, destination_country, flight_result)
+  def get_full_travel_plan(destination_city, destination_country, flight_result, visa_result = nil)
+    prompt = build_full_plan_prompt(destination_city, destination_country, flight_result, visa_result)
     
     begin
       Rails.logger.info "=== Requesting Full Travel Plan from OpenAI ==="
@@ -152,7 +155,7 @@ class OpenaiService
       
       parsed_recommendations = parse_response(response)
       
-      # Inject actual flight price into the recommendations
+      # Inject actual flight price and visa info into the recommendations
       parsed_recommendations.each do |rec|
         if rec[:budget_breakdown].is_a?(Hash)
           # Ensure flight_result[:price] is a number
@@ -165,6 +168,22 @@ class OpenaiService
             total_cost: flight_price.round(2),
             duration: flight_result[:details][:duration].to_s,
             stops: flight_result[:details][:stops].to_i
+          }
+        end
+        
+        # Inject structured visa information (NEW)
+        if visa_result && visa_result[:success]
+          rec[:visa_data] = {
+            status: visa_result[:visa_status],
+            duration: visa_result[:visa_duration],
+            color: visa_result[:visa_color],
+            alternative: visa_result[:alternative_visa],
+            alternative_link: visa_result[:alternative_link],
+            mandatory_registration: visa_result[:mandatory_registration],
+            registration_link: visa_result[:registration_link],
+            passport_validity: visa_result[:passport_validity],
+            exception_text: visa_result[:exception_text],
+            link: visa_result[:visa_link] || visa_result[:alternative_link]
           }
         end
       end
@@ -219,7 +238,7 @@ class OpenaiService
   end
 
   # Build prompt for full travel plan with known destination and flight price
-  def build_full_plan_prompt(destination_city, destination_country, flight_result)
+  def build_full_plan_prompt(destination_city, destination_country, flight_result, visa_result = nil)
     start_date = @preferences[:start_date].present? ? Date.parse(@preferences[:start_date].to_s) : nil
     end_date = @preferences[:end_date].present? ? Date.parse(@preferences[:end_date].to_s) : nil
     length_of_stay = @preferences[:length_of_stay] ||
@@ -238,6 +257,9 @@ class OpenaiService
     remaining_budget_max = @preferences[:budget_max].to_f - flight_cost
     remaining_budget_min = [@preferences[:budget_min].to_f - flight_cost, 0].max
     
+    # Build visa information section (NEW)
+    visa_info_section = build_visa_info_section(visa_result)
+    
     <<~PROMPT
       You are a professional travel planner. Create a detailed travel plan for #{destination_city}, #{destination_country}.
       
@@ -245,6 +267,8 @@ class OpenaiService
       - Flight Cost: $#{flight_cost} (already booked/confirmed)
       - Route: #{flight_result[:details][:departure_airport]} to #{flight_result[:details][:arrival_airport]}
       - Airline: #{flight_result[:details][:airline]}
+      
+      #{visa_info_section}
       
       REMAINING BUDGET for accommodation, food, activities, and transportation:
       - Minimum: $#{remaining_budget_min.round(2)}
@@ -297,7 +321,7 @@ class OpenaiService
             "total_trip_cost": "Total of all categories (must equal budget_max)"
           },
           "travel_style": "#{@preferences[:travel_style]}",
-          "visa_info": "Visa requirements for #{@preferences[:passport_country]} citizens",
+          "visa_info": "Use the verified visa information provided above to give specific guidance",
           "length_of_stay": #{length_of_stay},
           "travel_month": "#{travel_month}",
           "trip_scope": "#{@preferences[:trip_scope]}",
@@ -568,6 +592,123 @@ class OpenaiService
          start_date: @preferences[:start_date],
          end_date: @preferences[:end_date]
        }]
+    end
+  end
+
+  # Get visa information for a destination (NEW METHOD)
+  def get_visa_info(destination_country)
+    passport_country = @preferences[:passport_country]
+    
+    # Skip visa check for domestic travel
+    if @preferences[:trip_scope] == "Domestic"
+      Rails.logger.info "ℹ️  Domestic travel - skipping visa check"
+      return {
+        success: true,
+        visa_status: "No visa required (domestic travel)",
+        visa_color: "green",
+        domestic: true
+      }
+    end
+    
+    # Skip if no passport country provided
+    if passport_country.blank?
+      Rails.logger.warn "⚠️  No passport country provided"
+      return {
+        success: false,
+        visa_status: "Check visa requirements",
+        visa_color: "yellow"
+      }
+    end
+    
+    begin
+      Rails.logger.info "🔍 Fetching visa info: #{passport_country} → #{destination_country}"
+      visa_service = VisaService.new(passport_country, destination_country)
+      visa_result = visa_service.get_visa_requirements
+      
+      Rails.logger.info "✅ Visa info retrieved: #{visa_result[:visa_status]}"
+      visa_result
+    rescue => e
+      Rails.logger.error "❌ Error fetching visa info: #{e.message}"
+      {
+        success: false,
+        error: e.message,
+        visa_status: "Check visa requirements",
+        visa_color: "yellow"
+      }
+    end
+  end
+
+  # Build visa information section for GPT prompt (NEW METHOD)
+  def build_visa_info_section(visa_result)
+    return "" unless visa_result && visa_result[:success]
+    
+    section = <<~VISA
+      VERIFIED VISA INFORMATION (from official sources):
+      Passport: #{@preferences[:passport_country]} → Destination: #{visa_result[:destination_code] || 'N/A'}
+      
+      Primary Visa Requirement:
+      - Status: #{visa_result[:visa_status]}
+      - Maximum Stay: #{visa_result[:visa_duration] || 'Check with embassy'}
+      - Difficulty Level: #{visa_color_to_description(visa_result[:visa_color])}
+    VISA
+    
+    # Add alternative visa option if available
+    if visa_result[:alternative_visa].present?
+      section += <<~ALT
+      
+      Alternative Option:
+      - Type: #{visa_result[:alternative_visa]}
+      - Duration: #{visa_result[:alternative_duration]}
+      - Apply: #{visa_result[:alternative_link] || 'Contact embassy'}
+      ALT
+    end
+    
+    # Add mandatory registration if required
+    if visa_result[:mandatory_registration].present?
+      section += <<~MAND
+      
+      ⚠️  MANDATORY REGISTRATION REQUIRED:
+      - Type: #{visa_result[:mandatory_registration]}
+      - Apply: #{visa_result[:registration_link] || 'Check official website'}
+      - Note: This is FREE but REQUIRED for all travelers
+      MAND
+    end
+    
+    # Add passport validity requirement
+    if visa_result[:passport_validity].present?
+      section += <<~PASS
+      
+      Passport Requirement:
+      - Validity: #{visa_result[:passport_validity]}
+      PASS
+    end
+    
+    # Add exception rules if available
+    if visa_result[:exception_text].present?
+      section += <<~EXCEPT
+      
+      💡 Special Exception Available:
+      - #{visa_result[:exception_text]}
+      EXCEPT
+    end
+    
+    section += "\nIMPORTANT: Use this official visa information to provide specific, accurate guidance in the travel plan.\n"
+    section
+  end
+
+  # Convert visa color to human-readable description
+  def visa_color_to_description(color)
+    case color
+    when "green"
+      "Easy (Visa-free or Freedom of movement)"
+    when "blue"
+      "Moderate (Visa on arrival or eVisa available)"
+    when "yellow"
+      "Moderate (eTA or registration required)"
+    when "red"
+      "Difficult (Visa required in advance)"
+    else
+      "Unknown"
     end
   end
 end
