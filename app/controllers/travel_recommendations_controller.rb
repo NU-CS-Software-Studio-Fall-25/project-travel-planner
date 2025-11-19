@@ -17,6 +17,8 @@ class TravelRecommendationsController < ApplicationController
     # Load last preferences from session to pre-fill the form
     last_prefs = session[:last_preferences] || {}
     @travel_plan = TravelPlan.new(last_prefs)
+
+    @max_trip_days = (current_user&.subscription_tier == 'premium') ? 14 : 7
     
     # If we have recommendations, show a helpful message
     if @recommendations.present?

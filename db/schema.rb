@@ -88,14 +88,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_020531) do
     t.string "general_purpose"
     t.string "trip_scope"
     t.string "trip_type"
-    t.text "itinerary"
-    t.text "details"
-    t.text "description"
     t.integer "safety_score"
     t.string "visa_info"
     t.json "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
+    t.text "description"
+    t.text "details"
+    t.json "itinerary"
     t.integer "number_of_travelers", default: 1
     t.integer "number_of_people", default: 1
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"

@@ -203,6 +203,10 @@
         const safetyPreferenceSelect = document.getElementById('safety-preference-field');
         const submitBtn = document.getElementById('submit-btn');
 
+        // Get max trip days from the controller instance variable
+        const maxTripDays = parseInt('<%= @max_trip_days %>');
+        const userTier = maxTripDays === 14 ? 'Premium' : 'Free';
+
         // DOM elements for validation
         const currentLocationField = document.getElementById('current-location-field');
         const budgetMinField = document.getElementById('budget-min-field');
@@ -260,9 +264,22 @@
             return null;
         }
 
-        function validateEndDate(value) {
+        function validateEndDate(value, startDateValue) {
             if (!value) {
                 return "End date is required.";
+            }
+            if (startDateValue) {
+                const startDate = new Date(startDateValue);
+                const endDate = new Date(value);
+                if (endDate <= startDate) {
+                    return "End date must be after the start date.";
+                }
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > maxTripDays) {
+                    return `Your ${userTier} plan allows a maximum of ${maxTripDays} days.`;
+                }
             }
             return null;
         }
@@ -376,12 +393,19 @@
                 } else {
                     hideError(errors.startDate, startDateInput);
                 }
+                // Re-validate end date if start date changes
+                const endError = validateEndDate(endDateInput.value, startDateInput.value);
+                if (endError) {
+                    showError(errors.endDate, endError, endDateInput);
+                } else if (endDateInput.value) {
+                    hideError(errors.endDate, endDateInput);
+                }
             });
         }
 
         if (endDateInput) {
             endDateInput.addEventListener("blur", () => {
-                const error = validateEndDate(endDateInput.value);
+                const error = validateEndDate(endDateInput.value, startDateInput.value);
                 if (error) {
                     showError(errors.endDate, error, endDateInput);
                 } else {
@@ -455,28 +479,18 @@
             // Update when start date changes
             startDateInput.addEventListener('change', function() {
                 updateEndDateMin();
+                // Re-validate end date after start date changes
+                const error = validateEndDate(endDateInput.value, this.value);
+                if (error) {
+                    showError(errors.endDate, error, endDateInput);
+                } else if (endDateInput.value) {
+                    hideError(errors.endDate, endDateInput);
+                }
             });
 
             // Update when end date is focused (handles direct clicks)
             endDateInput.addEventListener('focus', function() {
                 updateEndDateMin();
-            });
-
-            // Validate end date only on blur to avoid interrupting manual typing
-            endDateInput.addEventListener('blur', function() {
-                // Only validate if we have a complete, valid date (YYYY-MM-DD format with 10 characters)
-                if (!this.value || this.value.length < 10) {
-                    return; // Incomplete date, skip validation
-                }
-
-                const startDate = new Date(startDateInput.value);
-                const endDate = new Date(this.value);
-
-                // Check if dates are valid and end date is not after start date
-                if (startDateInput.value && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime()) && endDate <= startDate) {
-                    alert('End date must be after start date!');
-                    this.value = '';
-                }
             });
         }
 
@@ -555,7 +569,7 @@
 
             // End Date
             if (endDateInput) {
-                const endError = validateEndDate(endDateInput.value);
+                const endError = validateEndDate(endDateInput.value, startDateInput.value);
                 if (endError) {
                     showError(errors.endDate, endError, endDateInput);
                     isValid = false;
@@ -585,7 +599,7 @@
 
             // Clear localStorage on successful submit
             localStorage.removeItem(storageKey);
-            
+
             // Show loading animation
             showLoadingAnimation();
         });
@@ -602,14 +616,14 @@
             "Exploring amazing destinations",
             "Planning your dream vacation"
         ];
-        
+
         function showLoadingAnimation() {
             const overlay = document.getElementById('loading-overlay');
             const messageEl = document.getElementById('loading-message');
-            
+
             if (overlay) {
                 overlay.classList.add('active');
-                
+
                 // Rotate through messages
                 let currentIndex = 0;
                 messageInterval = setInterval(() => {
@@ -620,7 +634,7 @@
                 }, 5000); // Change message every 5 seconds
             }
         }
-        
+
         function hideLoadingAnimation() {
             const overlay = document.getElementById('loading-overlay');
             if (overlay) {
@@ -631,24 +645,24 @@
                 messageInterval = null;
             }
         }
-        
+
         // Hide loading animation when page loads (in case of back navigation)
         document.addEventListener('turbo:load', () => {
             hideLoadingAnimation();
         });
-        
+
         // Listen for Turbo Stream render events (when AJAX response arrives)
         document.addEventListener('turbo:before-stream-render', (event) => {
             console.log('Turbo stream about to render, hiding loading animation');
             hideLoadingAnimation();
         });
-        
+
         // Additional backup - hide when frame loads
         document.addEventListener('turbo:frame-render', (event) => {
             console.log('Turbo frame rendered:', event.target.id);
             hideLoadingAnimation();
         });
-        
+
         // Another backup - listen for successful form submission response
         document.addEventListener('turbo:submit-end', (event) => {
             if (event.detail.success) {
@@ -714,7 +728,7 @@
             }
         }
         if (endDateInput && endDateInput.value) {
-            const error = validateEndDate(endDateInput.value);
+            const error = validateEndDate(endDateInput.value, startDateInput.value);
             if (error) {
                 showError(errors.endDate, error, endDateInput);
             } else {
@@ -757,41 +771,41 @@
             console.log('Autocomplete already initialized');
             return;
         }
-        
+
         const currentLocationField = document.getElementById('current-location-field');
         if (!currentLocationField) {
             console.log('Current location field not found, waiting for DOM...');
             return;
         }
-        
+
         // Check if Google Maps is loaded
         if (typeof google === 'undefined' || !google.maps) {
             console.log('Google Maps not loaded yet');
             return;
         }
-        
+
         try {
             const autocomplete = new google.maps.places.Autocomplete(currentLocationField);
             autocomplete.setFields(['address_components', 'formatted_address']);
             window.autocompleteInitialized = true;
             console.log('✅ Google Maps Autocomplete initialized');
-            
+
             // Listen for place selection to extract standardized country name
             autocomplete.addListener('place_changed', function() {
                 const place = autocomplete.getPlace();
-                
+
                 if (!place.address_components) {
                     return;
                 }
-                
+
                 // Extract country from address_components (language-independent)
                 let city = '';
                 let state = '';
                 let country = '';
-                
+
                 for (const component of place.address_components) {
                     const types = component.types;
-                    
+
                     // Get city
                     if (types.includes('locality')) {
                         city = component.long_name;
@@ -805,7 +819,7 @@
                         country = component.long_name; // Use long_name for full country name in English
                     }
                 }
-                
+
                 // Construct a standardized location string: "City, State, Country"
                 let standardizedLocation = '';
                 if (city && state && country) {
@@ -815,14 +829,14 @@
                 } else if (country) {
                     standardizedLocation = country;
                 }
-                
+
                 // Update the field with standardized location (English country name)
                 if (standardizedLocation) {
                     currentLocationField.value = standardizedLocation;
                     console.log('Standardized location:', standardizedLocation);
                 }
             });
-            
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
                     const geolocation = {
