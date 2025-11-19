@@ -8,7 +8,12 @@ class TravelPlansController < ApplicationController
 
   # ruby
   def download_pdf
-    travel_plan = TravelPlan.find(params[:id])
+    # Ensure users can only download PDFs for their own travel plans
+    travel_plan = current_user.travel_plans.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    flash[:alert] = "Travel plan not found or you don't have permission to access it."
+    redirect_to travel_plans_path and return
+  else
     trip_days = if travel_plan.start_date && travel_plan.end_date
                   ((travel_plan.end_date - travel_plan.start_date).to_i + 1)
                 else
@@ -278,6 +283,10 @@ class TravelPlansController < ApplicationController
       plan_params.delete(:safety_level)
     end
     
+    # Remove destination fields from plan_params as they're handled separately
+    plan_params.delete(:destination_name)
+    plan_params.delete(:destination_country)
+    
     @travel_plan = current_user.travel_plans.build(plan_params)
     @travel_plan.destination = destination if destination
     
@@ -296,16 +305,14 @@ class TravelPlansController < ApplicationController
         format.html { redirect_to @travel_plan, notice: "Travel plan was successfully created." }
         format.json { render :show, status: :created, location: @travel_plan }
       else
-        # If save fails, re-render the recommendations page with an error.
-        # This prevents losing the context of the recommendations.
+        # If save fails, re-render the form with errors
         flash.now[:alert] = @travel_plan.errors.full_messages.to_sentence
-        @recommendations = current_user.recommendations_json || []
         format.turbo_stream do
           render turbo_stream: turbo_stream.prepend("notifications", 
                                                      partial: "shared/error_notification",
                                                      locals: { message: @travel_plan.errors.full_messages.to_sentence })
         end
-        format.html { render 'travel_recommendations/index', status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @travel_plan.errors, status: :unprocessable_entity }
       end
     end
@@ -337,7 +344,11 @@ class TravelPlansController < ApplicationController
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_travel_plan
+    # Ensure users can only access their own travel plans (prevents unauthorized access)
     @travel_plan = current_user.travel_plans.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    flash[:alert] = "Travel plan not found or you don't have permission to access it."
+    redirect_to travel_plans_path
   end
 
   # Only allow a list of trusted parameters through.
@@ -350,7 +361,8 @@ class TravelPlansController < ApplicationController
       :safety_score, :safety_level, :travel_style, :length_of_stay, :travel_month,
       :trip_scope, :number_of_travelers, :general_purpose, :status, :notes,
       :visa_info, :safety_preference, :start_date, :end_date, 
-      :passport_country, :current_location, :destination_country,
+      :passport_country, :current_location, :destination_country, :destination_name,
+      :destination_id,
       itinerary: {}, budget_breakdown: {}, safety_levels: []
     )
   end
@@ -367,11 +379,19 @@ class TravelPlansController < ApplicationController
     # Return nil if travel_plan params don't exist
     return nil unless params[:travel_plan].present?
     
-    destination_name = params[:travel_plan][:destination_name] || params[:travel_plan][:name]
-    destination_city = params[:travel_plan][:destination_city] || destination_name
-    destination_country = params[:travel_plan][:destination_country]
+    # If a destination_id is selected, use that (validate it's a valid ID)
+    if params[:travel_plan][:destination_id].present?
+      destination_id = params[:travel_plan][:destination_id].to_i
+      return Destination.find_by(id: destination_id) if destination_id > 0
+    end
     
-    return nil unless destination_name && destination_country
+    # Otherwise, try to create from destination_name and destination_country
+    # Sanitize inputs to prevent XSS and injection attacks
+    destination_name = ActionController::Base.helpers.sanitize(params[:travel_plan][:destination_name]&.strip)
+    destination_country = ActionController::Base.helpers.sanitize(params[:travel_plan][:destination_country]&.strip)
+    
+    # Return nil if no destination info provided (it's optional now)
+    return nil unless destination_name.present? && destination_country.present?
     
     # Try to find existing destination by name and country
     destination = Destination.find_by(
@@ -391,7 +411,7 @@ class TravelPlansController < ApplicationController
         else 5
         end
       else
-        params[:travel_plan][:safety_score]&.to_i
+        params[:travel_plan][:safety_score]&.to_i || 5
       end
       
       # Calculate average cost from budget
@@ -408,7 +428,7 @@ class TravelPlansController < ApplicationController
       
       destination = Destination.create(
         name: destination_name,
-        city: destination_city,
+        city: destination_name,
         country: destination_country,
         description: params[:travel_plan][:description],
         safety_score: safety_score_value,

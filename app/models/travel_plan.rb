@@ -1,6 +1,6 @@
 class TravelPlan < ApplicationRecord
   belongs_to :user
-  belongs_to :destination
+  belongs_to :destination, optional: true
   
   # Custom serializer for itinerary that handles both JSON and Ruby hash formats
   class ItinerarySerializer
@@ -43,7 +43,12 @@ class TravelPlan < ApplicationRecord
   
   validates :start_date, :end_date, presence: true
   validates :status, inclusion: { in: %w[planned booked completed cancelled] }, allow_nil: true
+  validates :notes, length: { maximum: 1000 }, allow_blank: true
+  validates :name, length: { maximum: 255 }, allow_blank: true
+  validates :description, length: { maximum: 2000 }, allow_blank: true
   validate :end_date_after_start_date
+  validate :sanitize_text_fields
+  validate :budget_max_greater_than_or_equal_to_min
   
   # Set default status
   before_validation :set_default_status, on: :create
@@ -61,5 +66,20 @@ class TravelPlan < ApplicationRecord
   
   def set_default_status
     self.status ||= 'planned'
+  end
+  
+  def sanitize_text_fields
+    # Strip any potentially malicious HTML/JavaScript from text fields
+    self.notes = ActionController::Base.helpers.sanitize(notes) if notes.present?
+    self.name = ActionController::Base.helpers.sanitize(name) if name.present?
+    self.description = ActionController::Base.helpers.sanitize(description) if description.present?
+  end
+  
+  def budget_max_greater_than_or_equal_to_min
+    return unless budget_min.present? && budget_max.present?
+    
+    if budget_max < budget_min
+      errors.add(:budget_max, "must be greater than or equal to minimum budget")
+    end
   end
 end

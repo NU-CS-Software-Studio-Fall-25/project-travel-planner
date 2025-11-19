@@ -95,7 +95,7 @@
                 <span class="badge bg-primary fs-6">
                   <%= travel_plan.number_of_travelers %> <%= travel_plan.number_of_travelers == 1 ? 'person' : 'people' %>
                 </span>
-              </div>z
+              </div>
             </div>
           <% end %>
           <% if travel_plan.travel_style.present? %>
@@ -160,7 +160,7 @@
             </h6>
           </div>
           <div class="card-body">
-            <p class="mb-0"><%= simple_format(travel_plan.notes) %></p>
+            <p class="mb-0"><%= simple_format(h(travel_plan.notes)) %></p>
           </div>
         </div>
       </div>
@@ -191,17 +191,17 @@
                           <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16" class="me-2">
                             <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
                           </svg>
-                          <%= activity %>
+                          <%= h(activity) %>
                         </li>
                       <% end %>
                     </ul>
                   <% else %>
-                    <p class="ms-3"><%= activities %></p>
+                    <p class="ms-3"><%= h(activities) %></p>
                   <% end %>
                 </div>
               <% end %>
             <% else %>
-              <p><%= travel_plan.itinerary %></p>
+              <p><%= h(travel_plan.itinerary) %></p>
             <% end %>
           </div>
         </div>
@@ -329,7 +329,7 @@
                 </strong>
               </div>
             <% else %>
-              <p><%= travel_plan.budget_breakdown %></p>
+              <p><%= h(travel_plan.budget_breakdown) %></p>
             <% end %>
           </div>
         </div>
