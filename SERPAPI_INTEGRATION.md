@@ -125,7 +125,12 @@ Tests:
 ### Airport Intelligence
 - Automatically finds nearest airports for user's location
 - Matches destination cities to appropriate airports
-- Handles multiple airport cities (e.g., NYC has JFK, EWR, LGA)
+- **Multi-Airport Search**: For cities with multiple airports, checks up to 3 airports
+- **Smart Prioritization**: Prioritizes international/major airports first
+  - Example: JFK before LGA for New York
+  - Example: LHR before Luton for London
+- **Best Price Selection**: Compares prices across all available airports and returns cheapest option
+- Handles 7,699+ airports worldwide from comprehensive dataset
 
 ## Error Handling
 

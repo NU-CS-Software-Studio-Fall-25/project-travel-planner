@@ -29,27 +29,20 @@ class SerpapiFlightService
         }
       end
       
-      arrival_airport = arrival_airports.first
-      
       Rails.logger.info "=== SerpAPI Flight Search ==="
       Rails.logger.info "From: #{departure_airport} (#{@preferences[:current_location]})"
-      Rails.logger.info "To: #{arrival_airport} (#{destination_city}, #{destination_country})"
+      Rails.logger.info "To: #{destination_city}, #{destination_country}"
+      Rails.logger.info "Available arrival airports: #{arrival_airports.join(', ')}"
       Rails.logger.info "Dates: #{@preferences[:start_date]} to #{@preferences[:end_date]}"
       
-      # Build API request
-      response = make_flight_request(
+      # Check all available airports to find the cheapest flight
+      best_result = find_cheapest_flight_across_airports(
         departure_airport: departure_airport,
-        arrival_airport: arrival_airport,
-        outbound_date: @preferences[:start_date],
-        return_date: @preferences[:end_date],
-        adults: @preferences[:number_of_travelers] || 1
+        arrival_airports: arrival_airports,
+        destination_city: destination_city
       )
       
-      if response[:success]
-        parse_flight_response(response[:data], departure_airport, arrival_airport, destination_city)
-      else
-        response
-      end
+      best_result
       
     rescue => e
       Rails.logger.error "=== SerpAPI Flight Error ==="
@@ -64,6 +57,68 @@ class SerpapiFlightService
   end
 
   private
+
+  # Check all available airports and return the cheapest flight option
+  def find_cheapest_flight_across_airports(departure_airport:, arrival_airports:, destination_city:)
+    valid_results = []
+    errors = []
+    
+    # Limit to first 3 airports to avoid excessive API calls
+    airports_to_check = arrival_airports.take(3)
+    
+    Rails.logger.info "Checking #{airports_to_check.length} airports for best price..."
+    
+    airports_to_check.each do |arrival_airport|
+      Rails.logger.info "  → Checking #{arrival_airport}..."
+      
+      # Make flight request for this airport
+      response = make_flight_request(
+        departure_airport: departure_airport,
+        arrival_airport: arrival_airport,
+        outbound_date: @preferences[:start_date],
+        return_date: @preferences[:end_date],
+        adults: @preferences[:number_of_travelers] || 1
+      )
+      
+      if response[:success]
+        result = parse_flight_response(response[:data], departure_airport, arrival_airport, destination_city)
+        
+        if result[:success]
+          valid_results << result
+          Rails.logger.info "    ✓ Found flight via #{arrival_airport}: $#{result[:price]}"
+        else
+          errors << { airport: arrival_airport, error: result[:error] }
+          Rails.logger.warn "    ✗ #{arrival_airport}: #{result[:error]}"
+        end
+      else
+        errors << { airport: arrival_airport, error: response[:error] }
+        Rails.logger.warn "    ✗ #{arrival_airport}: #{response[:error]}"
+      end
+      
+      # Small delay to avoid rate limiting (optional)
+      sleep(0.5) if airports_to_check.length > 1
+    end
+    
+    # Return the cheapest valid result
+    if valid_results.any?
+      cheapest = valid_results.min_by { |r| r[:price] }
+      Rails.logger.info "=== Best Option Found ==="
+      Rails.logger.info "Airport: #{cheapest[:details][:arrival_airport]}"
+      Rails.logger.info "Price: $#{cheapest[:price]}"
+      return cheapest
+    end
+    
+    # If no valid results, return error with details
+    Rails.logger.error "No valid flights found for any airport"
+    {
+      success: false,
+      error: "No flights available for #{destination_city}",
+      details: {
+        airports_checked: airports_to_check,
+        errors: errors
+      }
+    }
+  end
 
   def make_flight_request(departure_airport:, arrival_airport:, outbound_date:, return_date:, adults: 1)
     # Build query parameters
