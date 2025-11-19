@@ -33,6 +33,17 @@
               <span class="badge subscription-badge <%= tier.parameterize %>"><%= tier %></span>
             </dd>
 
+            <%# START: Display Recommendation Generations %>
+            <dt class="col-sm-3">Generations Left</dt>
+            <dd class="col-sm-9">
+              <% if @user.premium? %>
+                <span class="badge bg-success">Unlimited</span>
+              <% else %>
+                <span class="badge bg-info"><%= @user.remaining_generations %> / <%= User::FREE_TIER_GENERATION_LIMIT %> this month</span>
+              <% end %>
+            </dd>
+            <%# END: Display Recommendation Generations %>
+
             <dt class="col-sm-3">Total Plans</dt>
             <dd class="col-sm-9"><%= @user.travel_plans.count %></dd>
           </dl>
@@ -50,7 +61,7 @@
         <div class="card-footer footer-actions">
           <div class="d-flex justify-content-end">
             <%= button_to "Delete Account", @user, method: :delete,
-                          data: { confirm: "Are you sure? This action cannot be undone and will permanently delete all your travel plans and data." },
+                          data: { turbo_confirm: "Are you sure? This action cannot be undone and will permanently delete all your travel plans and data." },
                           class: "btn btn-outline-danger delete-btn",
                           style: "transition: all 0.2s ease-in-out;" %>
           </div>

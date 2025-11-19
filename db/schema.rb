@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_19_020531) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_19_174334) do
   create_table "country_safety_scores", force: :cascade do |t|
     t.string "country_name", null: false
     t.decimal "gpi_score", precision: 5, scale: 3, null: false
@@ -118,6 +118,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_020531) do
     t.boolean "email_verified", default: false, null: false
     t.string "verification_token"
     t.datetime "verification_sent_at"
+    t.integer "recommendation_generations_used", default: 0
+    t.datetime "generations_reset_at"
     t.index ["verification_token"], name: "index_users_on_verification_token", unique: true
   end
 

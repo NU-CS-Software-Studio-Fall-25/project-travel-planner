@@ -1,7 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
   has_secure_password validations: false
-
+  FREE_TIER_GENERATION_LIMIT = 30
   has_many :travel_plans, dependent: :destroy
   has_many :recommendations, dependent: :destroy
   has_many :destinations, through: :travel_plans
@@ -21,6 +21,35 @@ class User < ApplicationRecord
   validates :current_country, presence: true
 
   before_save { self.email = email.downcase }
+
+  # Checks if the user can generate a new recommendation
+  def can_generate_recommendation?
+    return true if premium?
+
+    reset_generation_count_if_needed!
+    recommendation_generations_used < FREE_TIER_GENERATION_LIMIT
+  end
+
+  # Increments the generation counter
+  def increment_generations_used!
+    # No need to increment for premium users
+    return if premium?
+
+    reset_generation_count_if_needed!
+    self.increment!(:recommendation_generations_used)
+  end
+
+  # Returns the number of remaining generations for the current period
+  def remaining_generations
+    return Float::INFINITY if premium?
+
+    reset_generation_count_if_needed!
+    [0, FREE_TIER_GENERATION_LIMIT - recommendation_generations_used].max
+  end
+
+  def premium?
+    subscription_tier == 'premium'
+  end
 
   # Helper methods for managing recommendations stored as JSON
   def cached_recommendations
@@ -55,4 +84,13 @@ class User < ApplicationRecord
   def oauth_user?
     provider.present?
   end
+
+  private
+  # Resets the monthly generation count if a month has passed
+  def reset_generation_count_if_needed!
+    if generations_reset_at.nil? || generations_reset_at < 1.month.ago
+      self.update_columns(recommendation_generations_used: 0, generations_reset_at: Time.current)
+    end
+  end
+
 end

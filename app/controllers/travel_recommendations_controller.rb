@@ -31,6 +31,7 @@ class TravelRecommendationsController < ApplicationController
   end
 
   def create
+
     preferences = travel_plan_params
     
     # Calculate length of stay from dates
