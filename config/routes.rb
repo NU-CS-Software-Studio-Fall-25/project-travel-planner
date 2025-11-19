@@ -10,6 +10,14 @@ Rails.application.routes.draw do
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy"
+  
+  # OAuth routes
+  get '/auth/:provider/callback', to: 'sessions#google_oauth2'
+  post '/auth/:provider/callback', to: 'sessions#google_oauth2'
+  get '/auth/failure', to: 'sessions#failure'
+  
+  # Complete profile after OAuth
+  get '/complete_profile', to: 'users#complete_profile'
 
   # API routes
   namespace :api do

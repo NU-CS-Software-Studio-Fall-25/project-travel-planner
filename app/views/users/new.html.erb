@@ -9,6 +9,25 @@
           <p class="text-center text-muted mb-0">Join us to start planning your next adventure!</p>
         </div>
         <div class="card-body">
+          <div class="text-center mb-3">
+            <div class="d-grid">
+              <%= link_to "/auth/google_oauth2", method: :post, class: "btn btn-outline-danger d-flex align-items-center justify-content-center", data: { turbo: false } do %>
+                <svg style="width:20px;height:20px;margin-right:8px;" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.2,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.1,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.25,22C17.6,22 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1V11.1Z" />
+                </svg>
+                <span>Sign up with Google</span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="text-center my-3">
+            <div class="d-flex align-items-center">
+              <hr class="flex-grow-1">
+              <span class="px-3 text-muted">OR</span>
+              <hr class="flex-grow-1">
+            </div>
+          </div>
+
           <%= render "form", user: @user %>
           
           <div class="text-center mt-3">

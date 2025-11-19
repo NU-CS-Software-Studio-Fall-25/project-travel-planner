@@ -18,6 +18,26 @@ class UsersController < ApplicationController
   # GET /users/new
   def new
     @user = User.new
+    
+    # Pre-fill from OAuth if coming from Google Sign In
+    if session[:omniauth_user_id]
+      oauth_user = User.find_by(id: session[:omniauth_user_id])
+      if oauth_user
+        @user.name = oauth_user.name
+        @user.email = oauth_user.email
+        @user.provider = oauth_user.provider
+        @user.uid = oauth_user.uid
+      end
+    end
+  end
+
+  # Complete profile after OAuth (similar to new but for existing OAuth users)
+  def complete_profile
+    @user = User.find_by(id: session[:omniauth_user_id])
+    
+    if @user.nil?
+      redirect_to signup_path, alert: "Session expired. Please sign in again."
+    end
   end
 
   # GET /users/1/edit
@@ -26,6 +46,29 @@ class UsersController < ApplicationController
 
   # POST /users or /users.json
   def create
+    # Check if this is an OAuth user completing their profile
+    if session[:omniauth_user_id]
+      @user = User.find_by(id: session[:omniauth_user_id])
+      if @user
+        # Update only the additional required fields
+        @user.current_country = user_params[:current_country]
+        
+        respond_to do |format|
+          if @user.save
+            session.delete(:omniauth_user_id)
+            log_in @user
+            format.html { redirect_to travel_plans_path, notice: "Welcome! Your account was successfully created." }
+            format.json { render :show, status: :created, location: @user }
+          else
+            format.html { render :complete_profile, status: :unprocessable_entity }
+            format.json { render json: @user.errors, status: :unprocessable_entity }
+          end
+        end
+        return
+      end
+    end
+    
+    # Regular signup flow
     @user = User.new(user_params)
 
     respond_to do |format|

@@ -1,0 +1,101 @@
+<% content_for :title, "Complete Your Profile - Travel Planner" %>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="text-center mb-0">Complete Your Profile</h1>
+          <p class="text-center text-muted mb-0">Just a few more details to get started!</p>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Welcome, <%= @user.name %>!</strong><br>
+            Your email (<%= @user.email %>) has been verified through Google.
+          </div>
+
+          <%= form_with(model: @user, url: users_path, method: :post, local: true) do |form| %>
+            <% if @user.errors.any? %>
+              <div class="alert alert-danger">
+                <h4><%= pluralize(@user.errors.count, "error") %> prohibited this profile from being completed:</h4>
+                <ul class="mb-0">
+                  <% @user.errors.each do |error| %>
+                    <li><%= error.full_message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= form.label :current_country, "Current Country *", class: "form-label" %>
+              <%= form.select :current_country,
+                              options_for_select([
+                                ['United States', 'United States'],
+                                ['Canada', 'Canada'],
+                                ['United Kingdom', 'United Kingdom'],
+                                ['Australia', 'Australia'],
+                                ['Germany', 'Germany'],
+                                ['France', 'France'],
+                                ['Japan', 'Japan'],
+                                ['China', 'China'],
+                                ['India', 'India'],
+                                ['Brazil', 'Brazil'],
+                                ['Mexico', 'Mexico'],
+                                ['Spain', 'Spain'],
+                                ['Italy', 'Italy'],
+                                ['--- More Countries ---', ''],
+                                ['Afghanistan', 'Afghanistan'],
+                                ['Albania', 'Albania'],
+                                ['Algeria', 'Algeria'],
+                                ['Argentina', 'Argentina'],
+                                ['Austria', 'Austria'],
+                                ['Bangladesh', 'Bangladesh'],
+                                ['Belgium', 'Belgium'],
+                                ['Chile', 'Chile'],
+                                ['Colombia', 'Colombia'],
+                                ['Czech Republic', 'Czech Republic'],
+                                ['Denmark', 'Denmark'],
+                                ['Egypt', 'Egypt'],
+                                ['Finland', 'Finland'],
+                                ['Greece', 'Greece'],
+                                ['Hungary', 'Hungary'],
+                                ['Indonesia', 'Indonesia'],
+                                ['Ireland', 'Ireland'],
+                                ['Israel', 'Israel'],
+                                ['Korea, Republic of', 'Korea, Republic of'],
+                                ['Malaysia', 'Malaysia'],
+                                ['Netherlands', 'Netherlands'],
+                                ['New Zealand', 'New Zealand'],
+                                ['Norway', 'Norway'],
+                                ['Pakistan', 'Pakistan'],
+                                ['Peru', 'Peru'],
+                                ['Philippines', 'Philippines'],
+                                ['Poland', 'Poland'],
+                                ['Portugal', 'Portugal'],
+                                ['Romania', 'Romania'],
+                                ['Russia', 'Russia'],
+                                ['Saudi Arabia', 'Saudi Arabia'],
+                                ['Singapore', 'Singapore'],
+                                ['South Africa', 'South Africa'],
+                                ['Sweden', 'Sweden'],
+                                ['Switzerland', 'Switzerland'],
+                                ['Taiwan', 'Taiwan'],
+                                ['Thailand', 'Thailand'],
+                                ['Turkey', 'Turkey'],
+                                ['Ukraine', 'Ukraine'],
+                                ['United Arab Emirates', 'United Arab Emirates'],
+                                ['Vietnam', 'Vietnam']
+                              ], @user.current_country || 'United States'),
+                              { include_blank: "Select your country" },
+                              { class: "form-select", required: true } %>
+            </div>
+
+            <div class="d-grid">
+              <%= form.submit "Complete Profile", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
