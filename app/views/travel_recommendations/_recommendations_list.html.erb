@@ -43,7 +43,7 @@
                             <% rec[:itinerary].each do |day, description| %>
                               <div class="mb-2">
                                 <strong><%= sanitize(day.to_s.humanize, tags: []) %>:</strong>
-                                <p class="mb-1 text-muted"><%= sanitize(description, tags: %w[br strong em]) %></p>
+                                <p class="mb-1 text-muted"><%= sanitize(description.to_s, tags: %w[br strong em]) %></p>
                               </div>
                             <% end %>
                           </div>

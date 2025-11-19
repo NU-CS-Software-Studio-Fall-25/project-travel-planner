@@ -20,21 +20,56 @@
     <%# Hide user_id field as it should be set automatically %>
     <%= form.hidden_field :user_id, value: current_user&.id %>
 
-    <div class="col-md-6">
-      <%= form.label :destination_id, "Destination", class: "form-label" %>
+    <div class="col-md-12">
+      <%= form.label :destination_id, "Select Existing Destination (Optional)", class: "form-label" %>
       <%= form.select :destination_id, 
           options_from_collection_for_select(Destination.all, :id, :name, travel_plan.destination_id),
-          { include_blank: "Select a destination" },
-          class: "form-select" %>
-      <small class="text-muted">Choose from existing destinations or create a new one below</small>
+          { include_blank: "-- Select from saved destinations --" },
+          class: "form-select",
+          id: "destination-select" %>
+      <small class="text-muted">Choose from your saved destinations, or create a new one below</small>
+    </div>
+
+    <div class="col-12 mt-3">
+      <h6 class="text-muted">OR Create New Destination</h6>
+    </div>
+
+    <div class="col-md-6">
+      <%= form.label :destination_name, "Destination Name", class: "form-label" %>
+      <%= form.text_field :destination_name, 
+          class: "form-control", 
+          placeholder: "e.g., Paris, Banff National Park",
+          id: "destination-name-field",
+          maxlength: 255 %>
+      <small class="text-muted">Name of the place you're visiting</small>
+    </div>
+
+    <div class="col-md-6">
+      <%= form.label :destination_country, "Country", class: "form-label" %>
+      <%= form.text_field :destination_country, 
+          class: "form-control", 
+          placeholder: "e.g., France, Canada",
+          id: "destination-country-field",
+          maxlength: 100 %>
+      <small class="text-muted">Country of your destination</small>
     </div>
 
     <div class="col-md-6">
       <%= form.label :status, class: "form-label" %>
       <%= form.select :status, 
-          ["Planned", "Booked", "Completed", "Cancelled"],
+          [["Planned", "planned"], ["Booked", "booked"], ["Completed", "completed"], ["Cancelled", "cancelled"]],
           { selected: travel_plan.status || "planned" },
           class: "form-select" %>
+    </div>
+
+    <div class="col-md-6">
+      <%= form.label :number_of_travelers, "Number of Travelers", class: "form-label" %>
+      <%= form.number_field :number_of_travelers, 
+          class: "form-control", 
+          min: 1, 
+          value: travel_plan.number_of_travelers || 1,
+          placeholder: "1" %>
+      <small class="text-muted">How many people are traveling?</small>
     </div>
 
     <div class="col-md-6">
@@ -49,14 +84,37 @@
       <small class="text-muted">When does your trip end?</small>
     </div>
 
+    <div class="col-md-6">
+      <%= form.label :budget_min, "Minimum Budget ($)", class: "form-label" %>
+      <%= form.number_field :budget_min, 
+          class: "form-control", 
+          min: 0, 
+          step: 100,
+          value: travel_plan.budget_min || 0,
+          placeholder: "0" %>
+      <small class="text-muted">Minimum budget for this trip</small>
+    </div>
+
+    <div class="col-md-6">
+      <%= form.label :budget_max, "Maximum Budget ($)", class: "form-label" %>
+      <%= form.number_field :budget_max, 
+          class: "form-control", 
+          min: 0, 
+          step: 100,
+          value: travel_plan.budget_max || 0,
+          placeholder: "0" %>
+      <small class="text-muted">Maximum budget for this trip</small>
+    </div>
+
     <div class="col-12">
       <%= form.label :notes, "Trip Notes", class: "form-label" %>
       <%= form.text_area :notes,
                          class: "form-control",
                          rows: 5,
                          placeholder: "Add any notes, reminders, or special requirements for this trip...",
-                         id: "trip-notes-field" %>
-      <small class="text-muted">Optional: Add details about accommodations, activities, or anything you want to remember (Max 300 characters)</small>
+                         id: "trip-notes-field",
+                         maxlength: 1000 %>
+      <small class="text-muted">Optional: Add details about accommodations, activities, or anything you want to remember (Max 1000 characters)</small>
       <div id="notes-error" class="text-danger mt-1" style="display: none; font-size: 0.8rem;">
         Max character length reached. Cannot enter more characters.
       </div>
@@ -73,18 +131,48 @@
     function initTripForm() {
         const notesField = document.getElementById("trip-notes-field");
         const errorDiv = document.getElementById("notes-error");
-        const maxLength = 500;
+        const maxLength = 1000;
 
-        if (!notesField) return;
+        if (notesField) {
+            notesField.addEventListener("input", function() {
+                if (this.value.length >= maxLength) {
+                    this.value = this.value.slice(0, maxLength);
+                    errorDiv.style.display = "block";
+                } else {
+                    errorDiv.style.display = "none";
+                }
+            });
+        }
 
-        notesField.addEventListener("input", function() {
-            if (this.value.length >= maxLength) {
-                this.value = this.value.slice(0, maxLength);
-                errorDiv.style.display = "block";
-            } else {
-                errorDiv.style.display = "none";
+        // Handle destination selection logic
+        const destinationSelect = document.getElementById("destination-select");
+        const destinationNameField = document.getElementById("destination-name-field");
+        const destinationCountryField = document.getElementById("destination-country-field");
+
+        if (destinationSelect && destinationNameField && destinationCountryField) {
+            // When selecting an existing destination, clear the new destination fields
+            destinationSelect.addEventListener("change", function() {
+                if (this.value) {
+                    destinationNameField.value = "";
+                    destinationCountryField.value = "";
+                    destinationNameField.disabled = true;
+                    destinationCountryField.disabled = true;
+                } else {
+                    destinationNameField.disabled = false;
+                    destinationCountryField.disabled = false;
+                }
+            });
+
+            // When typing a new destination, clear the select dropdown
+            function handleNewDestinationInput() {
+                if (destinationNameField.value || destinationCountryField.value) {
+                    destinationSelect.value = "";
+                }
             }
-        });
+
+            destinationNameField.addEventListener("input", handleNewDestinationInput);
+            destinationCountryField.addEventListener("input", handleNewDestinationInput);
+        }
     }
 
     document.addEventListener("DOMContentLoaded", initTripForm);
