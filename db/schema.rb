@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_19_010010) do
   create_table "country_safety_scores", force: :cascade do |t|
     t.string "country_name", null: false
     t.decimal "gpi_score", precision: 5, scale: 3, null: false
@@ -88,14 +88,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
     t.string "general_purpose"
     t.string "trip_scope"
     t.string "trip_type"
+    t.text "itinerary"
+    t.text "details"
+    t.text "description"
     t.integer "safety_score"
     t.string "visa_info"
     t.json "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
-    t.text "description"
-    t.text "details"
-    t.json "itinerary"
     t.integer "number_of_people", default: 1
     t.integer "number_of_travelers", default: 1
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
@@ -105,12 +105,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_09_052328) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
+    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "password_digest"
     t.text "recommendations_json"
     t.string "current_country", default: "United States"
     t.string "subscription_tier", default: "free", null: false
+    t.string "provider"
+    t.string "uid"
+    t.string "oauth_token"
+    t.datetime "oauth_expires_at"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
   add_foreign_key "recommendation_feedbacks", "users"

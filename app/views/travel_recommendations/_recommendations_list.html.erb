@@ -111,12 +111,102 @@
                       <span class="<%= badge_class %>"><%= safety_level %></span>
                     </li>
 
-                    <li class="list-group-item"><i class="bi bi-geo-alt me-1 text-info"></i><strong>Travel Style:</strong> <%= sanitize(rec[:travel_style], tags: []) %></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span><i class="bi bi-geo-alt me-1 text-info"></i><strong>Travel Style</strong></span>
+                      <span class="badge bg-primary rounded-pill"><%= sanitize(rec[:travel_style], tags: []) %></span>
+                    </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                       <span><i class="bi bi-people-fill me-1 text-primary"></i><strong>Travelers</strong></span>
                       <span class="badge bg-primary rounded-pill"><%= (rec[:number_of_travelers] || 1).to_i %> <%= (rec[:number_of_travelers] || 1).to_i == 1 ? 'person' : 'people' %></span>
                     </li>
-                    <li class="list-group-item"><i class="bi bi-pass me-1 text-primary"></i><strong>Visa Info:</strong> <%= sanitize(rec[:visa_info], tags: []) %></li>
+                    
+                    <%# Enhanced Visa Information Display %>
+                    <% if rec[:visa_data].present? %>
+                      <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <span><i class="bi bi-pass me-1"></i><strong>Visa</strong></span>
+                          <div class="text-end">
+                            <%
+                              visa_badge_class = case rec[:visa_data][:color]
+                              when "green"
+                                "badge bg-success"
+                              when "blue"
+                                "badge bg-info"
+                              when "yellow"
+                                "badge bg-warning text-dark"
+                              when "red"
+                                "badge bg-danger"
+                              else
+                                "badge bg-secondary"
+                              end
+                            %>
+                            <span class="<%= visa_badge_class %> me-1">
+                              <%= sanitize(rec[:visa_data][:status], tags: []) %>
+                            </span>
+                            
+                            <% if rec[:visa_data][:duration].present? %>
+                              <span class="badge bg-secondary">
+                                Up to <%= sanitize(rec[:visa_data][:duration], tags: []) %>
+                              </span>
+                            <% end %>
+                          </div>
+                        </div>
+                        
+                        <%# Additional visa details below %>
+                        <%# Alternative visa option %>
+                        <% if rec[:visa_data][:alternative].present? %>
+                          <div class="mt-2">
+                            <small class="text-muted">
+                              <i class="bi bi-arrow-right-circle"></i> Alternative: 
+                              <strong><%= sanitize(rec[:visa_data][:alternative], tags: []) %></strong>
+                              <% if rec[:visa_data][:alternative_link].present? %>
+                                <a href="<%= rec[:visa_data][:alternative_link] %>" target="_blank" class="text-primary">
+                                  <i class="bi bi-box-arrow-up-right"></i> Apply
+                                </a>
+                              <% end %>
+                            </small>
+                          </div>
+                        <% end %>
+                        
+                        <%# Mandatory registration warning %>
+                        <% if rec[:visa_data][:mandatory_registration].present? %>
+                          <div class="alert alert-warning mt-2 mb-0 py-2 px-3" role="alert">
+                            <small>
+                              <i class="bi bi-exclamation-triangle-fill"></i>
+                              <strong>Required:</strong> <%= sanitize(rec[:visa_data][:mandatory_registration], tags: []) %>
+                              <% if rec[:visa_data][:registration_link].present? %>
+                                <a href="<%= rec[:visa_data][:registration_link] %>" target="_blank" class="alert-link">
+                                  Complete here <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                              <% end %>
+                            </small>
+                          </div>
+                        <% end %>
+                        
+                        <%# Passport validity requirement %>
+                        <% if rec[:visa_data][:passport_validity].present? %>
+                          <div class="mt-2">
+                            <small class="text-muted">
+                              <i class="bi bi-bookmark-check"></i> Passport must be valid: 
+                              <%= sanitize(rec[:visa_data][:passport_validity], tags: []) %>
+                            </small>
+                          </div>
+                        <% end %>
+                        
+                        <%# Exception rule (special cases) %>
+                        <% if rec[:visa_data][:exception_text].present? %>
+                          <div class="alert alert-info mt-2 mb-0 py-2 px-3" role="alert">
+                            <small>
+                              <i class="bi bi-info-circle-fill"></i>
+                              <strong>Note:</strong> <%= sanitize(rec[:visa_data][:exception_text], tags: []) %>
+                            </small>
+                          </div>
+                        <% end %>
+                      </li>
+                    <% else %>
+                      <%# Fallback to old visa_info if visa_data not available %>
+                      <li class="list-group-item"><i class="bi bi-pass me-1 text-primary"></i><strong>Visa Info:</strong> <%= sanitize(rec[:visa_info], tags: []) %></li>
+                    <% end %>
                   </ul>
 
                   <% if rec[:budget_breakdown].present? %>
@@ -134,7 +224,13 @@
                         </h2>
                         <div id="collapse-budget-<%= index %>" class="accordion-collapse collapse">
                           <div class="accordion-body p-4 bg-light rounded-4">
-                            <% rec[:budget_breakdown].each do |category, data| %>
+                            <%
+                              # Sort budget breakdown to ensure total_trip_cost is last
+                              sorted_breakdown = rec[:budget_breakdown].sort_by do |category, data|
+                                category.to_s.downcase.include?('total') ? 1 : 0
+                              end
+                            %>
+                            <% sorted_breakdown.each do |category, data| %>
                               <div class="budget-item mb-4 p-3 bg-white shadow-sm rounded-4 border-start border-4 border-primary-subtle">
                                 <h5 class="fw-bold text-primary mb-2 d-flex align-items-center">
                                   <i class="bi bi-dot fs-3 lh-1 me-1 text-primary"></i>
