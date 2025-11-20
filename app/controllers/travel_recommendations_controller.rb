@@ -13,13 +13,13 @@ class TravelRecommendationsController < ApplicationController
 
     # Load all countries from the database for the dropdown
     @countries = CountrySafetyScore.where(year: 2025).order(:country_name).pluck(:country_name).uniq
-    
+
     # Load last preferences from session to pre-fill the form
     last_prefs = session[:last_preferences] || {}
     @travel_plan = TravelPlan.new(last_prefs)
 
     @max_trip_days = (current_user&.subscription_tier == 'premium') ? 14 : 7
-    
+
     # If we have recommendations, show a helpful message
     if @recommendations.present?
       if last_prefs.present?
@@ -31,32 +31,54 @@ class TravelRecommendationsController < ApplicationController
   end
 
   def create
+    # --- 1. Check generation eligibility ---
+    unless current_user.can_generate_recommendation?
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "recommendations_list",
+            partial: "travel_recommendations/limit_reached",
+            locals: { remaining: current_user.remaining_generations }
+          )
+        end
+        format.html do
+          redirect_to travel_recommendations_path,
+                      alert: "You have reached your monthly free generation limit."
+        end
+      end
+      return
+    end
 
+    # --- 2. Extract preferences ---
     preferences = travel_plan_params
-    
-    # Calculate length of stay from dates
+
     if preferences[:start_date].present? && preferences[:end_date].present?
       start_date = Date.parse(preferences[:start_date]) rescue nil
-      end_date = Date.parse(preferences[:end_date]) rescue nil
-      
+      end_date   = Date.parse(preferences[:end_date])   rescue nil
+
       if start_date && end_date && end_date >= start_date
         preferences[:length_of_stay] = (end_date - start_date).to_i + 1
-        # Derive the travel month from start_date
-        preferences[:travel_month] = start_date.strftime("%B") # e.g., "November"
+        preferences[:travel_month] = start_date.strftime("%B")
       end
     end
-    
-    # Store preferences in session for form pre-filling, but exclude safety_levels (not a TravelPlan attribute)
+
+    # Save for pre-filling form later
     session_prefs = preferences.to_h.except(:safety_levels)
     session[:last_preferences] = session_prefs
 
+    # --- 3. Generate recommendations ---
     @recommendations = OpenaiService.new(preferences).get_recommendations
-    # Store the new recommendations in the user's database record instead of session
+
+    # Save to user record
     current_user.update(recommendations_json: @recommendations)
-    
-    # Create TravelPlan object for form display (without safety_levels attribute)
+
+    # --- 4. Count one generation AFTER success ---
+    current_user.increment_generations_used!
+
+    # Prepare form object
     @travel_plan = TravelPlan.new(session_prefs)
 
+    # --- 5. Render response ---
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(
@@ -89,14 +111,14 @@ class TravelRecommendationsController < ApplicationController
   def fetch_photos
     destination_city = params[:destination_city]
     destination_country = params[:destination_country]
-    
+
     Rails.logger.info "="*80
     Rails.logger.info "FETCH_PHOTOS Controller - Received Parameters:"
     Rails.logger.info "destination_city param: '#{destination_city}'"
     Rails.logger.info "destination_country param: '#{destination_country}'"
     Rails.logger.info "All params: #{params.inspect}"
     Rails.logger.info "="*80
-    
+
     unless destination_city.present? && destination_country.present?
       Rails.logger.error "Missing destination information!"
       render json: { success: false, error: 'Missing destination information' }, status: :bad_request
@@ -105,10 +127,10 @@ class TravelRecommendationsController < ApplicationController
 
     tripadvisor_service = TripadvisorService.new
     result = tripadvisor_service.get_location_photos(destination_city, destination_country, 7)
-    
+
     Rails.logger.info "Result success: #{result[:success]}"
     Rails.logger.info "Result photos count: #{result[:photos]&.length || 0}"
-    
+
     render json: result
   end
 

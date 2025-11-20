@@ -37,9 +37,9 @@
             <dt class="col-sm-3">Generations Left</dt>
             <dd class="col-sm-9">
               <% if @user.premium? %>
-                <span class="badge bg-success">Unlimited</span>
+                <span id="generations-count" class="badge bg-success">Unlimited</span>
               <% else %>
-                <span class="badge bg-info"><%= @user.remaining_generations %> / <%= User::FREE_TIER_GENERATION_LIMIT %> this month</span>
+                <span id="generations-count" class="badge bg-info"><%= @user.remaining_generations %> / <%= User::FREE_TIER_GENERATION_LIMIT %> this month</span>
               <% end %>
             </dd>
             <%# END: Display Recommendation Generations %>

@@ -32,11 +32,12 @@ class User < ApplicationRecord
 
   # Increments the generation counter
   def increment_generations_used!
-    # No need to increment for premium users
     return if premium?
 
     reset_generation_count_if_needed!
-    self.increment!(:recommendation_generations_used)
+    # ensure attribute isn't nil before incrementing
+    self.recommendation_generations_used = (recommendation_generations_used || 0) + 1
+    save!(validate: false)
   end
 
   # Returns the number of remaining generations for the current period
@@ -44,7 +45,7 @@ class User < ApplicationRecord
     return Float::INFINITY if premium?
 
     reset_generation_count_if_needed!
-    [0, FREE_TIER_GENERATION_LIMIT - recommendation_generations_used].max
+    [0, FREE_TIER_GENERATION_LIMIT - (recommendation_generations_used || 0)].max
   end
 
   def premium?
@@ -86,11 +87,14 @@ class User < ApplicationRecord
   end
 
   private
+
   # Resets the monthly generation count if a month has passed
   def reset_generation_count_if_needed!
     if generations_reset_at.nil? || generations_reset_at < 1.month.ago
-      self.update_columns(recommendation_generations_used: 0, generations_reset_at: Time.current)
+      # Persist reset and keep in-memory attributes in sync
+      update_columns(recommendation_generations_used: 0, generations_reset_at: Time.current)
+      self.recommendation_generations_used = 0
+      self.generations_reset_at = Time.current
     end
   end
-
 end
