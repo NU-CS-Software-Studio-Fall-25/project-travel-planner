@@ -69,8 +69,15 @@ class TravelRecommendationsController < ApplicationController
     # --- 3. Generate recommendations ---
     @recommendations = OpenaiService.new(preferences).get_recommendations
 
-    # Save to user record
-    current_user.update(recommendations_json: @recommendations)
+    # Filter out NA results before saving (don't store failed searches)
+    valid_recommendations = @recommendations.reject do |rec|
+      rec[:name] == "No Suitable Destination Found" || rec[:destination_country] == "N/A"
+    end
+
+    # Save to user record (only if we have valid recommendations)
+    if valid_recommendations.present?
+      current_user.update(recommendations_json: valid_recommendations)
+    end
 
     # --- 4. Count one generation AFTER success ---
     current_user.increment_generations_used!
