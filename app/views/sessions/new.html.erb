@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-md-6">
@@ -10,13 +16,21 @@
             <div class="mb-3">
               <%= form.label :email, class: "form-label" %>
               <%= form.email_field :email, class: "form-control", placeholder: "Enter your email", required: true, id: "login-email-field", maxlength: 60 %>
-              <div class="invalid-feedback" id="login-email-error"></div>
             </div>
 
             <div class="mb-3">
               <%= form.label :password, class: "form-label" %>
-              <%= form.password_field :password, class: "form-control", placeholder: "Enter your password", required: true, id: "login-password-field", maxlength: 60 %>
-              <div class="invalid-feedback" id="login-password-error"></div>
+
+              <div class="input-group">
+                <%= form.password_field :password, class: "form-control", placeholder: "Enter your password", required: true, id: "login-password-field", maxlength: 60, 'aria-describedby': "toggle-password-btn" %>
+
+                <button type="button" class="btn btn-outline-secondary" id="toggle-password-btn" aria-pressed="false" title="Show password" data-visible="false">
+                  <svg id="eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+                    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div class="d-grid">
@@ -51,119 +65,74 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // DOM elements
+
+    function initLogin() {
         const form = document.getElementById("login-form");
         const emailField = document.getElementById("login-email-field");
         const passwordField = document.getElementById("login-password-field");
         const submitBtn = document.getElementById("login-submit-btn");
-
-        // Error elements
-        const errors = {
-            email: document.getElementById("login-email-error"),
-            password: document.getElementById("login-password-error")
-        };
+        const toggleBtn = document.getElementById("toggle-password-btn");
+        const eyeIcon = document.getElementById("eye-icon");
 
         const MAX_LENGTH = 60;
 
-        // Validation functions
         function validateEmail(value) {
-            if (!value) {
-                return "Email is required.";
-            }
-            if (value.length > MAX_LENGTH) {
-                return `Email cannot exceed ${MAX_LENGTH} characters.`;
-            }
+            if (!value) return "Email is required.";
+            if (value.length > MAX_LENGTH) return `Email cannot exceed ${MAX_LENGTH} characters.`;
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(value)) {
-                return "Please enter a valid email address.";
-            }
+            if (!emailRegex.test(value)) return "Please enter a valid email address.";
             return null;
         }
 
         function validatePassword(value) {
-            if (!value) {
-                return "Password is required.";
-            }
-            if (value.length > MAX_LENGTH) {
-                return `Password cannot exceed ${MAX_LENGTH} characters.`;
-            }
+            if (!value) return "Password is required.";
+            if (value.length > MAX_LENGTH) return `Password cannot exceed ${MAX_LENGTH} characters.`;
             return null;
         }
 
-        // UI update functions
-        function showError(errorElement, message, inputElement) {
-            errorElement.textContent = message;
-            inputElement.classList.add("is-invalid");
-            inputElement.classList.remove("is-valid");
-        }
-
-        function hideError(errorElement, inputElement) {
-            errorElement.textContent = "";
-            inputElement.classList.remove("is-invalid");
-            inputElement.classList.add("is-valid");
-        }
-
-        // Validation on blur for email
-        emailField.addEventListener("blur", () => {
-            const error = validateEmail(emailField.value);
-            if (error) {
-                showError(errors.email, error, emailField);
+        // Toggle password visibility with same eye plus diagonal line for "visible" state
+        toggleBtn.addEventListener("click", () => {
+            const currentlyVisible = toggleBtn.getAttribute("data-visible") === "true";
+            if (currentlyVisible) {
+                // hide password
+                passwordField.type = "password";
+                toggleBtn.setAttribute("aria-pressed", "false");
+                toggleBtn.setAttribute("title", "Show password");
+                toggleBtn.setAttribute("data-visible", "false");
+                eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>';
             } else {
-                hideError(errors.email, emailField);
+                // show password
+                passwordField.type = "text";
+                toggleBtn.setAttribute("aria-pressed", "true");
+                toggleBtn.setAttribute("title", "Hide password");
+                toggleBtn.setAttribute("data-visible", "true");
+                eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />';
             }
+            passwordField.focus();
         });
 
-        // Validation on blur for password
-        passwordField.addEventListener("blur", () => {
-            const error = validatePassword(passwordField.value);
-            if (error) {
-                showError(errors.password, error, passwordField);
-            } else {
-                hideError(errors.password, passwordField);
-            }
-        });
-
-        // Form submit validation
+        // On submit: validate but do not show inline errors or validation classes
         form.addEventListener("submit", (e) => {
             let isValid = true;
 
-            // Email
             const emailError = validateEmail(emailField.value);
-            if (emailError) {
-                showError(errors.email, emailError, emailField);
-                isValid = false;
-            }
+            if (emailError) isValid = false;
 
-            // Password
             const passwordError = validatePassword(passwordField.value);
-            if (passwordError) {
-                showError(errors.password, passwordError, passwordField);
-                isValid = false;
-            }
+            if (passwordError) isValid = false;
 
             if (!isValid) {
                 e.preventDefault();
+                const originalText = submitBtn.textContent;
                 submitBtn.textContent = "Please fix errors above";
                 setTimeout(() => {
-                    submitBtn.textContent = "Login";
+                    submitBtn.textContent = originalText;
                 }, 3000);
             }
         });
-
-        // Initial validation
-        [emailField, passwordField].forEach(field => {
-            if (field.value) {
-                const validator = field.id === "login-email-field" ? validateEmail : validatePassword;
-                const error = validator(field.value);
-                if (error) {
-                    const errorKey = field.id === "login-email-field" ? "email" : "password";
-                    showError(errors[errorKey], error, field);
-                } else {
-                    const errorKey = field.id === "login-email-field" ? "email" : "password";
-                    hideError(errors[errorKey], field);
-                }
-            }
-        });
-    });
+    }
+    document.addEventListener("turbo:load", initLogin);
 </script>
+
+</body>
+</html>

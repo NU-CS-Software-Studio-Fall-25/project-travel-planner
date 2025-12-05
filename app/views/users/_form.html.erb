@@ -326,19 +326,44 @@
   <% if user.new_record? %>
     <div class="mb-3">
       <%= form.label :password, class: "form-label" %>
-    <%= form.password_field :password, class: "form-control", placeholder: "Create a password (min 7 chars; include upper, lower, digit & special @#$%&!*)", required: true, id: "password-field", maxlength: 75 %>
-      <small class="form-text text-muted">
-        Password must be at least 7 characters and include: one uppercase letter, one lowercase letter, one digit, and one special character (@#$%&!*)
-      </small>
+      <div class="input-group">
+        <%= form.password_field :password,
+                                class: "form-control",
+                                placeholder: "Create a password (min 7 chars; include upper, lower, digit & special @#$%&!*)",
+                                required: true,
+                                id: "password-field",
+                                maxlength: 75,
+                                'aria-describedby': "toggle-password-btn" %>
+        <button type="button" class="btn btn-outline-secondary" id="toggle-password-btn" aria-pressed="false" title="Show password" data-visible="false">
+          <svg id="password-eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
       <div class="invalid-feedback" id="password-error"></div>
     </div>
 
     <div class="mb-3">
       <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
-      <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password", required: true, id: "password-confirm-field", maxlength: 75 %>
+      <div class="input-group">
+        <%= form.password_field :password_confirmation,
+                                class: "form-control",
+                                placeholder: "Confirm your password",
+                                required: true,
+                                id: "password-confirm-field",
+                                maxlength: 75,
+                                'aria-describedby': "toggle-password-confirm-btn" %>
+        <button type="button" class="btn btn-outline-secondary" id="toggle-password-confirm-btn" aria-pressed="false" title="Show password" data-visible="false">
+          <svg id="password-confirm-eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
       <div class="invalid-feedback" id="password-confirm-error"></div>
     </div>
-    
+
     <div class="mb-3 form-check">
       <%= form.check_box :terms_accepted, class: "form-check-input", required: true, id: "terms-accepted-field" %>
       <%= form.label :terms_accepted, class: "form-check-label" do %>
@@ -354,366 +379,427 @@
 <% end %>
 
 <script>
-  function initUserForm() {
-      // DOM elements
-      const form = document.getElementById("user-form");
-      const nameField = document.getElementById("name-field");
-      const emailField = document.getElementById("email-field");
-      const countryField = document.getElementById("country-field");
-      const promoField = document.getElementById("promo-code-field");
-      const tierRadios = document.querySelectorAll(".tier-radio");
-      const freeTierRadio = document.querySelector(".tier-radio[data-tier='free']");
-      const premiumTierRadio = document.querySelector(".tier-radio[data-tier='premium']");
-      const passwordField = document.getElementById("password-field");
-      const passwordConfirmField = document.getElementById("password-confirm-field");
-      const submitBtn = document.getElementById("submit-btn");
+    function initUserForm() {
+        // DOM elements
+        const form = document.getElementById("user-form");
+        const nameField = document.getElementById("name-field");
+        const emailField = document.getElementById("email-field");
+        const countryField = document.getElementById("country-field");
+        const promoField = document.getElementById("promo-code-field");
+        const tierRadios = document.querySelectorAll(".tier-radio");
+        const freeTierRadio = document.querySelector(".tier-radio[data-tier='free']");
+        const premiumTierRadio = document.querySelector(".tier-radio[data-tier='premium']");
+        const passwordField = document.getElementById("password-field");
+        const passwordConfirmField = document.getElementById("password-confirm-field");
+        const submitBtn = document.getElementById("submit-btn");
 
-      // Error elements
-      const errors = {
-          name: document.getElementById("name-error"),
-          email: document.getElementById("email-error"),
-          country: document.getElementById("country-error"),
-          promo: document.getElementById("promo-error"),
-          tier: document.getElementById("tier-error"),
-          password: document.getElementById("password-error"),
-          passwordConfirm: document.getElementById("password-confirm-error")
-      };
+        // Toggle elements (may be null if not present)
+        const togglePwBtn = document.getElementById("toggle-password-btn");
+        const togglePwConfirmBtn = document.getElementById("toggle-password-confirm-btn");
+        const pwEyeIcon = document.getElementById("password-eye-icon");
+        const pwConfirmEyeIcon = document.getElementById("password-confirm-eye-icon");
 
-      const initialTier = "<%= user.subscription_tier || 'free' %>";
-      const isNewRecord = <%= user.new_record? %>;
-      const MAX_LENGTH = 75;
+        // Error elements
+        const errors = {
+            name: document.getElementById("name-error"),
+            email: document.getElementById("email-error"),
+            country: document.getElementById("country-error"),
+            promo: document.getElementById("promo-error"),
+            tier: document.getElementById("tier-error"),
+            password: document.getElementById("password-error"),
+            passwordConfirm: document.getElementById("password-confirm-error")
+        };
 
-      // Validation functions
-      function validateName(value) {
-          const trimmed = value.trim();
-          if (!trimmed) {
-              return "Full name is required.";
-          }
-          if (trimmed.length < 2) {
-              return "Full name must be at least 2 characters long.";
-          }
-          if (trimmed.length > MAX_LENGTH) {
-              return `Full name cannot exceed ${MAX_LENGTH} characters.`;
-          }
-          return null;
-      }
+        const initialTier = "<%= user.subscription_tier || 'free' %>";
+        const isNewRecord = <%= user.new_record? %>;
+        const MAX_LENGTH = 75;
 
-      function validateEmail(value) {
-          if (!value) {
-              return "Email is required.";
-          }
-          if (value.length > MAX_LENGTH) {
-              return `Email cannot exceed ${MAX_LENGTH} characters.`;
-          }
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value)) {
-              return "Please enter a valid email address.";
-          }
-          return null;
-      }
+        // Validation functions ...
+        function validateName(value) {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                return "Full name is required.";
+            }
+            if (trimmed.length < 2) {
+                return "Full name must be at least 2 characters long.";
+            }
+            if (trimmed.length > MAX_LENGTH) {
+                return `Full name cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            return null;
+        }
 
-      function validateCountry(value) {
-          if (!value) {
-              return "Please select your current country.";
-          }
-          return null;
-      }
+        function validateEmail(value) {
+            if (!value) {
+                return "Email is required.";
+            }
+            if (value.length > MAX_LENGTH) {
+                return `Email cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                return "Please enter a valid email address.";
+            }
+            return null;
+        }
 
-      function validatePromo() {
-          const value = promoField.value;
-          if (value.length > MAX_LENGTH) {
-              return `Promo code cannot exceed ${MAX_LENGTH} characters.`;
-          }
-          return null;
-      }
+        function validateCountry(value) {
+            if (!value) {
+                return "Please select your current country.";
+            }
+            return null;
+        }
 
-      function validatePromoForPremium() {
-          const code = promoField.value.trim();
-          const isValid = code === "cs397project";
-          if (premiumTierRadio.checked && !isValid) {
-              return "Valid promo code required to select Premium tier.";
-          }
-          return null;
-      }
+        function validatePromo() {
+            const value = promoField.value;
+            if (value.length > MAX_LENGTH) {
+                return `Promo code cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            return null;
+        }
 
-      function validateTier() {
-          const selected = document.querySelector("input[name='user[subscription_tier]']:checked");
-          if (!selected) {
-              return "Please select an account tier.";
-          }
-          const promoError = validatePromo();
-          if (promoError) {
-              return promoError;
-          }
-          return validatePromoForPremium();
-      }
+        function validatePromoForPremium() {
+            const code = promoField.value.trim();
+            const isValid = code === "cs397project";
+            if (premiumTierRadio.checked && !isValid) {
+                return "Valid promo code required to select Premium tier.";
+            }
+            return null;
+        }
 
-      function validatePassword(value) {
-          if (!value) {
-              return "Password is required.";
-          }
-          if (value.length < 7) {
-              return "Password must be at least 7 characters long.";
-          }
-          if (value.length > MAX_LENGTH) {
-              return `Password cannot exceed ${MAX_LENGTH} characters.`;
-          }
-          const pwRegex = /(?=.{7,})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#\$%&!\*])/;
-          if (!pwRegex.test(value)) {
-              return "Password must include one uppercase, one lowercase, one digit and one special character (@#$%&!*).";
-          }
-          return null;
-      }
+        function validateTier() {
+            const selected = document.querySelector("input[name='user[subscription_tier]']:checked");
+            if (!selected) {
+                return "Please select an account tier.";
+            }
+            const promoError = validatePromo();
+            if (promoError) {
+                return promoError;
+            }
+            return validatePromoForPremium();
+        }
 
-      function validatePasswordConfirm(value, passwordValue) {
-          if (!value) {
-              return "Password confirmation is required.";
-          }
-          if (value !== passwordValue) {
-              return "Passwords do not match.";
-          }
-          return null;
-      }
+        function validatePassword(value) {
+            if (!value) {
+                return "Password is required.";
+            }
+            if (value.length < 7) {
+                return "Password must be at least 7 characters long.";
+            }
+            if (value.length > MAX_LENGTH) {
+                return `Password cannot exceed ${MAX_LENGTH} characters.`;
+            }
+            const pwRegex = /(?=.{7,})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#\$%&!\*])/;
+            if (!pwRegex.test(value)) {
+                return "Password must include one uppercase, one lowercase, one digit and one special character (@#$%&!*).";
+            }
+            return null;
+        }
 
-      // UI update functions - Fixed to target the input/select element directly
-      function showError(errorElement, message, inputElement = null) {
-          errorElement.textContent = message;
-          if (inputElement) {
-              inputElement.classList.add("is-invalid");
-              inputElement.classList.remove("is-valid");
-          } else {
-              // Fallback for tier-error (always visible due to d-block)
-              const tierSection = errorElement.parentElement;
-              tierSection.classList.add("is-invalid");
-          }
-      }
+        function validatePasswordConfirm(value, passwordValue) {
+            if (!value) {
+                return "Password confirmation is required.";
+            }
+            if (value !== passwordValue) {
+                return "Passwords do not match.";
+            }
+            return null;
+        }
 
-      function hideError(errorElement, inputElement = null) {
-          errorElement.textContent = "";
-          if (inputElement) {
-              inputElement.classList.remove("is-invalid");
-              inputElement.classList.add("is-valid");
-          } else {
-              // Fallback for tier-error
-              const tierSection = errorElement.parentElement;
-              tierSection.classList.remove("is-invalid");
-          }
-      }
+        function showError(errorElement, message, inputElement = null) {
+            errorElement.textContent = message;
+            errorElement.classList.add("d-block"); // ensure feedback is visible even when not a direct sibling
+            if (inputElement) {
+                inputElement.classList.add("is-invalid");
+                inputElement.classList.remove("is-valid");
+            } else {
+                const tierSection = errorElement.parentElement;
+                tierSection.classList.add("is-invalid");
+            }
+        }
 
-      function updateTierAvailability() {
-          const code = promoField.value.trim();
-          const isCodeValid = (code === "cs397project");
-          const promoError = validatePromo();
+        function hideError(errorElement, inputElement = null) {
+            errorElement.textContent = "";
+            errorElement.classList.remove("d-block");
+            if (inputElement) {
+                inputElement.classList.remove("is-invalid");
+                inputElement.classList.add("is-valid");
+            } else {
+                const tierSection = errorElement.parentElement;
+                tierSection.classList.remove("is-invalid");
+            }
+        }
 
-          // Show promo length error if exceeded
-          if (promoError) {
-              showError(errors.promo, promoError, promoField);
-              return;
-          } else if (code) {
-              errors.promo.textContent = "";
-          }
+        function updateTierAvailability() {
+            const code = promoField.value.trim();
+            const isCodeValid = (code === "cs397project");
+            const promoError = validatePromo();
 
-          // Visual feedback for promo field
-          if (code && isCodeValid) {
-              promoField.classList.add("is-valid");
-              promoField.classList.remove("is-invalid");
-              errors.promo.textContent = "";
-          } else if (code) {
-              promoField.classList.add("is-invalid");
-              promoField.classList.remove("is-valid");
-              showError(errors.promo, "Invalid promo code.", promoField);
-          } else {
-              promoField.classList.remove("is-valid", "is-invalid");
-              errors.promo.textContent = "";
-          }
-      }
+            if (promoError) {
+                showError(errors.promo, promoError, promoField);
+                return;
+            } else if (code) {
+                errors.promo.textContent = "";
+            }
 
-      // Prevent selecting premium without valid promo and show alert
-      premiumTierRadio.addEventListener('change', (e) => {
-          const code = promoField.value.trim();
-          if (code !== "cs397project") {
-              e.target.checked = false;
-              alert("Need to enter a valid promo code before accessing premium tier");
-          }
-      });
+            if (code && isCodeValid) {
+                promoField.classList.add("is-valid");
+                promoField.classList.remove("is-invalid");
+                errors.promo.textContent = "";
+            } else if (code) {
+                promoField.classList.add("is-invalid");
+                promoField.classList.remove("is-valid");
+                showError(errors.promo, "Invalid promo code.", promoField);
+            } else {
+                promoField.classList.remove("is-valid", "is-invalid");
+                errors.promo.textContent = "";
+            }
+        }
 
-      // Validation on blur for name and email
-      nameField.addEventListener("blur", () => {
-          const error = validateName(nameField.value);
-          if (error) {
-              showError(errors.name, error, nameField);
-          } else {
-              hideError(errors.name, nameField);
-          }
-      });
+        // Prevent selecting premium without valid promo and show alert
+        premiumTierRadio.addEventListener('change', (e) => {
+            const code = promoField.value.trim();
+            if (code !== "cs397project") {
+                e.target.checked = false;
+                alert("Need to enter a valid promo code before accessing premium tier");
+            }
+        });
 
-      emailField.addEventListener("blur", () => {
-          const error = validateEmail(emailField.value);
-          if (error) {
-              showError(errors.email, error, emailField);
-          } else {
-              hideError(errors.email, emailField);
-          }
-      });
+        // Toggle password visibility helpers (reuse for both fields)
+        function setEyeOpen(iconElement) {
+            if (!iconElement) return;
+            iconElement.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>';
+        }
+        function setEyeWithSlash(iconElement) {
+            if (!iconElement) return;
+            iconElement.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />'
+        }
 
-      // Validation on blur for country
-      countryField.addEventListener("change", () => {
-          const error = validateCountry(countryField.value);
-          if (error) {
-              showError(errors.country, error, countryField);
-          } else {
-              hideError(errors.country, countryField);
-          }
-      });
+        // Attach toggle listeners only if buttons and fields exist
+        if (togglePwBtn && passwordField) {
+            togglePwBtn.addEventListener("click", () => {
+                const currentlyVisible = togglePwBtn.getAttribute("data-visible") === "true";
+                if (currentlyVisible) {
+                    passwordField.type = "password";
+                    togglePwBtn.setAttribute("aria-pressed", "false");
+                    togglePwBtn.setAttribute("title", "Show password");
+                    togglePwBtn.setAttribute("data-visible", "false");
+                    setEyeOpen(pwEyeIcon);
+                } else {
+                    passwordField.type = "text";
+                    togglePwBtn.setAttribute("aria-pressed", "true");
+                    togglePwBtn.setAttribute("title", "Hide password");
+                    togglePwBtn.setAttribute("data-visible", "true");
+                    setEyeWithSlash(pwEyeIcon);
+                }
+                passwordField.focus();
+            });
+        }
 
-      promoField.addEventListener("input", updateTierAvailability);
+        if (togglePwConfirmBtn && passwordConfirmField) {
+            togglePwConfirmBtn.addEventListener("click", () => {
+                const currentlyVisible = togglePwConfirmBtn.getAttribute("data-visible") === "true";
+                if (currentlyVisible) {
+                    passwordConfirmField.type = "password";
+                    togglePwConfirmBtn.setAttribute("aria-pressed", "false");
+                    togglePwConfirmBtn.setAttribute("title", "Show password");
+                    togglePwConfirmBtn.setAttribute("data-visible", "false");
+                    setEyeOpen(pwConfirmEyeIcon);
+                } else {
+                    passwordConfirmField.type = "text";
+                    togglePwConfirmBtn.setAttribute("aria-pressed", "true");
+                    togglePwConfirmBtn.setAttribute("title", "Hide password");
+                    togglePwConfirmBtn.setAttribute("data-visible", "true");
+                    setEyeWithSlash(pwConfirmEyeIcon);
+                }
+                passwordConfirmField.focus();
+            });
+        }
 
-      tierRadios.forEach(radio => {
-          radio.addEventListener("change", () => {
-              const error = validateTier();
-              if (error) {
-                  showError(errors.tier, error);
-              } else {
-                  hideError(errors.tier);
-              }
-          });
-      });
+        // Validation on blur for name and email
+        nameField.addEventListener("blur", () => {
+            const error = validateName(nameField.value);
+            if (error) {
+                showError(errors.name, error, nameField);
+            } else {
+                hideError(errors.name, nameField);
+            }
+        });
 
-      if (isNewRecord) {
-          // Password: validate on blur
-          passwordField.addEventListener("blur", () => {
-              const error = validatePassword(passwordField.value);
-              if (error) {
-                  showError(errors.password, error, passwordField);
-              } else {
-                  hideError(errors.password, passwordField);
-              }
-          });
+        emailField.addEventListener("blur", () => {
+            const error = validateEmail(emailField.value);
+            if (error) {
+                showError(errors.email, error, emailField);
+            } else {
+                hideError(errors.email, emailField);
+            }
+        });
 
-          // Password confirm: validate on input for match, on blur for required
-          passwordConfirmField.addEventListener("input", () => {
-              const error = validatePasswordConfirm(passwordConfirmField.value, passwordField.value);
-              if (error && passwordConfirmField.value) {
-                  showError(errors.passwordConfirm, error, passwordConfirmField);
-              } else if (passwordConfirmField.value) {
-                  hideError(errors.passwordConfirm, passwordConfirmField);
-              }
-          });
+        // Validation on blur for country
+        countryField.addEventListener("change", () => {
+            const error = validateCountry(countryField.value);
+            if (error) {
+                showError(errors.country, error, countryField);
+            } else {
+                hideError(errors.country, countryField);
+            }
+        });
 
-          passwordConfirmField.addEventListener("blur", () => {
-              const error = validatePasswordConfirm(passwordConfirmField.value, passwordField.value);
-              if (error) {
-                  showError(errors.passwordConfirm, error, passwordConfirmField);
-              } else {
-                  hideError(errors.passwordConfirm, passwordConfirmField);
-              }
-          });
+        promoField.addEventListener("input", updateTierAvailability);
 
-          // Also trigger password validation on confirm input (for length if confirm changes)
-          passwordConfirmField.addEventListener("input", () => {
-              if (passwordField.value) {
-                  const pwError = validatePassword(passwordField.value);
-                  if (pwError) {
-                      showError(errors.password, pwError, passwordField);
-                  }
-              }
-          });
-      }
+        tierRadios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                const error = validateTier();
+                if (error) {
+                    showError(errors.tier, error);
+                } else {
+                    hideError(errors.tier);
+                }
+            });
+        });
 
-      // Form submit validation
-      form.addEventListener("submit", (e) => {
-          let isValid = true;
+        if (isNewRecord) {
+            // Password: validate on blur
+            if (passwordField) {
+                passwordField.addEventListener("blur", () => {
+                    const error = validatePassword(passwordField.value);
+                    if (error) {
+                        showError(errors.password, error, passwordField);
+                    } else {
+                        hideError(errors.password, passwordField);
+                    }
+                });
+            }
 
-          // Name
-          const nameError = validateName(nameField.value);
-          if (nameError) {
-              showError(errors.name, nameError, nameField);
-              isValid = false;
-          }
+            // Password confirm: validate on input for match, on blur for required
+            if (passwordConfirmField) {
+                passwordConfirmField.addEventListener("input", () => {
+                    const error = validatePasswordConfirm(passwordConfirmField.value, passwordField ? passwordField.value : "");
+                    if (error && passwordConfirmField.value) {
+                        showError(errors.passwordConfirm, error, passwordConfirmField);
+                    } else if (passwordConfirmField.value) {
+                        hideError(errors.passwordConfirm, passwordConfirmField);
+                    }
+                });
 
-          // Email
-          const emailError = validateEmail(emailField.value);
-          if (emailError) {
-              showError(errors.email, emailError, emailField);
-              isValid = false;
-          }
+                passwordConfirmField.addEventListener("blur", () => {
+                    const error = validatePasswordConfirm(passwordConfirmField.value, passwordField ? passwordField.value : "");
+                    if (error) {
+                        showError(errors.passwordConfirm, error, passwordConfirmField);
+                    } else {
+                        hideError(errors.passwordConfirm, passwordConfirmField);
+                    }
+                });
 
-          // Country
-          const countryError = validateCountry(countryField.value);
-          if (countryError) {
-              showError(errors.country, countryError, countryField);
-              isValid = false;
-          }
+                // Also trigger password validation on confirm input (for length if confirm changes)
+                passwordConfirmField.addEventListener("input", () => {
+                    if (passwordField && passwordField.value) {
+                        const pwError = validatePassword(passwordField.value);
+                        if (pwError) {
+                            showError(errors.password, pwError, passwordField);
+                        }
+                    }
+                });
+            }
+        }
 
-          // Tier and Promo
-          const tierError = validateTier();
-          if (tierError) {
-              showError(errors.tier, tierError);
-              isValid = false;
-          }
+        // Form submit validation
+        form.addEventListener("submit", (e) => {
+            let isValid = true;
 
-          if (isNewRecord) {
-              // Password
-              const passwordError = validatePassword(passwordField.value);
-              if (passwordError) {
-                  showError(errors.password, passwordError, passwordField);
-                  isValid = false;
-              }
+            // Name
+            const nameError = validateName(nameField.value);
+            if (nameError) {
+                showError(errors.name, nameError, nameField);
+                isValid = false;
+            }
 
-              // Password confirm
-              const confirmError = validatePasswordConfirm(passwordConfirmField.value, passwordField.value);
-              if (confirmError) {
-                  showError(errors.passwordConfirm, confirmError, passwordConfirmField);
-                  isValid = false;
-              }
-          }
+            // Email
+            const emailError = validateEmail(emailField.value);
+            if (emailError) {
+                showError(errors.email, emailError, emailField);
+                isValid = false;
+            }
 
-          if (!isValid) {
-              e.preventDefault();
-              submitBtn.textContent = "Please fix errors above";
-              setTimeout(() => {
-                  submitBtn.textContent = isNewRecord ? "Create Account" : "Update Profile";
-              }, 3000);
-          }
-      });
+            // Country
+            const countryError = validateCountry(countryField.value);
+            if (countryError) {
+                showError(errors.country, countryError, countryField);
+                isValid = false;
+            }
 
-      // Initial validation
-      updateTierAvailability();
-      [nameField, emailField].forEach(field => {
-          if (field.value) {
-              const validator = field.id === "name-field" ? validateName :
-                  validateEmail;
-              const error = validator(field.value);
-              if (error) {
-                  const errorKey = field.id.replace('-field', '');
-                  showError(errors[errorKey], error, field);
-              } else {
-                  const errorKey = field.id.replace('-field', '');
-                  hideError(errors[errorKey], field);
-              }
-          }
-      });
-      if (countryField.value) {
-          hideError(errors.country, countryField);
-      }
-      if (initialTier) {
-          const initialRadio = document.querySelector(`input[value="${initialTier}"]`);
-          if (initialRadio) {
-              initialRadio.dispatchEvent(new Event("change"));
-          }
-      }
-      if (isNewRecord) {
-          // For initial, trigger blur simulation if values present
-          if (passwordField.value) {
-              passwordField.dispatchEvent(new Event("blur"));
-          }
-          if (passwordConfirmField.value) {
-              passwordConfirmField.dispatchEvent(new Event("input"));
-              passwordConfirmField.dispatchEvent(new Event("blur"));
-          }
-      }
-  }
-  document.addEventListener("turbo:load", initUserForm);
-  document.addEventListener("turbolinks:load", initUserForm)
-  document.addEventListener("DOMContentLoaded", initUserForm);
+            // Tier and Promo
+            const tierError = validateTier();
+            if (tierError) {
+                showError(errors.tier, tierError);
+                isValid = false;
+            }
+
+            if (isNewRecord) {
+                // Password
+                if (passwordField) {
+                    const passwordError = validatePassword(passwordField.value);
+                    if (passwordError) {
+                        showError(errors.password, passwordError, passwordField);
+                        isValid = false;
+                    }
+                }
+
+                // Password confirm
+                if (passwordConfirmField) {
+                    const confirmError = validatePasswordConfirm(passwordConfirmField.value, passwordField ? passwordField.value : "");
+                    if (confirmError) {
+                        showError(errors.passwordConfirm, confirmError, passwordConfirmField);
+                        isValid = false;
+                    }
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                submitBtn.textContent = "Please fix errors above";
+                setTimeout(() => {
+                    submitBtn.textContent = isNewRecord ? "Create Account" : "Update Profile";
+                }, 3000);
+            }
+        });
+
+        // Initial validation
+        updateTierAvailability();
+        [nameField, emailField].forEach(field => {
+            if (field.value) {
+                const validator = field.id === "name-field" ? validateName :
+                    validateEmail;
+                const error = validator(field.value);
+                if (error) {
+                    const errorKey = field.id.replace('-field', '');
+                    showError(errors[errorKey], error, field);
+                } else {
+                    const errorKey = field.id.replace('-field', '');
+                    hideError(errors[errorKey], field);
+                }
+            }
+        });
+        if (countryField.value) {
+            hideError(errors.country, countryField);
+        }
+        if (initialTier) {
+            const initialRadio = document.querySelector(`input[value="${initialTier}"]`);
+            if (initialRadio) {
+                initialRadio.dispatchEvent(new Event("change"));
+            }
+        }
+        if (isNewRecord) {
+            if (passwordField && passwordField.value) {
+                passwordField.dispatchEvent(new Event("blur"));
+            }
+            if (passwordConfirmField && passwordConfirmField.value) {
+                passwordConfirmField.dispatchEvent(new Event("input"));
+                passwordConfirmField.dispatchEvent(new Event("blur"));
+            }
+        }
+    }
+    document.addEventListener("turbo:load", initUserForm);
+    document.addEventListener("turbolinks:load", initUserForm);
+    document.addEventListener("DOMContentLoaded", initUserForm);
 </script>

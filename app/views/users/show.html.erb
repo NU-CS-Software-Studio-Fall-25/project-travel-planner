@@ -55,6 +55,9 @@
           <div class="quick-actions d-grid gap-2 d-md-flex justify-content-md-start">
             <%= link_to "🗺️ View My Plans", travel_plans_path, class: "btn btn-primary" %>
             <%= link_to "✈️ Plan New Trip", travel_recommendations_path, class: "btn btn-success" %>
+            <% if @user.provider.blank? %>
+              <%= link_to "🔒 Change Password", change_password_user_path(@user), class: "btn btn-secondary" %>
+            <% end %>
           </div>
         </div>
 

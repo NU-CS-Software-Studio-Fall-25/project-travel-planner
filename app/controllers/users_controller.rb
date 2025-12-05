@@ -1,8 +1,8 @@
 # app/controllers/users_controller.rb
 class UsersController < ApplicationController
-  before_action :require_login, only: [:show, :edit, :update, :destroy]
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_user, only: [:show, :edit, :update, :destroy]
+  before_action :require_login, only: [:show, :edit, :update, :destroy, :change_password, :update_password, :verify_password]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :change_password, :update_password, :verify_password]
+  before_action :authorize_user, only: [:show, :edit, :update, :destroy, :change_password, :update_password, :verify_password]
   before_action :redirect_if_logged_in, only: [:new, :create]
 
   # GET /users or /users.json
@@ -103,6 +103,44 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.html { redirect_to users_url, notice: "User was successfully destroyed." }
       format.json { head :no_content }
+    end
+  end
+
+  def change_password
+    # Renders app/views/users/change_password.html.erb
+  end
+
+  def verify_password
+    # Protect OAuth users
+    if @user.provider.present?
+      render json: { valid: false }, status: :forbidden
+      return
+    end
+
+    current_pwd = params[:current_password].to_s
+    valid = @user.authenticate(current_pwd) if current_pwd.present?
+    render json: { valid: !!valid }
+  end
+
+  def update_password
+    # Prevent OAuth users from changing password
+    if @user.provider.present?
+      redirect_to user_path(@user), alert: "Password cannot be changed for accounts created via OAuth."
+      return
+    end
+
+    # Ensure current password matches
+    unless @user.authenticate(params[:current_password].to_s)
+      @user.errors.add(:current_password, "is incorrect")
+      render :change_password, status: :unprocessable_entity
+      return
+    end
+
+    # Attempt to update new password fields
+    if @user.update(password: params[:password], password_confirmation: params[:password_confirmation])
+      redirect_to user_path(@user), notice: "Password updated successfully."
+    else
+      render :change_password, status: :unprocessable_entity
     end
   end
 

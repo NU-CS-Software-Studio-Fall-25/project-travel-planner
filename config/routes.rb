@@ -51,6 +51,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :users do
+    member do
+      get :change_password
+      patch :update_password
+      post :verify_password
+    end
+  end
+
   # Add member route for PDF download
   resources :travel_plans do
     member do
