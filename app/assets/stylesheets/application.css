@@ -12,12 +12,19 @@
 /* Travel Planner Custom Styles */
 
 /* Accessibility: Base font and line-height */
+html {
+  height: 100%;
+}
+
 body {
   background-color: #f8f9fa;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   letter-spacing: 0.01em;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Content area spacing - not navbar */
@@ -25,6 +32,13 @@ main.container {
   max-width: 1400px;
   padding-left: 3rem;
   padding-right: 3rem;
+  flex: 1 0 auto; /* Allow main content to grow and push footer down */
+}
+
+/* Footer sticky positioning */
+footer {
+  flex-shrink: 0; /* Prevent footer from shrinking */
+  margin-top: auto; /* Push footer to bottom */
 }
 
 /* Accessibility: Heading spacing */
@@ -629,5 +643,70 @@ p {
   .destination-cta,
   .destination-secondary-action {
     border-width: 3px;
+  }
+}
+
+/* Mobile-specific footer styles for PWA */
+@media (max-width: 768px) {
+  main.container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  footer {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  footer .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  footer .row {
+    gap: 1rem;
+  }
+
+  footer .col-md-6 {
+    text-align: center !important;
+  }
+
+  footer a {
+    display: inline-block;
+    margin: 0.25rem 0.5rem !important;
+  }
+}
+
+/* Extra small devices - ensure footer remains at bottom */
+@media (max-width: 480px) {
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari fix */
+  }
+
+  html {
+    height: -webkit-fill-available; /* iOS Safari fix */
+  }
+
+  footer p {
+    font-size: 0.8rem;
+  }
+
+  footer a {
+    font-size: 0.85rem;
+  }
+}
+
+/* PWA standalone mode adjustments */
+@media (display-mode: standalone) {
+  body {
+    /* Account for safe areas on notched devices */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  footer {
+    /* Ensure footer doesn't overlap with home indicator on iOS */
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
 }
