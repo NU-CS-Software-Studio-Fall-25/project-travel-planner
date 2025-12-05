@@ -24,9 +24,12 @@ class RecommendationFeedbacksController < ApplicationController
     if existing_feedback
       # Update existing feedback
       if existing_feedback.update(feedback_params_sanitized)
+        message = existing_feedback.feedback_type == 'like' ? 
+                  'Successfully marked this recommendation as liked' : 
+                  'Successfully marked this recommendation as disliked'
         render json: { 
           success: true, 
-          message: "Feedback updated successfully",
+          message: message,
           feedback_type: existing_feedback.feedback_type 
         }
       else
@@ -40,9 +43,12 @@ class RecommendationFeedbacksController < ApplicationController
       @feedback = current_user.recommendation_feedbacks.build(feedback_params_sanitized)
       
       if @feedback.save
+        message = @feedback.feedback_type == 'like' ? 
+                  'Successfully marked this recommendation as liked' : 
+                  'Successfully marked this recommendation as disliked'
         render json: { 
           success: true, 
-          message: "Feedback saved successfully",
+          message: message,
           feedback_type: @feedback.feedback_type 
         }
       else
@@ -71,8 +77,12 @@ class RecommendationFeedbacksController < ApplicationController
       return
     end
 
+    feedback_type = @feedback.feedback_type
     if @feedback.destroy
-      render json: { success: true, message: "Feedback removed" }
+      message = feedback_type == 'like' ? 
+                'Your like has been successfully removed' : 
+                'Your dislike has been successfully removed'
+      render json: { success: true, message: message }
     else
       render json: { success: false, errors: @feedback.errors.full_messages }, status: :unprocessable_entity
     end
@@ -100,8 +110,12 @@ class RecommendationFeedbacksController < ApplicationController
       return
     end
 
+    feedback_type = @feedback.feedback_type
     if @feedback.destroy
-      render json: { success: true, message: "Feedback removed" }
+      message = feedback_type == 'like' ? 
+                'Your like has been successfully removed' : 
+                'Your dislike has been successfully removed'
+      render json: { success: true, message: message }
     else
       render json: { success: false, errors: @feedback.errors.full_messages }, status: :unprocessable_entity
     end

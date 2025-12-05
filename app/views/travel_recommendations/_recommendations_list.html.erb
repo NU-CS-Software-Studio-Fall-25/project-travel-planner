@@ -14,9 +14,54 @@
         <div class="col-12" id="recommendation-<%= index %>">
           <div class="card border-0 shadow-lg rounded-5 overflow-hidden hover-zoom">
 
-            <div class="card-header p-4 text-white" style="background: linear-gradient(135deg, #3B82F6 0%, #1E3A8A 100%);">
-              <h4 class="mb-1 fw-bold"><%= sanitize(rec[:name], tags: []) %></h4>
-              <small class="text-white-50"><%= sanitize(rec[:destination_country], tags: []) %></small>
+            <div class="card-header p-4 text-white position-relative" style="background: linear-gradient(135deg, #3B82F6 0%, #1E3A8A 100%);">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h4 class="mb-1 fw-bold"><%= sanitize(rec[:name], tags: []) %></h4>
+                  <small class="text-white-50"><%= sanitize(rec[:destination_country], tags: []) %></small>
+                </div>
+                
+                <!-- Like/Dislike Buttons -->
+                <%
+                  # Check if user has existing feedback for this destination
+                  existing_feedback = current_user&.recommendation_feedbacks&.find_by(
+                    destination_city: rec[:destination_city],
+                    destination_country: rec[:destination_country]
+                  )
+                  is_liked = existing_feedback&.feedback_type == 'like'
+                  is_disliked = existing_feedback&.feedback_type == 'dislike'
+                %>
+                <div class="d-flex gap-2" role="group" aria-label="Recommendation feedback">
+                  <button type="button" 
+                          class="btn btn-sm <%= is_liked ? 'btn-success' : 'btn-light' %> like-btn"
+                          data-recommendation-id="<%= index %>"
+                          data-city="<%= h(rec[:destination_city]) %>"
+                          data-country="<%= h(rec[:destination_country]) %>"
+                          data-trip-type="<%= h(rec[:trip_scope]) %>"
+                          data-travel-style="<%= h(rec[:travel_style]) %>"
+                          data-budget-min="<%= rec[:budget_min].to_i %>"
+                          data-budget-max="<%= rec[:budget_max].to_i %>"
+                          data-length-of-stay="<%= rec[:length_of_stay].to_i %>"
+                          title="Like this recommendation"
+                          style="opacity: <%= is_liked ? '1' : '0.9' %>;">
+                    ❤️ <%= is_liked ? 'Liked' : 'Like' %>
+                  </button>
+                  <button type="button" 
+                          class="btn btn-sm <%= is_disliked ? 'btn-danger' : 'btn-light' %> dislike-btn"
+                          data-recommendation-id="<%= index %>"
+                          data-city="<%= h(rec[:destination_city]) %>"
+                          data-country="<%= h(rec[:destination_country]) %>"
+                          data-trip-type="<%= h(rec[:trip_scope]) %>"
+                          data-travel-style="<%= h(rec[:travel_style]) %>"
+                          data-budget-min="<%= rec[:budget_min].to_i %>"
+                          data-budget-max="<%= rec[:budget_max].to_i %>"
+                          data-length-of-stay="<%= rec[:length_of_stay].to_i %>"
+                          title="Dislike this recommendation"
+                          style="opacity: <%= is_disliked ? '1' : '0.9' %>;">
+                    👎 <%= is_disliked ? 'Disliked' : 'Dislike' %>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="card-body p-4">
@@ -282,38 +327,7 @@
               </div>
             </div>
 
-            <div class="card-footer bg-light d-flex justify-content-between align-items-center gap-2">
-              <!-- Like/Dislike Buttons -->
-              <div class="btn-group" role="group" aria-label="Recommendation feedback">
-                <button type="button" 
-                        class="btn btn-sm btn-outline-success like-btn"
-                        data-recommendation-id="<%= index %>"
-                        data-city="<%= h(rec[:destination_city]) %>"
-                        data-country="<%= h(rec[:destination_country]) %>"
-                        data-trip-type="<%= h(rec[:trip_scope]) %>"
-                        data-travel-style="<%= h(rec[:travel_style]) %>"
-                        data-budget-min="<%= rec[:budget_min].to_i %>"
-                        data-budget-max="<%= rec[:budget_max].to_i %>"
-                        data-length-of-stay="<%= rec[:length_of_stay].to_i %>"
-                        title="Like this recommendation">
-                  ❤️ Like
-                </button>
-                <button type="button" 
-                        class="btn btn-sm btn-outline-danger dislike-btn"
-                        data-recommendation-id="<%= index %>"
-                        data-city="<%= h(rec[:destination_city]) %>"
-                        data-country="<%= h(rec[:destination_country]) %>"
-                        data-trip-type="<%= h(rec[:trip_scope]) %>"
-                        data-travel-style="<%= h(rec[:travel_style]) %>"
-                        data-budget-min="<%= rec[:budget_min].to_i %>"
-                        data-budget-max="<%= rec[:budget_max].to_i %>"
-                        data-length-of-stay="<%= rec[:length_of_stay].to_i %>"
-                        title="Dislike this recommendation">
-                  👎 Dislike
-                </button>
-              </div>
-
-              <div class="d-flex gap-2">
+            <div class="card-footer bg-light d-flex justify-content-end align-items-center gap-2">
                 <form action="<%= travel_plans_path %>" method="post" data-turbo-stream="true"
                       onsubmit="event.target.querySelector('button[type=submit]').disabled = true;
                         event.target.querySelector('button[type=submit]').classList.replace('btn-primary', 'btn-success');
@@ -809,15 +823,74 @@
 
   function submitFeedback(data, buttonElement) {
     // Disable both buttons while processing
-    const card = buttonElement.closest('.card-footer');
-    const likeBtn = card.querySelector('.like-btn');
-    const dislikeBtn = card.querySelector('.dislike-btn');
+    const buttonContainer = buttonElement.closest('.d-flex');
+    const likeBtn = buttonContainer.querySelector('.like-btn');
+    const dislikeBtn = buttonContainer.querySelector('.dislike-btn');
     const originalLikeHTML = likeBtn.innerHTML;
     const originalDislikeHTML = dislikeBtn.innerHTML;
+    const clickedBtn = buttonElement;
+    
+    // Check if clicking the same button that's already active (to remove feedback)
+    const isLikeActive = likeBtn.classList.contains('btn-success');
+    const isDislikeActive = dislikeBtn.classList.contains('btn-danger');
+    const clickingActiveLike = clickedBtn.classList.contains('like-btn') && isLikeActive;
+    const clickingActiveDislike = clickedBtn.classList.contains('dislike-btn') && isDislikeActive;
 
     likeBtn.disabled = true;
     dislikeBtn.disabled = true;
 
+    // If clicking the active button, remove the feedback instead
+    if (clickingActiveLike || clickingActiveDislike) {
+      fetch('/recommendation_feedbacks/remove', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ 
+          destination_city: data.destination_city,
+          destination_country: data.destination_country,
+          feedback_type: data.feedback_type
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          // Reset both buttons to neutral state
+          likeBtn.classList.remove('btn-success');
+          likeBtn.classList.add('btn-light');
+          likeBtn.innerHTML = '❤️ Like';
+          likeBtn.style.opacity = '0.9';
+          
+          dislikeBtn.classList.remove('btn-danger');
+          dislikeBtn.classList.add('btn-light');
+          dislikeBtn.innerHTML = '👎 Dislike';
+          dislikeBtn.style.opacity = '0.9';
+          
+          const cardHeader = buttonElement.closest('.card-header');
+          const specificMessage = data.feedback_type === 'like' ? 
+            'Your like has been successfully removed' : 
+            'Your dislike has been successfully removed';
+          showFeedbackMessage(cardHeader, specificMessage, 'info');
+        } else {
+          const cardHeader = buttonElement.closest('.card-header');
+          showFeedbackMessage(cardHeader, result.message || 'Failed to remove feedback', 'danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error removing feedback:', error);
+        const cardHeader = buttonElement.closest('.card-header');
+        showFeedbackMessage(cardHeader, 'An error occurred. Please try again.', 'danger');
+      })
+      .finally(() => {
+        likeBtn.disabled = false;
+        dislikeBtn.disabled = false;
+      });
+      return;
+    }
+
+    // Otherwise, submit the new/updated feedback
     fetch('/recommendation_feedbacks', {
       method: 'POST',
       headers: {
@@ -832,28 +905,34 @@
       if (result.success) {
         // Update button states based on feedback type
         if (result.feedback_type === 'like') {
-          likeBtn.classList.remove('btn-outline-success');
+          likeBtn.classList.remove('btn-light');
           likeBtn.classList.add('btn-success');
-          likeBtn.innerHTML = '<i class="bi bi-hand-thumbs-up-fill"></i> Liked';
+          likeBtn.innerHTML = '❤️ Liked';
+          likeBtn.style.opacity = '1';
           
           dislikeBtn.classList.remove('btn-danger');
-          dislikeBtn.classList.add('btn-outline-danger');
-          dislikeBtn.innerHTML = '<i class="bi bi-hand-thumbs-down"></i> Dislike';
+          dislikeBtn.classList.add('btn-light');
+          dislikeBtn.innerHTML = '👎 Dislike';
+          dislikeBtn.style.opacity = '0.9';
         } else {
-          dislikeBtn.classList.remove('btn-outline-danger');
+          dislikeBtn.classList.remove('btn-light');
           dislikeBtn.classList.add('btn-danger');
-          dislikeBtn.innerHTML = '<i class="bi bi-hand-thumbs-down-fill"></i> Disliked';
+          dislikeBtn.innerHTML = '👎 Disliked';
+          dislikeBtn.style.opacity = '1';
           
           likeBtn.classList.remove('btn-success');
-          likeBtn.classList.add('btn-outline-success');
-          likeBtn.innerHTML = '<i class="bi bi-hand-thumbs-up"></i> Like';
+          likeBtn.classList.add('btn-light');
+          likeBtn.innerHTML = '❤️ Like';
+          likeBtn.style.opacity = '0.9';
         }
         
-        // Show success message
-        showFeedbackMessage(card, result.message, 'success');
+        // Show success message in card header
+        const cardHeader = buttonElement.closest('.card-header');
+        showFeedbackMessage(cardHeader, result.message, 'success');
       } else {
         // Show error message
-        showFeedbackMessage(card, result.errors ? result.errors.join(', ') : 'Failed to save feedback', 'danger');
+        const cardHeader = buttonElement.closest('.card-header');
+        showFeedbackMessage(cardHeader, result.errors ? result.errors.join(', ') : 'Failed to save feedback', 'danger');
         
         // Reset button states
         likeBtn.innerHTML = originalLikeHTML;
@@ -862,7 +941,8 @@
     })
     .catch(error => {
       console.error('Error submitting feedback:', error);
-      showFeedbackMessage(card, 'An error occurred. Please try again.', 'danger');
+      const cardHeader = buttonElement.closest('.card-header');
+      showFeedbackMessage(cardHeader, 'An error occurred. Please try again.', 'danger');
       
       // Reset button states
       likeBtn.innerHTML = originalLikeHTML;
@@ -890,13 +970,14 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
 
-    // Insert after the button group
-    container.insertBefore(alert, container.lastElementChild);
+    // Append to the card header
+    container.appendChild(alert);
 
     // Auto-dismiss after 3 seconds
     setTimeout(() => {
       if (alert.parentNode) {
-        alert.remove();
+        alert.classList.remove('show');
+        setTimeout(() => alert.remove(), 150);
       }
     }, 3000);
   }
