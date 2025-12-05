@@ -76,6 +76,12 @@ group :development, :test do
   
   # Use sqlite3 for development and test environments (easier local setup)
   gem "sqlite3", ">= 2.1"
+  
+  # RSpec testing framework
+  gem "rspec-rails", "~> 6.1"
+  gem "factory_bot_rails", "~> 6.4"
+  gem "faker", "~> 3.2"
+  gem "rails-controller-testing"
 end
 
 group :development do
@@ -89,4 +95,9 @@ group :test do
   gem "selenium-webdriver"
   gem 'cucumber-rails', require: false
   gem 'database_cleaner-active_record'
+  
+  # Additional RSpec testing tools
+  gem "shoulda-matchers", "~> 6.0"
+  gem "webmock", "~> 3.19"
+  gem "vcr", "~> 6.2"
 end
