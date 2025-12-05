@@ -1,7 +1,7 @@
 <%# app/views/travel_recommendations/_recommendations_list.html.erb %>
 <%= turbo_frame_tag "recommendations_list" do %>
   <% if recommendations.present? %>
-    <div class="mb-5 d-flex justify-content-between align-items-center">
+    <div class="mb-5">
       <h2 class="display-6 fw-bold text-gradient mb-0">AI-Powered Travel Recommendations</h2>
     </div>
 
@@ -359,7 +359,7 @@
                     <% end %>
                   <% end %>
                   <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="bi bi-bookmark-plus me-1"></i> Save
+                    <i class="bi bi-bookmark-plus me-1"></i>Save
                   </button>
                 </form>
                 <%= button_to travel_recommendation_path(index), 
@@ -369,7 +369,7 @@
                       turbo_confirm: "Are you sure you want to delete this recommendation?",
                       turbo_method: :delete
                     } do %>
-                  <i class="bi bi-trash me-1"></i> Delete
+                  <i class="bi bi-trash me-1"></i>Delete
                 <% end %>
               </div>
             </div>

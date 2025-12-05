@@ -1,10 +1,12 @@
 # app/controllers/content_reports_controller.rb
 class ContentReportsController < ApplicationController
+  include Pagy::Backend
+  
   before_action :require_login
   before_action :set_reportable, only: [:new, :create]
   
   def index
-    @reports = current_user.content_reports.recent.page(params[:page]).per(20)
+    @pagy, @reports = pagy(current_user.content_reports.recent, items: 20)
   end
   
   def new

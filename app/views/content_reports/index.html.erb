@@ -86,6 +86,13 @@
                 </tbody>
               </table>
             </div>
+            
+            <%# Pagination controls %>
+            <% if defined?(@pagy) && @pagy.pages > 1 %>
+              <div class="d-flex justify-content-center mt-4">
+                <%== pagy_nav(@pagy) %>
+              </div>
+            <% end %>
           <% else %>
             <div class="alert alert-info">
               <p class="mb-0">You haven't submitted any reports yet.</p>
