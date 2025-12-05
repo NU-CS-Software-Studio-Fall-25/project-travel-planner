@@ -18,6 +18,13 @@ Rails.application.routes.draw do
   
   # Complete profile after OAuth
   get '/complete_profile', to: 'users#complete_profile'
+  
+  # Static pages
+  get '/community_guidelines', to: 'pages#community_guidelines'
+  get '/terms_of_service', to: 'pages#terms_of_service'
+  
+  # Content reporting
+  resources :content_reports, only: [:index, :new, :create]
 
   # API routes
   namespace :api do

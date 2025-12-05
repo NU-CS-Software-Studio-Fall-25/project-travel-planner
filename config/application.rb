@@ -34,5 +34,8 @@ module ProjectTravelPlanner
           credentials: true
       end
     end
+    
+    # Enable Rack::Attack for rate limiting and abuse prevention
+    config.middleware.use Rack::Attack
   end
 end

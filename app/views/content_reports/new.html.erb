@@ -1,0 +1,79 @@
+<% content_for :title, "Report Content - Travel Planner" %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header bg-warning">
+          <h1 class="h3 mb-0">Report Content</h1>
+          <p class="mb-0 mt-2">Help us keep our community safe</p>
+        </div>
+        
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Before you report:</strong> Please ensure the content genuinely violates our 
+            <%= link_to "Community Guidelines", community_guidelines_path, target: "_blank" %>. 
+            False reports may result in action against your account.
+          </div>
+
+          <%= form_with(model: @report, url: content_reports_path, local: true) do |form| %>
+            <%= hidden_field_tag :reportable_type, params[:reportable_type] %>
+            <%= hidden_field_tag :reportable_id, params[:reportable_id] %>
+
+            <% if @report.errors.any? %>
+              <div class="alert alert-danger">
+                <h4><%= pluralize(@report.errors.count, "error") %> prohibited this report from being submitted:</h4>
+                <ul class="mb-0">
+                  <% @report.errors.each do |error| %>
+                    <li><%= error.full_message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+
+            <div class="mb-3">
+              <%= form.label :report_type, "Reason for Reporting", class: "form-label" %>
+              <%= form.select :report_type, 
+                  options_for_select([
+                    ['Spam or Unwanted Commercial Content', 'spam'],
+                    ['Inappropriate or Offensive Content', 'inappropriate_content'],
+                    ['Harassment or Bullying', 'harassment'],
+                    ['Misinformation or False Information', 'misinformation'],
+                    ['Profanity or Offensive Language', 'profanity'],
+                    ['Other', 'other']
+                  ]), 
+                  { prompt: 'Select a reason...' },
+                  { class: 'form-select', required: true }
+              %>
+            </div>
+
+            <div class="mb-3">
+              <%= form.label :reason, "Additional Details", class: "form-label" %>
+              <%= form.text_area :reason, 
+                  class: 'form-control', 
+                  rows: 5, 
+                  placeholder: 'Please provide specific details about why you are reporting this content (minimum 10 characters)...', 
+                  required: true,
+                  minlength: 10,
+                  maxlength: 1000
+              %>
+              <small class="form-text text-muted">
+                Please be as specific as possible. This helps our team review the report more effectively.
+              </small>
+            </div>
+
+            <div class="alert alert-warning">
+              <strong>Note:</strong> Your report will be reviewed by our moderation team. 
+              We take all reports seriously and will investigate according to our Community Guidelines.
+            </div>
+
+            <div class="d-flex gap-2">
+              <%= form.submit "Submit Report", class: "btn btn-warning" %>
+              <%= link_to "Cancel", :back, class: "btn btn-secondary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

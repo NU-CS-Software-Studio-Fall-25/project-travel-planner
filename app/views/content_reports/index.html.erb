@@ -1,0 +1,98 @@
+<% content_for :title, "My Reports - Travel Planner" %>
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h1 class="h3 mb-0">My Content Reports</h1>
+          <p class="mb-0 mt-2">View the status of your submitted reports</p>
+        </div>
+        
+        <div class="card-body">
+          <% if @reports.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Content Type</th>
+                    <th>Report Type</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @reports.each do |report| %>
+                    <tr>
+                      <td>
+                        <span class="badge bg-info"><%= report.reportable_type %></span>
+                      </td>
+                      <td><%= report.report_type.titleize %></td>
+                      <td>
+                        <% case report.status %>
+                        <% when 'pending' %>
+                          <span class="badge bg-warning">Pending Review</span>
+                        <% when 'reviewing' %>
+                          <span class="badge bg-info">Under Review</span>
+                        <% when 'resolved' %>
+                          <span class="badge bg-success">Resolved</span>
+                        <% when 'dismissed' %>
+                          <span class="badge bg-secondary">Dismissed</span>
+                        <% end %>
+                      </td>
+                      <td><%= time_ago_in_words(report.created_at) %> ago</td>
+                      <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#reportModal<%= report.id %>">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    <!-- Modal for report details -->
+                    <div class="modal fade" id="reportModal<%= report.id %>" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Report Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                            <p><strong>Report Type:</strong> <%= report.report_type.titleize %></p>
+                            <p><strong>Status:</strong> <%= report.status.titleize %></p>
+                            <p><strong>Submitted:</strong> <%= report.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                            <hr>
+                            <p><strong>Your Comments:</strong></p>
+                            <p class="text-muted"><%= report.reason %></p>
+                            
+                            <% if report.reviewed_at.present? %>
+                              <hr>
+                              <p><strong>Reviewed:</strong> <%= report.reviewed_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                              <% if report.resolution_notes.present? %>
+                                <p><strong>Resolution Notes:</strong></p>
+                                <p class="text-muted"><%= report.resolution_notes %></p>
+                              <% end %>
+                            <% end %>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="alert alert-info">
+              <p class="mb-0">You haven't submitted any reports yet.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -338,6 +338,14 @@
       <%= form.password_field :password_confirmation, class: "form-control", placeholder: "Confirm your password", required: true, id: "password-confirm-field", maxlength: 75 %>
       <div class="invalid-feedback" id="password-confirm-error"></div>
     </div>
+    
+    <div class="mb-3 form-check">
+      <%= form.check_box :terms_accepted, class: "form-check-input", required: true, id: "terms-accepted-field" %>
+      <%= form.label :terms_accepted, class: "form-check-label" do %>
+        I agree to the <%= link_to "Terms of Service", terms_of_service_path, target: "_blank" %> and <%= link_to "Community Guidelines", community_guidelines_path, target: "_blank" %>
+      <% end %>
+      <div class="invalid-feedback" id="terms-error"></div>
+    </div>
   <% end %>
 
   <div class="d-grid">

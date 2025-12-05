@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :recommendations, dependent: :destroy
   has_many :destinations, through: :travel_plans
   has_many :recommendation_feedbacks, dependent: :destroy
+  has_many :content_reports, dependent: :destroy
 
   # Serialize recommendations_json as JSON
   serialize :recommendations_json, coder: JSON
@@ -19,8 +20,10 @@ class User < ApplicationRecord
   validates :password, format: { with: VALID_PASSWORD_REGEX, message: 'must be at least 7 characters and include one uppercase letter, one lowercase letter, one digit and one special character (@#$%&!*)' }, if: -> { (new_record? || !password.nil?) && provider.blank? }
   validates :password, presence: true, if: -> { new_record? && provider.blank? }
   validates :current_country, presence: true
+  validates :terms_accepted, acceptance: { message: 'must be accepted' }, on: :create
 
   before_save { self.email = email.downcase }
+  before_create :set_terms_accepted_at
 
   # Checks if the user can generate a new recommendation
   def can_generate_recommendation?
@@ -96,5 +99,9 @@ class User < ApplicationRecord
       self.recommendation_generations_used = 0
       self.generations_reset_at = Time.current
     end
+  end
+  
+  def set_terms_accepted_at
+    self.terms_accepted_at = Time.current if terms_accepted
   end
 end

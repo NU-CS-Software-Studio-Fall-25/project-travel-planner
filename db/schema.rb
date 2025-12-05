@@ -10,7 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_19_174334) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_05_202819) do
+  create_table "content_reports", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "reportable_type", null: false
+    t.integer "reportable_id", null: false
+    t.text "reason", null: false
+    t.string "report_type", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "reviewed_by"
+    t.datetime "reviewed_at"
+    t.text "resolution_notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reportable_type", "reportable_id"], name: "index_content_reports_on_reportable"
+    t.index ["reportable_type", "reportable_id"], name: "index_content_reports_on_reportable_type_and_reportable_id"
+    t.index ["status"], name: "index_content_reports_on_status"
+    t.index ["user_id"], name: "index_content_reports_on_user_id"
+  end
+
   create_table "country_safety_scores", force: :cascade do |t|
     t.string "country_name", null: false
     t.decimal "gpi_score", precision: 5, scale: 3, null: false
@@ -88,16 +106,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_174334) do
     t.string "general_purpose"
     t.string "trip_scope"
     t.string "trip_type"
+    t.text "itinerary"
+    t.text "details"
+    t.text "description"
     t.integer "safety_score"
     t.string "visa_info"
     t.json "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
-    t.text "description"
-    t.text "details"
-    t.json "itinerary"
-    t.integer "number_of_people", default: 1
     t.integer "number_of_travelers", default: 1
+    t.integer "number_of_people", default: 1
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
   end
@@ -120,9 +138,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_174334) do
     t.datetime "verification_sent_at"
     t.integer "recommendation_generations_used", default: 0
     t.datetime "generations_reset_at"
+    t.boolean "terms_accepted", default: false, null: false
+    t.datetime "terms_accepted_at"
     t.index ["verification_token"], name: "index_users_on_verification_token", unique: true
   end
 
+  add_foreign_key "content_reports", "users"
   add_foreign_key "recommendation_feedbacks", "users"
   add_foreign_key "recommendations", "destinations"
   add_foreign_key "recommendations", "users"

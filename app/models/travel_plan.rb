@@ -1,6 +1,9 @@
 class TravelPlan < ApplicationRecord
+  include ProfanityFilterable
+  
   belongs_to :user
   belongs_to :destination, optional: true
+  has_many :content_reports, as: :reportable, dependent: :destroy
   
   # Custom serializer for itinerary that handles both JSON and Ruby hash formats
   class ItinerarySerializer
@@ -49,6 +52,9 @@ class TravelPlan < ApplicationRecord
   validate :end_date_after_start_date
   validate :sanitize_text_fields
   validate :budget_max_greater_than_or_equal_to_min
+  
+  # Profanity validation
+  validates_profanity_of :notes, :name, :description
   
   # Set default status
   before_validation :set_default_status, on: :create

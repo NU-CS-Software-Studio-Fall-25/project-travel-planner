@@ -127,8 +127,19 @@
 
 <!-- Footer -->
 <footer class="bg-light mt-5 py-4">
-  <div class="container text-center">
-    <p>&copy; 2025 Travel Planner - Built by Sirui Chen, Ailin Chu, Jerome Bizimana, Rohun Gargya</p>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+        <p class="mb-1">&copy; 2025 Travel Planner - Built by Sirui Chen, Ailin Chu, Jerome Bizimana, Rohun Gargya</p>
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <%= link_to "Community Guidelines", community_guidelines_path, class: "text-decoration-none me-3" %>
+        <%= link_to "Terms of Service", terms_of_service_path, class: "text-decoration-none me-3" %>
+        <% if logged_in? %>
+          <%= link_to "My Reports", content_reports_path, class: "text-decoration-none" %>
+        <% end %>
+      </div>
+    </div>
   </div>
 </footer>
 
