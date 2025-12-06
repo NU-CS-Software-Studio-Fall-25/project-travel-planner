@@ -3,15 +3,56 @@ class DestinationsController < ApplicationController
 
   # GET /destinations or /destinations.json
   def index
-    all = Destination.all.order(:name)
-
-    if current_user&.current_country.present?
-      @pagy_domestic, @domestic_destinations     = pagy(all.where(country: current_user.current_country), items: 10)
-      @pagy_international, @international_destinations = pagy(all.where.not(country: current_user.current_country), items: 10)
-    else
-      @pagy_international, @international_destinations = pagy(all, items: 20)
-      @domestic_destinations = []
+    all = Destination.all
+    
+    # Filter by name search
+    if params[:search].present?
+      all = all.where("name LIKE ? OR country LIKE ?", "%#{params[:search]}%", "%#{params[:search]}%")
     end
+    
+    # Filter by country (domestic/international)
+    if params[:country_filter].present? && params[:country_filter] != 'all'
+      if current_user&.current_country.present?
+        if params[:country_filter] == 'domestic'
+          all = all.where(country: current_user.current_country)
+        elsif params[:country_filter] == 'international'
+          all = all.where.not(country: current_user.current_country)
+        end
+      end
+    end
+    
+    # Filter by visa requirement
+    if params[:visa_filter].present? && params[:visa_filter] != 'all'
+      if params[:visa_filter] == 'not_required'
+        # Include domestic destinations (always no visa) and international destinations without visa
+        if current_user&.current_country.present?
+          all = all.where("country = ? OR visa_required = ?", current_user.current_country, false)
+        else
+          all = all.where(visa_required: false)
+        end
+      elsif params[:visa_filter] == 'required'
+        # Only international destinations with visa required
+        if current_user&.current_country.present?
+          all = all.where.not(country: current_user.current_country).where(visa_required: true)
+        else
+          all = all.where(visa_required: true)
+        end
+      end
+    end
+    
+    # Sort by safety score
+    if params[:safety_sort].present? && params[:safety_sort] != 'default'
+      if params[:safety_sort] == 'high_to_low'
+        all = all.order(safety_score: :desc, name: :asc)
+      elsif params[:safety_sort] == 'low_to_high'
+        all = all.order(safety_score: :asc, name: :asc)
+      end
+    else
+      all = all.order(:name)
+    end
+    
+    # Pagination for all destinations (25 per page)
+    @pagy, @destinations = pagy(all, items: 25)
   end
 
   # GET /destinations/1 or /destinations/1.json
