@@ -22,9 +22,12 @@ Rails.application.routes.draw do
   # Static pages
   get '/community_guidelines', to: 'pages#community_guidelines'
   get '/terms_of_service', to: 'pages#terms_of_service'
+
+  get '/users/:id/send_test_email', to: 'users#send_test_email', as: :send_test_email_user
   
   # Content reporting
   resources :content_reports, only: [:index, :new, :create]
+  resources :password_resets, only: [:new, :create, :edit, :update]
 
   # API routes
   namespace :api do

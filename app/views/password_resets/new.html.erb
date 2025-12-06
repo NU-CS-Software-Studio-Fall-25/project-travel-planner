@@ -1,0 +1,12 @@
+<h1>Forgot your password?</h1>
+<p>Enter your email and we'll send instructions to reset your password.</p>
+
+<%= form_with url: password_resets_path, local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :email, class: "form-label" %>
+    <%= f.email_field :email, class: "form-control", placeholder: "you@example.com", required: true, maxlength: 60 %>
+  </div>
+  <div class="d-grid">
+    <%= f.submit "Send reset instructions", class: "btn btn-primary" %>
+  </div>
+<% end %>

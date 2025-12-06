@@ -1,0 +1,140 @@
+<!-- app/views/password_resets/edit.html.erb -->
+<h1>Reset your password</h1>
+
+<%= form_with model: @user, url: password_reset_path(params[:id]), method: :patch, local: true, id: "reset-password-form" do |f| %>
+  <div class="mb-3">
+    <%= f.label :password, "New password", class: "form-label" %>
+    <%= f.password_field :password,
+                         class: "form-control password-field",
+                         required: true,
+                         minlength: 7,
+                         maxlength: 60,
+                         id: "reset-password-field",
+                         autocomplete: "new-password",
+                         placeholder: "Enter new password" %>
+    <div class="invalid-feedback" id="reset-password-error"></div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :password_confirmation, "Confirm password", class: "form-label" %>
+    <%= f.password_field :password_confirmation,
+                         class: "form-control password-field",
+                         required: true,
+                         minlength: 7,
+                         maxlength: 60,
+                         id: "reset-password-confirmation-field",
+                         autocomplete: "new-password",
+                         placeholder: "Confirm new password" %>
+    <div class="invalid-feedback" id="reset-password-confirmation-error"></div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <button type="button" id="toggle-passwords" class="btn btn-sm btn-outline-secondary">
+        Show Passwords
+      </button>
+    </div>
+    <div>
+      <%= f.submit "Update password", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<script>
+    document.addEventListener("DOMContentLoaded", runScript);
+    document.addEventListener("turbo:load", runScript);
+    document.addEventListener("turbo:render", runScript);
+
+    function runScript() {
+        // ──────────────────────────────
+        // 1. Show / Hide Passwords (this was broken before)
+        // ──────────────────────────────
+        const toggleBtn = document.getElementById('toggle-passwords');
+        if (toggleBtn && !toggleBtn.dataset.listenerAdded) {
+            toggleBtn.dataset.listenerAdded = 'true'; // prevent double-binding with Turbo
+
+            toggleBtn.addEventListener('click', function () {
+                const fields = document.querySelectorAll('.password-field');
+                const isShowing = this.textContent.trim() === 'Show Passwords';
+
+                fields.forEach(field => {
+                    field.type = isShowing ? 'text' : 'password';
+                });
+
+                this.textContent = isShowing ? 'Hide Passwords' : 'Show Passwords';
+            });
+        }
+
+        // ──────────────────────────────
+        // 2. Validation (exactly like before)
+        // ──────────────────────────────
+        const pw          = document.getElementById('reset-password-field');
+        const pwConfirm   = document.getElementById('reset-password-confirmation-field');
+        const pwError     = document.getElementById('reset-password-error');
+        const pwConfirmError = document.getElementById('reset-password-confirmation-error');
+        const form        = document.getElementById('reset-password-form');
+
+        if (!pw || !pwConfirm || !form) return;
+
+        const MAX_LENGTH = 60;
+        const MIN_LENGTH = 7;
+
+        function validatePassword(value) {
+            if (!value) return "Password is required.";
+            if (value.length < MIN_LENGTH) return `Password must be at least ${MIN_LENGTH} characters long.`;
+            if (value.length > MAX_LENGTH) return `Password cannot exceed ${MAX_LENGTH} characters.`;
+            if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%&!*])/.test(value))
+                return "Password must include one uppercase, one lowercase, one digit and one special character (@#$%&!*).";
+            return null;
+        }
+
+        function validateConfirmation(confirmValue, pwValue) {
+            if (!confirmValue) return "Password confirmation is required.";
+            if (confirmValue !== pwValue) return "Passwords do not match.";
+            return null;
+        }
+
+        function showError(el, msg) {
+            const errorEl = el.id.includes('confirmation') ? pwConfirmError : pwError;
+            errorEl.textContent = msg;
+            errorEl.style.display = 'block';
+            el.classList.add('is-invalid');
+            el.classList.remove('is-valid');
+        }
+
+        function clearError(el) {
+            const errorEl = el.id.includes('confirmation') ? pwConfirmError : pwError;
+            errorEl.textContent = '';
+            errorEl.style.display = 'none';
+            el.classList.remove('is-invalid');
+            el.classList.add('is-valid');
+        }
+
+        // Live validation
+        pw.addEventListener('input', () => {
+            if (pw.value.length > MAX_LENGTH) pw.value = pw.value.slice(0, MAX_LENGTH);
+            const err = validatePassword(pw.value);
+            if (err) showError(pw, err); else clearError(pw);
+
+            if (pwConfirm.value) {
+                const err2 = validateConfirmation(pwConfirm.value, pw.value);
+                if (err2) showError(pwConfirm, err2); else clearError(pwConfirm);
+            }
+        });
+
+        pwConfirm.addEventListener('input', () => {
+            if (pwConfirm.value.length > MAX_LENGTH) pwConfirm.value = pwConfirm.value.slice(0, MAX_LENGTH);
+            const err = validateConfirmation(pwConfirm.value, pw.value);
+            if (err) showError(pwConfirm, err); else clearError(pwConfirm);
+        });
+
+        // Final check on submit
+        form.addEventListener('submit', e => {
+            const err1 = validatePassword(pw.value);
+            if (err1) { e.preventDefault(); showError(pw, err1); pw.focus(); return; }
+
+            const err2 = validateConfirmation(pwConfirm.value, pw.value);
+            if (err2) { e.preventDefault(); showError(pwConfirm, err2); pwConfirm.focus(); return; }
+        });
+    }
+</script>
