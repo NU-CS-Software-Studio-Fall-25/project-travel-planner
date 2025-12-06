@@ -69,7 +69,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("SMTP_ADDRESS", "smtp.sendgrid.net"),
     port: ENV.fetch("SMTP_PORT", "587").to_i,
-    domain: ENV.fetch("SMTP_DOMAIN", "herokuapp.com"),
+    domain: ENV.fetch("APP_HOST", "herokuapp.com"),
     user_name: ENV.fetch("SMTP_USERNAME", "apikey"),
     password: ENV.fetch("SMTP_PASSWORD") { ENV.fetch("SENDGRID_API_KEY") },
     authentication: :plain,

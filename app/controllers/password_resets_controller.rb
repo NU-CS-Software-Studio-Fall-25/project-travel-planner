@@ -10,7 +10,8 @@ class PasswordResetsController < ApplicationController
     user = User.where("lower(email) = ?", email).first
 
     # Always respond with the same message to avoid account enumeration
-    generic_notice = "If an account exists with that email you'll receive password reset instructions."
+    generic_notice = "If an account exists with that email, you will receive instructions to reset your password.
+    Please check your spam or junk folder if you do not see the email in your inbox."
 
     if user.nil?
       redirect_to new_password_reset_path, notice: generic_notice

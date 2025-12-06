@@ -89,6 +89,15 @@ class User < ApplicationRecord
     provider.present?
   end
 
+  def generate_password_reset_token!
+    loop do
+      self.reset_password_token = SecureRandom.urlsafe_base64(24)
+      break unless self.class.exists?(reset_password_token: reset_password_token)
+    end
+    self.reset_password_sent_at = Time.current
+    save!(validate: false)
+  end
+
   private
 
   # Resets the monthly generation count if a month has passed

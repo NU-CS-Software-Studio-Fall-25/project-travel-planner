@@ -5,13 +5,28 @@ Rails.application.configure do
   config.annotations.register_directories('features')
   config.annotations.register_extensions('feature') { |tag| /#\s*(#{tag}):?\s*(.*)$/ }
 
-  # Use Letter Opener in development to preview emails in the browser
-  config.action_mailer.delivery_method = :letter_opener
+
+  config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { host: ENV.fetch("SMTP_DOMAIN", "localhost"), port: 3000 }
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("SMTP_ADDRESS", "smtp.sendgrid.net"),
+    port: ENV.fetch("SMTP_PORT", "587").to_i,
+    domain: ENV.fetch("SMTP_DOMAIN", "localhost"),
+    user_name: ENV.fetch("SMTP_USERNAME", "apikey"),
+    password: ENV.fetch("SMTP_PASSWORD"), # DO NOT hard-code API keys in repo
+    authentication: :plain,
+    enable_starttls_auto: true
+  }
 
-  # Ensure links in emails point to localhost
-  config.action_mailer.default_url_options ||= { host: "localhost", port: 3000 }
+  # # Use Letter Opener in development to preview emails in the browser
+  # config.action_mailer.delivery_method = :letter_opener
+  # config.action_mailer.perform_deliveries = true
+  # config.action_mailer.raise_delivery_errors = true
+  #
+  # # Ensure links in emails point to localhost
+  # config.action_mailer.default_url_options ||= { host: "localhost", port: 3000 }
 
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -50,7 +65,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
