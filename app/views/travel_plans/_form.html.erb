@@ -23,10 +23,11 @@
     <div class="col-md-12">
       <%= form.label :destination_id, "Select Existing Destination (Optional)", class: "form-label" %>
       <%= form.select :destination_id, 
-          options_from_collection_for_select(Destination.all, :id, :name, travel_plan.destination_id),
+          options_from_collection_for_select(Destination.all, :id, :name, params[:destination_id] || travel_plan.destination_id),
           { include_blank: "-- Select from saved destinations --" },
           class: "form-select",
-          id: "destination-select" %>
+          id: "destination-select",
+          data: { destinations: Destination.all.map { |d| { id: d.id, name: d.name, country: d.country } }.to_json } %>
       <small class="text-muted">Choose from your saved destinations, or create a new one below</small>
     </div>
 
@@ -150,18 +151,31 @@
         const destinationCountryField = document.getElementById("destination-country-field");
 
         if (destinationSelect && destinationNameField && destinationCountryField) {
-            // When selecting an existing destination, clear the new destination fields
+            // Parse destinations data
+            const destinationsData = JSON.parse(destinationSelect.dataset.destinations || '[]');
+            
+            // When selecting an existing destination, populate the new destination fields
             destinationSelect.addEventListener("change", function() {
                 if (this.value) {
-                    destinationNameField.value = "";
-                    destinationCountryField.value = "";
+                    const selectedDestination = destinationsData.find(d => d.id == this.value);
+                    if (selectedDestination) {
+                        destinationNameField.value = selectedDestination.name;
+                        destinationCountryField.value = selectedDestination.country;
+                    }
                     destinationNameField.disabled = true;
                     destinationCountryField.disabled = true;
                 } else {
+                    destinationNameField.value = "";
+                    destinationCountryField.value = "";
                     destinationNameField.disabled = false;
                     destinationCountryField.disabled = false;
                 }
             });
+            
+            // Trigger change event on page load if a destination is pre-selected
+            if (destinationSelect.value) {
+                destinationSelect.dispatchEvent(new Event('change'));
+            }
 
             // When typing a new destination, clear the select dropdown
             function handleNewDestinationInput() {
