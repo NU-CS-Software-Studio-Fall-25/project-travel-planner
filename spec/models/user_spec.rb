@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
   # Test validations
   describe 'validations' do
-    subject { build(:user) }
+    subject { build(:user, terms_accepted: true) }
 
     it { should validate_presence_of(:name) }
     it { should validate_length_of(:name).is_at_least(2).is_at_most(50) }
@@ -14,18 +14,18 @@ RSpec.describe User, type: :model do
 
     context 'password validation for non-OAuth users' do
       it 'validates password format for new users' do
-        user = build(:user, password: 'weak')
+        user = build(:user, password: 'weak', terms_accepted: true)
         expect(user).not_to be_valid
         expect(user.errors[:password]).to include(/must be at least 7 characters/)
       end
 
       it 'accepts valid password' do
-        user = build(:user, password: 'Password1!', password_confirmation: 'Password1!')
+        user = build(:user, password: 'Password1!', password_confirmation: 'Password1!', terms_accepted: true)
         expect(user).to be_valid
       end
 
       it 'does not validate password for OAuth users' do
-        user = build(:user, :oauth_user)
+        user = build(:user, :oauth_user, terms_accepted: true)
         expect(user).to be_valid
       end
     end
@@ -41,8 +41,8 @@ RSpec.describe User, type: :model do
 
   # Test generation limit feature
   describe 'recommendation generation limits' do
-    let(:free_user) { create(:user) }
-    let(:premium_user) { create(:user, :premium) }
+    let(:free_user) { create(:user, terms_accepted: true) }
+    let(:premium_user) { create(:user, :premium, terms_accepted: true) }
 
     describe '#can_generate_recommendation?' do
       it 'returns true for premium users regardless of usage' do
@@ -111,18 +111,18 @@ RSpec.describe User, type: :model do
   describe '.from_omniauth' do
     let(:auth) do
       OmniAuth::AuthHash.new({
-        provider: 'google_oauth2',
-        uid: '123456',
-        info: {
-          email: 'oauth@example.com',
-          name: 'OAuth User',
-          email_verified: true
-        },
-        credentials: {
-          token: 'oauth_token_123',
-          expires_at: 1.hour.from_now.to_i
-        }
-      })
+                               provider: 'google_oauth2',
+                               uid: '123456',
+                               info: {
+                                 email: 'oauth@example.com',
+                                 name: 'OAuth User',
+                                 email_verified: true
+                               },
+                               credentials: {
+                                 token: 'oauth_token_123',
+                                 expires_at: 1.hour.from_now.to_i
+                               }
+                             })
     end
 
     it 'creates a new user from OAuth data' do
@@ -143,7 +143,7 @@ RSpec.describe User, type: :model do
     it 'updates existing user on subsequent logins' do
       user = User.from_omniauth(auth)
       auth.info.name = 'Updated Name'
-      
+
       updated_user = User.from_omniauth(auth)
       expect(updated_user.id).to eq(user.id)
       expect(updated_user.name).to eq('Updated Name')
@@ -168,8 +168,8 @@ RSpec.describe User, type: :model do
   end
 
   describe '#premium?' do
-    let(:premium_user) { create(:user, :premium) }
-    let(:free_user) { create(:user) }
+    let(:premium_user) { create(:user, :premium, terms_accepted: true) }
+    let(:free_user) { create(:user, terms_accepted: true) }
 
     it 'returns true for premium users' do
       expect(premium_user.premium?).to be true

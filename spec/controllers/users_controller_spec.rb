@@ -8,7 +8,8 @@ RSpec.describe UsersController, type: :controller do
       email: 'john@example.com',
       password: 'Password1!',
       password_confirmation: 'Password1!',
-      current_country: 'United States'
+      current_country: 'United States',
+      terms_accepted: true
     }
   end
 
@@ -115,7 +116,7 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'GET #show' do
-    let(:user) { create(:user) }
+    let(:user) { User.create!(valid_attributes) }
 
     context 'when logged in as the user' do
       before { log_in_as(user) }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_05_202819) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_05_224650) do
   create_table "content_reports", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "reportable_type", null: false
@@ -114,8 +114,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_202819) do
     t.json "budget_breakdown"
     t.string "destination_country"
     t.string "current_location"
-    t.integer "number_of_people", default: 1
     t.integer "number_of_travelers", default: 1
+    t.integer "number_of_people", default: 1
     t.index ["destination_id"], name: "index_travel_plans_on_destination_id"
     t.index ["user_id"], name: "index_travel_plans_on_user_id"
   end
@@ -123,9 +123,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_202819) do
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "password_digest"
     t.text "recommendations_json"
     t.string "current_country", default: "United States"
     t.string "subscription_tier", default: "free", null: false
@@ -140,8 +140,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_202819) do
     t.datetime "generations_reset_at"
     t.boolean "terms_accepted", default: false, null: false
     t.datetime "terms_accepted_at"
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["verification_token"], name: "index_users_on_verification_token", unique: true
   end
 

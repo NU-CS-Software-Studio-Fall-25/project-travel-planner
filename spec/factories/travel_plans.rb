@@ -1,30 +1,17 @@
 # spec/factories/travel_plans.rb
 FactoryBot.define do
   factory :travel_plan do
+    name { "Trip to #{Faker::Address.city}" }
+    description { Faker::Lorem.paragraph }
+    start_date { 1.month.from_now }
+    end_date { 1.month.from_now + 7.days }
+    status { 'planned' }
+
+    # Use an association for the user, which is the correct approach.
+    # This ensures a user is created and linked without inheriting its attributes.
     association :user
+
+    # Also associate a destination.
     association :destination
-    sequence(:name) { |n| "Trip #{n}" }
-    description { "A wonderful vacation" }
-    start_date { 1.week.from_now }
-    end_date { 2.weeks.from_now }
-    status { "planned" }
-    notes { "Don't forget passport" }
-    budget_min { 1000.0 }
-    budget_max { 3000.0 }
-    itinerary { { "day_1" => "Arrival", "day_2" => "Sightseeing" } }
-
-    trait :booked do
-      status { "booked" }
-    end
-
-    trait :completed do
-      status { "completed" }
-      start_date { 2.weeks.ago }
-      end_date { 1.week.ago }
-    end
-
-    trait :cancelled do
-      status { "cancelled" }
-    end
   end
 end

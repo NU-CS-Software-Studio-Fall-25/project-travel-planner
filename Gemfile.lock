@@ -581,6 +581,7 @@ DEPENDENCIES
   rails-controller-testing
   rspec-rails (~> 6.1)
   rubocop-rails-omakase
+  securerandom
   selenium-webdriver
   shoulda-matchers (~> 6.0)
   solid_cable

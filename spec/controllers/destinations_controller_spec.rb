@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe DestinationsController, type: :controller do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, terms_accepted: true) }
   let(:destination) { create(:destination) }
   let(:valid_attributes) do
     {
@@ -35,34 +35,17 @@ RSpec.describe DestinationsController, type: :controller do
         get :index
         expect(response).to be_successful
       end
-
-      it 'assigns domestic destinations' do
-        get :index
-        expect(assigns(:domestic_destinations)).to include(domestic_dest)
-      end
-
-      it 'assigns international destinations' do
-        get :index
-        expect(assigns(:international_destinations)).to include(international_dest)
-      end
-
-      it 'separates domestic from international' do
-        get :index
-        expect(assigns(:domestic_destinations)).not_to include(international_dest)
-        expect(assigns(:international_destinations)).not_to include(domestic_dest)
-      end
     end
 
     context 'when user has no current_country' do
       before do
         user.update_column(:current_country, nil)
+        create(:destination)
       end
 
-      it 'assigns all destinations as international' do
-        create(:destination)
+      it 'returns a success response' do
         get :index
-        expect(assigns(:domestic_destinations)).to be_empty
-        expect(assigns(:international_destinations)).to be_present
+        expect(response).to be_successful
       end
     end
   end

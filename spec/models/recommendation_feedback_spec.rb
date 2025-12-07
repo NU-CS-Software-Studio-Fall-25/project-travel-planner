@@ -38,35 +38,35 @@ RSpec.describe RecommendationFeedback, type: :model do
     end
 
     describe 'uniqueness validation' do
-      let(:user) { create(:user) }
-      
+      let(:user) { create(:user, terms_accepted: true) }
+
       it 'prevents duplicate feedback for same destination by same user' do
-        create(:recommendation_feedback, 
-               user: user, 
-               destination_city: 'Paris', 
+        create(:recommendation_feedback,
+               user: user,
+               destination_city: 'Paris',
                destination_country: 'France')
-        
-        duplicate = build(:recommendation_feedback, 
-                          user: user, 
-                          destination_city: 'Paris', 
+
+        duplicate = build(:recommendation_feedback,
+                          user: user,
+                          destination_city: 'Paris',
                           destination_country: 'France')
-        
+
         expect(duplicate).not_to be_valid
         expect(duplicate.errors[:destination_city]).to be_present
       end
 
       it 'allows same destination feedback from different users' do
-        user2 = create(:user)
-        create(:recommendation_feedback, 
-               user: user, 
-               destination_city: 'Paris', 
+        user2 = create(:user, terms_accepted: true)
+        create(:recommendation_feedback,
+               user: user,
+               destination_city: 'Paris',
                destination_country: 'France')
-        
-        feedback2 = build(:recommendation_feedback, 
-                          user: user2, 
-                          destination_city: 'Paris', 
+
+        feedback2 = build(:recommendation_feedback,
+                          user: user2,
+                          destination_city: 'Paris',
                           destination_country: 'France')
-        
+
         expect(feedback2).to be_valid
       end
     end
@@ -74,9 +74,10 @@ RSpec.describe RecommendationFeedback, type: :model do
 
   # Test scopes
   describe 'scopes' do
-    let!(:like_feedback) { create(:recommendation_feedback, feedback_type: 'like') }
-    let!(:dislike_feedback) { create(:recommendation_feedback, :dislike) }
-    let!(:old_feedback) { create(:recommendation_feedback, created_at: 1.month.ago) }
+    let(:user) { create(:user, terms_accepted: true) }
+    let!(:like_feedback) { create(:recommendation_feedback, user: user, feedback_type: 'like', destination_city: 'Kyoto') }
+    let!(:dislike_feedback) { create(:recommendation_feedback, :dislike, user: user, destination_city: 'Cancun') }
+    let!(:old_feedback) { create(:recommendation_feedback, user: user, created_at: 1.month.ago, destination_city: 'Rome') }
 
     describe '.likes' do
       it 'returns only like feedbacks' do
@@ -94,6 +95,7 @@ RSpec.describe RecommendationFeedback, type: :model do
 
     describe '.recent' do
       it 'orders by created_at descending' do
+        # Re-fetch to ensure order
         recent_feedbacks = RecommendationFeedback.recent.to_a
         expect(recent_feedbacks.first.created_at).to be > recent_feedbacks.last.created_at
       end
@@ -102,18 +104,18 @@ RSpec.describe RecommendationFeedback, type: :model do
 
   # Test class methods
   describe '.user_preferences' do
-    let(:user) { create(:user) }
-    
+    let(:user) { create(:user, terms_accepted: true) }
+
     before do
-      create(:recommendation_feedback, 
-             user: user, 
+      create(:recommendation_feedback,
+             user: user,
              feedback_type: 'like',
              destination_city: 'Tokyo',
              destination_country: 'Japan',
              travel_style: 'cultural',
              trip_type: 'leisure',
              length_of_stay: 7)
-      
+
       create(:recommendation_feedback,
              user: user,
              feedback_type: 'dislike',
@@ -126,7 +128,7 @@ RSpec.describe RecommendationFeedback, type: :model do
 
     it 'returns user preferences structure' do
       preferences = RecommendationFeedback.user_preferences(user.id)
-      
+
       expect(preferences).to have_key(:liked_destinations)
       expect(preferences).to have_key(:disliked_destinations)
       expect(preferences).to have_key(:preferred_styles)
@@ -136,7 +138,7 @@ RSpec.describe RecommendationFeedback, type: :model do
     it 'includes liked destinations' do
       preferences = RecommendationFeedback.user_preferences(user.id)
       liked = preferences[:liked_destinations].first
-      
+
       expect(liked[:city]).to eq('Tokyo')
       expect(liked[:country]).to eq('Japan')
       expect(liked[:travel_style]).to eq('cultural')
@@ -145,14 +147,14 @@ RSpec.describe RecommendationFeedback, type: :model do
     it 'includes disliked destinations' do
       preferences = RecommendationFeedback.user_preferences(user.id)
       disliked = preferences[:disliked_destinations].first
-      
+
       expect(disliked[:city]).to eq('Las Vegas')
       expect(disliked[:country]).to eq('USA')
     end
 
     it 'handles invalid user_id' do
       preferences = RecommendationFeedback.user_preferences(-1)
-      
+
       expect(preferences[:liked_destinations]).to be_empty
       expect(preferences[:disliked_destinations]).to be_empty
     end

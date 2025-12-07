@@ -100,6 +100,7 @@ group :test do
   gem "selenium-webdriver"
   gem 'cucumber-rails', require: false
   gem 'database_cleaner-active_record'
+  gem 'securerandom'
   
   # Additional RSpec testing tools
   gem "shoulda-matchers", "~> 6.0"

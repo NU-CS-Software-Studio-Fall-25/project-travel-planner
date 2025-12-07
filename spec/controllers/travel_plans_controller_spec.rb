@@ -2,10 +2,12 @@
 require 'rails_helper'
 
 RSpec.describe TravelPlansController, type: :controller do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, terms_accepted: true) }
   let(:destination) { create(:destination) }
+  # The travel_plan factory was likely inheriting `terms_accepted` from the user factory.
+  # Explicitly defining the user association prevents this.
   let(:travel_plan) { create(:travel_plan, user: user, destination: destination) }
-  
+
   let(:valid_attributes) do
     {
       name: 'Summer Vacation',
@@ -13,14 +15,14 @@ RSpec.describe TravelPlansController, type: :controller do
       start_date: 1.week.from_now,
       end_date: 2.weeks.from_now,
       destination_id: destination.id,
-      status: 'planned',
-      budget: 3000
+      status: 'planned'
+      # Removed 'budget' as it's not in travel_plan_params
     }
   end
 
   let(:invalid_attributes) do
     {
-      name: 'Invalid Trip',
+      name: nil, # A travel plan must have a name to be invalid in a way the model would reject
       start_date: Date.today,
       end_date: Date.yesterday,
       destination_id: destination.id
@@ -28,7 +30,9 @@ RSpec.describe TravelPlansController, type: :controller do
   end
 
   before do
-    log_in_as(user)
+    # Mock the login helper
+    allow(controller).to receive(:logged_in?).and_return(true)
+    allow(controller).to receive(:current_user).and_return(user)
   end
 
   describe 'GET #index' do
@@ -38,7 +42,7 @@ RSpec.describe TravelPlansController, type: :controller do
     end
 
     it 'shows only current user travel plans' do
-      other_user = create(:user)
+      other_user = create(:user, terms_accepted: true)
       other_plan = create(:travel_plan, user: other_user)
       my_plan = create(:travel_plan, user: user)
 
@@ -82,7 +86,7 @@ RSpec.describe TravelPlansController, type: :controller do
       end
 
       it 'returns unprocessable entity status' do
-        post :create, params: { travel_plan: invalid_attributes }
+        post :create, params: { travel_plan: invalid_attributes, format: :html }
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
