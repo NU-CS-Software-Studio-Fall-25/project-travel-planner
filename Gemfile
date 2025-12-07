@@ -65,7 +65,7 @@ gem "thruster", require: false
 # Pagination
 gem "pagy"
 
-gem 'rdoc'
+gem "rdoc"
 
 # Trust and Safety Features
 gem "obscenity", "~> 1.0.2"  # Profanity filtering
