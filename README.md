@@ -4,6 +4,8 @@ A personalized travel recommendation application built with Ruby on Rails and Ja
 
 https://travel-planner-cs397-9396d2cb2102.herokuapp.com/
 
+Link to RDoc: https://nu-cs-software-studio-fall-25.github.io/project-travel-planner/
+
 ## MVP Overview
 
 A single integrated travel platform that combines **OpenAI**, **Google Maps/Flights**, and **TripAdvisor** APIs to provide a **feasible**, **safety-aware**, and **visa-friendly** travel experience.
