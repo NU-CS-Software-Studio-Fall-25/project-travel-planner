@@ -66,12 +66,13 @@ document.addEventListener('turbo:load', function() {
   
   function submitFeedback(button, feedbackType) {
     // Get the button group (contains both like and dislike buttons)
-    const buttonGroup = button.closest('.btn-group');
+    const buttonGroup = button.closest('[role="group"]') || button.parentElement;
     const likeBtn = buttonGroup.querySelector('.like-btn');
     const dislikeBtn = buttonGroup.querySelector('.dislike-btn');
     
     // Check if already in this state - if so, remove the feedback
-    const isAlreadyActive = button.classList.contains(feedbackType === 'like' ? 'btn-success' : 'btn-danger');
+    const isAlreadyActive = (feedbackType === 'like' && likeBtn.classList.contains('btn-success')) ||
+                            (feedbackType === 'dislike' && dislikeBtn.classList.contains('btn-danger'));
     
     if (isAlreadyActive) {
       // User is un-liking or un-disliking - remove feedback
@@ -79,16 +80,18 @@ document.addEventListener('turbo:load', function() {
       return;
     }
     
-    // Get data from button attributes
+    // Get data from button attributes and wrap in recommendation_feedback for Rails
     const data = {
-      feedback_type: feedbackType,
-      destination_city: button.dataset.city,
-      destination_country: button.dataset.country,
-      trip_type: button.dataset.tripType,
-      travel_style: button.dataset.travelStyle,
-      budget_min: parseInt(button.dataset.budgetMin) || 0,
-      budget_max: parseInt(button.dataset.budgetMax) || 0,
-      length_of_stay: parseInt(button.dataset.lengthOfStay) || 0
+      recommendation_feedback: {
+        feedback_type: feedbackType,
+        destination_city: button.dataset.city,
+        destination_country: button.dataset.country,
+        trip_type: button.dataset.tripType,
+        travel_style: button.dataset.travelStyle,
+        budget_min: parseInt(button.dataset.budgetMin) || 0,
+        budget_max: parseInt(button.dataset.budgetMax) || 0,
+        length_of_stay: parseInt(button.dataset.lengthOfStay) || 0
+      }
     };
     
     // Disable both buttons during request
@@ -120,11 +123,11 @@ document.addEventListener('turbo:load', function() {
       
       // Update the clicked button appearance
       if (feedbackType === 'like') {
-        likeBtn.classList.remove('btn-outline-success');
+        likeBtn.classList.remove('btn-light');
         likeBtn.classList.add('btn-success');
         likeBtn.innerHTML = '❤️ Liked!';
       } else {
-        dislikeBtn.classList.remove('btn-outline-danger');
+        dislikeBtn.classList.remove('btn-light');
         dislikeBtn.classList.add('btn-danger');
         dislikeBtn.innerHTML = '👎 Disliked!';
       }
@@ -149,11 +152,11 @@ document.addEventListener('turbo:load', function() {
     // Reset button to default state
     if (button.classList.contains('like-btn')) {
       button.classList.remove('btn-success');
-      button.classList.add('btn-outline-success');
+      button.classList.add('btn-light');
       button.innerHTML = '❤️ Like';
     } else {
       button.classList.remove('btn-danger');
-      button.classList.add('btn-outline-danger');
+      button.classList.add('btn-light');
       button.innerHTML = '👎 Dislike';
     }
   }

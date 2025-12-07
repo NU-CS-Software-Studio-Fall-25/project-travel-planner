@@ -77,10 +77,10 @@ class TravelRecommendationsController < ApplicationController
     # Save to user record (only if we have valid recommendations)
     if valid_recommendations.present?
       current_user.update(recommendations_json: valid_recommendations)
+      
+      # --- 4. Count one generation AFTER success (only if valid destinations found) ---
+      current_user.increment_generations_used!
     end
-
-    # --- 4. Count one generation AFTER success ---
-    current_user.increment_generations_used!
 
     # Prepare form object
     @travel_plan = TravelPlan.new(session_prefs)

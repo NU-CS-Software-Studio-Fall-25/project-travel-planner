@@ -243,7 +243,14 @@ class TravelPlansController < ApplicationController
 
   # GET /travel_plans or /travel_plans.json
   def index
-    @pagy, @travel_plans = pagy(current_user.travel_plans.order(created_at: :desc), items: 10)
+    # Separate plans into future and past based on end_date
+    all_plans = current_user.travel_plans.order(created_at: :desc)
+    
+    @future_plans = all_plans.where("end_date >= ?", Date.today).or(all_plans.where(end_date: nil))
+    @past_plans = all_plans.where("end_date < ?", Date.today)
+    
+    # Keep pagination for backward compatibility if needed
+    @pagy, @travel_plans = pagy(all_plans, items: 10)
   end
 
   # GET /travel_plans/1 or /travel_plans/1.json

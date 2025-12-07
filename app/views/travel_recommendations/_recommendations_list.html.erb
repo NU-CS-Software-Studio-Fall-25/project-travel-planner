@@ -27,7 +27,7 @@
                   is_liked = existing_feedback&.feedback_type == 'like'
                   is_disliked = existing_feedback&.feedback_type == 'dislike'
                 %>
-                <div class="d-flex gap-2" role="group" aria-label="Recommendation feedback">
+                <div class="btn-group d-flex gap-2" role="group" aria-label="Recommendation feedback">
                   <button type="button" 
                           class="btn btn-sm <%= is_liked ? 'btn-success' : 'btn-light' %> like-btn"
                           data-recommendation-id="<%= index %>"

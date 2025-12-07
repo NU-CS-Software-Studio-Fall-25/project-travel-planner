@@ -3,9 +3,15 @@
 <div class="container mt-4">
   <h1 class="mb-4">My Saved Travel Plans</h1>
 
-  <% if @travel_plans.any? %>
-    <div class="row">
-      <% @travel_plans.each do |travel_plan| %>
+  <% if @future_plans.any? || @past_plans.any? %>
+    <%# Future Plans Section %>
+    <% if @future_plans.any? %>
+      <h3 class="mb-3 text-primary">
+        <i class="bi bi-calendar-check"></i> Upcoming Trips
+        <span class="badge bg-primary ms-2"><%= @future_plans.count %></span>
+      </h3>
+      <div class="row">
+        <% @future_plans.each do |travel_plan| %>
         <div class="col-12 mb-4">
           <div class="card h-100 shadow">
             <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
@@ -284,7 +290,190 @@
         </div>
       <% end %>
     </div>
-    <%= pagy_nav(@pagy) %>
+    <% else %>
+      <div class="alert alert-info mb-4">
+        <h5>No upcoming trips scheduled</h5>
+        <p>Start planning your next adventure!</p>
+      </div>
+    <% end %>
+
+    <%# Past Plans Section - Collapsible %>
+    <% if @past_plans.any? %>
+      <div class="mt-5">
+        <div class="accordion" id="pastPlansAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingPastPlans">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePastPlans" aria-expanded="false" aria-controls="collapsePastPlans">
+                <i class="bi bi-clock-history me-2"></i>
+                <strong>Past Trips</strong>
+                <span class="badge bg-secondary ms-2"><%= @past_plans.count %></span>
+              </button>
+            </h2>
+            <div id="collapsePastPlans" class="accordion-collapse collapse" aria-labelledby="headingPastPlans" data-bs-parent="#pastPlansAccordion">
+              <div class="accordion-body p-0">
+                <div class="row p-3">
+                  <% @past_plans.each do |travel_plan| %>
+                    <div class="col-12 mb-4">
+                      <div class="card h-100 shadow">
+                        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                          <h4 class="card-title mb-0">
+                            <%= travel_plan.name || travel_plan.destination.name %> - <%= travel_plan.destination_country || travel_plan.destination.country %>
+                          </h4>
+                          <span class="badge bg-light text-secondary">PAST</span>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-8">
+                              <% if travel_plan.description.present? %>
+                                <p><strong>Description:</strong> <%= travel_plan.description %></p>
+                              <% end %>
+
+                              <% if travel_plan.details.present? %>
+                                <p><strong>Details:</strong> <%= travel_plan.details %></p>
+                              <% end %>
+
+                              <p><strong>Dates:</strong> <%= travel_plan.start_date&.strftime("%B %d, %Y") %> - <%= travel_plan.end_date&.strftime("%B %d, %Y") %></p>
+                              <p><strong>Status:</strong> <span class="badge bg-info"><%= travel_plan.status&.titleize %></span></p>
+
+                              <%# Itinerary Accordion %>
+                              <% if travel_plan.itinerary.is_a?(Hash) && travel_plan.itinerary.present? %>
+                                <div class="accordion mt-3" id="accordion-itinerary-past-<%= travel_plan.id %>">
+                                  <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading-itinerary-past-<%= travel_plan.id %>">
+                                      <button class="accordion-button collapsed fw-semibold text-primary bg-white"
+                                              type="button"
+                                              data-bs-toggle="collapse"
+                                              data-bs-target="#collapse-itinerary-past-<%= travel_plan.id %>"
+                                              aria-expanded="false"
+                                              aria-controls="collapse-itinerary-past-<%= travel_plan.id %>">
+                                        View Detailed Itinerary
+                                      </button>
+                                    </h2>
+                                    <div id="collapse-itinerary-past-<%= travel_plan.id %>" class="accordion-collapse collapse">
+                                      <div class="accordion-body">
+                                        <% travel_plan.itinerary.each do |day, description| %>
+                                          <div class="mb-3">
+                                            <strong><%= day.to_s.humanize %>:</strong>
+                                            <p><%= description %></p>
+                                          </div>
+                                        <% end %>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              <% end %>
+                            </div>
+
+                            <div class="col-md-4">
+                              <ul class="list-group list-group-flush">
+                                <% if travel_plan.budget_min.present? && travel_plan.budget_max.present? %>
+                                  <li class="list-group-item">
+                                    <strong>Budget:</strong> $<%= number_with_precision(travel_plan.budget_min, precision: 0, delimiter: ",") %> - $<%= number_with_precision(travel_plan.budget_max, precision: 0, delimiter: ",") %>
+                                  </li>
+                                <% end %>
+
+                                <% if travel_plan.safety_score.present? %>
+                                  <% safety_level = safety_score_to_level(travel_plan.safety_score) %>
+                                  <li class="list-group-item">
+                                    <strong>Safety Level:</strong>
+                                    <span class="badge <%= safety_level_badge_class(safety_level) %>">
+                                      <%= safety_level_text(safety_level) %>
+                                    </span>
+                                  </li>
+                                <% end %>
+
+                                <% if travel_plan.travel_style.present? %>
+                                  <li class="list-group-item"><strong>Travel Style:</strong> <%= travel_plan.travel_style %></li>
+                                <% end %>
+
+                                <% if travel_plan.visa_info.present? %>
+                                  <li class="list-group-item"><strong>Visa Info:</strong> <%= travel_plan.visa_info %></li>
+                                <% end %>
+                              </ul>
+
+                              <%# BUDGET BREAKDOWN - Simplified for past trips %>
+                              <% if travel_plan.budget_breakdown.present? %>
+                                <div class="accordion mt-3" id="accordion-budget-past-<%= travel_plan.id %>">
+                                  <div class="accordion-item border-0 shadow-sm rounded-4">
+                                    <h2 class="accordion-header" id="heading-budget-past-<%= travel_plan.id %>">
+                                      <button class="accordion-button collapsed fw-semibold text-primary bg-white"
+                                              type="button"
+                                              data-bs-toggle="collapse"
+                                              data-bs-target="#collapse-budget-past-<%= travel_plan.id %>"
+                                              aria-expanded="false"
+                                              aria-controls="collapse-budget-past-<%= travel_plan.id %>">
+                                        <i class="bi bi-wallet2 me-2"></i> Budget Breakdown
+                                      </button>
+                                    </h2>
+                                    <div id="collapse-budget-past-<%= travel_plan.id %>" class="accordion-collapse collapse">
+                                      <div class="accordion-body">
+                                        <% total_trip_cost = 0 %>
+                                        <% travel_plan.budget_breakdown.each do |category, data| %>
+                                          <% next if category.to_s.downcase.include?("total_trip_cost") || category.to_s.strip.empty? %>
+                                          <% 
+                                            total_cost = nil
+                                            note = nil
+                                            if data.is_a?(Hash)
+                                              h = data.transform_keys(&:to_s)
+                                              if h["total_cost"].present?
+                                                total_cost = h["total_cost"].to_s.gsub(/[^\d\.]/, "").to_f
+                                              else
+                                                any_num = h.values.map { |v| v.to_s.gsub(/[^\d\.]/, "") }.find(&:present?)
+                                                total_cost = any_num.to_f
+                                              end
+                                              raw_note = (h["description"] || h["note"] || "").to_s.strip
+                                              note = raw_note.gsub(/\bdescription\b/i, "").strip
+                                            else
+                                              s = data.to_s
+                                              if (m = s.match(/total[_\s]*cost[:\s]*\$?(\d+(?:\.\d+)?)/i))
+                                                total_cost = m[1].to_f
+                                              else
+                                                total_cost = s.gsub(/[^\d\.]/, "").to_f
+                                              end
+                                              note = s.gsub(/description|total[_\s]*cost.*|cost.*/i, "").strip
+                                            end
+                                            total_cost ||= 0.0
+                                            total_trip_cost += total_cost
+                                          %>
+                                          <div class="budget-item p-3 mb-3 border rounded-3 bg-light">
+                                            <h5 class="fw-bold text-primary mb-2"><%= category.to_s.titleize %></h5>
+                                            <p class="mb-1 small text-muted"><%= note.presence || "No description" %></p>
+                                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                              <span class="fw-semibold text-dark">Total Cost:</span>
+                                              <span class="text-muted fs-5 fw-bold">$<%= number_with_precision(total_cost, precision: 2, delimiter: ",") %></span>
+                                            </div>
+                                          </div>
+                                        <% end %>
+                                        <div class="total-trip p-3 mt-4 bg-primary text-white rounded-3 text-center">
+                                          <h4 class="mb-0">Total Trip Cost: <strong>$<%= number_with_precision(total_trip_cost, precision: 2, delimiter: ",") %></strong></h4>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              <% end %>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="card-footer bg-white d-flex justify-content-between">
+                          <%= link_to "View Details", travel_plan, class: "btn btn-secondary" %>
+                          <%= link_to "Download PDF", download_pdf_travel_plan_path(travel_plan), class: "btn btn-outline-success", target: "_blank", rel: "noopener" %>
+                          <div class="d-flex gap-2">
+                            <%= link_to "Edit", edit_travel_plan_path(travel_plan), class: "btn btn-outline-secondary" %>
+                            <%= button_to "Delete", travel_plan, method: :delete, class: "btn btn-outline-danger", form: { data: { turbo_confirm: "Are you sure you want to delete this travel plan?" } } %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
   <% else %>
     <div class="alert alert-info">
       <h4>No saved travel plans yet!</h4>

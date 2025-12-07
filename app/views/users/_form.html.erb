@@ -557,13 +557,15 @@
         }
 
         // Prevent selecting premium without valid promo and show alert
-        premiumTierRadio.addEventListener('change', (e) => {
-            const code = promoField.value.trim();
-            if (code !== "cs397project") {
-                e.target.checked = false;
-                alert("Need to enter a valid promo code before accessing premium tier");
-            }
-        });
+        if (premiumTierRadio) {
+            premiumTierRadio.addEventListener('change', (e) => {
+                const code = promoField.value.trim();
+                if (code !== "cs397project") {
+                    e.target.checked = false;
+                    alert("Need to enter a valid promo code before accessing premium tier");
+                }
+            });
+        }
 
         // Toggle password visibility helpers (reuse for both fields)
         function setEyeOpen(iconElement) {
@@ -577,6 +579,11 @@
 
         // Attach toggle listeners only if buttons and fields exist
         if (togglePwBtn && passwordField) {
+            // Ensure data-visible is initialized
+            if (!togglePwBtn.hasAttribute("data-visible")) {
+                togglePwBtn.setAttribute("data-visible", "false");
+            }
+            
             togglePwBtn.addEventListener("click", () => {
                 const currentlyVisible = togglePwBtn.getAttribute("data-visible") === "true";
                 if (currentlyVisible) {
@@ -597,6 +604,11 @@
         }
 
         if (togglePwConfirmBtn && passwordConfirmField) {
+            // Ensure data-visible is initialized
+            if (!togglePwConfirmBtn.hasAttribute("data-visible")) {
+                togglePwConfirmBtn.setAttribute("data-visible", "false");
+            }
+            
             togglePwConfirmBtn.addEventListener("click", () => {
                 const currentlyVisible = togglePwConfirmBtn.getAttribute("data-visible") === "true";
                 if (currentlyVisible) {

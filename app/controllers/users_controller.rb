@@ -136,6 +136,13 @@ class UsersController < ApplicationController
       return
     end
 
+    # Check if new password is the same as current password
+    if @user.authenticate(params[:password].to_s)
+      @user.errors.add(:password, "cannot be the same as your current password")
+      render :change_password, status: :unprocessable_entity
+      return
+    end
+
     # Attempt to update new password fields
     if @user.update(password: params[:password], password_confirmation: params[:password_confirmation])
       redirect_to user_path(@user), notice: "Password updated successfully."

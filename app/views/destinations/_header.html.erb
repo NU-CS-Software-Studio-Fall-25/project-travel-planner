@@ -26,11 +26,6 @@
           <span class="quick-info-value"><%= destination.best_season || 'Year-round' %></span>
         </div>
         
-        <div class="quick-info-item">
-          <span class="quick-info-label">Avg. Cost</span>
-          <span class="quick-info-value"><%= number_to_currency(destination.average_cost) %></span>
-        </div>
-        
         <% if destination.visa_required %>
         <div class="quick-info-item">
           <span class="quick-info-label">Visa</span>
