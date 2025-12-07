@@ -2,7 +2,7 @@ class Destination < ApplicationRecord
   has_many :travel_plans, dependent: :destroy
   has_many :recommendations, dependent: :destroy
   has_many :users, through: :travel_plans
-  
+
   validates :name, presence: true, length: { maximum: 255 }
   validates :country, presence: true, length: { maximum: 100 }
   validates :city, length: { maximum: 255 }, allow_blank: true
@@ -23,21 +23,21 @@ class Destination < ApplicationRecord
     # e.g., "Burlington, Vermont" instead of just "Burlington"
     # Fall back to name + country if city is not available
     if city.present?
-      [city, country].compact.join(', ')
+      [ city, country ].compact.join(", ")
     else
-      [name, country].compact.join(', ')
+      [ name, country ].compact.join(", ")
     end
   end
 
   def full_address
     # For display purposes - show all available location info
-    [city, name, country].compact.uniq.join(', ')
+    [ city, name, country ].compact.uniq.join(", ")
   end
 
   def geocode_if_needed
     if (latitude.blank? || longitude.blank?) && geocoding_address.present?
       result = geocode
-      
+
       # Log geocoding attempts for debugging
       if result
         Rails.logger.info "Geocoded '#{geocoding_address}' to: #{latitude}, #{longitude}"
@@ -46,7 +46,7 @@ class Destination < ApplicationRecord
       end
     end
   end
-  
+
   def verify_geocoding_result
     # After geocoding, verify that the coordinates make sense
     # This helps catch cases where geocoding returned unexpected results
@@ -59,13 +59,13 @@ class Destination < ApplicationRecord
       end
     end
   end
-  
-  scope :safe_destinations, ->(min_safety) { where('safety_score >= ?', min_safety) }
+
+  scope :safe_destinations, ->(min_safety) { where("safety_score >= ?", min_safety) }
   scope :visa_not_required, -> { where(visa_required: false) }
   scope :by_season, ->(season) { where(best_season: season) }
-  
+
   private
-  
+
   def sanitize_text_fields
     # Strip any potentially malicious HTML/JavaScript from text fields
     self.name = ActionController::Base.helpers.sanitize(name) if name.present?

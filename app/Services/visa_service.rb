@@ -1,18 +1,18 @@
 # app/Services/visa_service.rb
 # Service to interact with Travel Buddy Visa Requirements API via RapidAPI
 
-require 'net/http'
-require 'json'
+require "net/http"
+require "json"
 
 class VisaService
-  API_HOST = 'visa-requirement.p.rapidapi.com'
+  API_HOST = "visa-requirement.p.rapidapi.com"
   API_BASE_URL = "https://#{API_HOST}"
   CACHE_EXPIRY = 30.days
 
   def initialize(passport_country, destination_country)
     @passport_country = passport_country
     @destination_country = destination_country
-    @api_key = ENV.fetch('RAPIDAPI_KEY')
+    @api_key = ENV.fetch("RAPIDAPI_KEY")
   end
 
   # Main method to get visa requirements
@@ -44,14 +44,14 @@ class VisaService
 
     # Call API
     api_response = call_visa_api(passport_code, destination_code)
-    
+
     if api_response[:success]
       # Parse and structure the response
       structured_data = parse_api_response(api_response[:data])
-      
+
       # Cache the result
       cache_visa_data(passport_code, destination_code, structured_data)
-      
+
       structured_data
     else
       fallback_response(api_response[:error])
@@ -67,17 +67,17 @@ class VisaService
   # Call the Visa Requirements API
   def call_visa_api(passport_code, destination_code)
     uri = URI("#{API_BASE_URL}/v2/visa/check")
-    
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.read_timeout = 10
     http.open_timeout = 10
 
     request = Net::HTTP::Post.new(uri)
-    request['Content-Type'] = 'application/json'
-    request['X-RapidAPI-Key'] = @api_key
-    request['X-RapidAPI-Proxy-Secret'] = @api_key  # Some APIs use this instead
-    request['X-RapidAPI-Host'] = API_HOST
+    request["Content-Type"] = "application/json"
+    request["X-RapidAPI-Key"] = @api_key
+    request["X-RapidAPI-Proxy-Secret"] = @api_key  # Some APIs use this instead
+    request["X-RapidAPI-Host"] = API_HOST
     request.body = {
       passport: passport_code,
       destination: destination_code
@@ -86,8 +86,8 @@ class VisaService
     Rails.logger.info "🔍 Calling Visa API: #{passport_code} → #{destination_code}"
 
     response = http.request(request)
-    
-    if response.code == '200'
+
+    if response.code == "200"
       data = JSON.parse(response.body, symbolize_names: true)
       Rails.logger.info "✅ Visa API Success: #{passport_code} → #{destination_code}"
       { success: true, data: data }
@@ -113,36 +113,36 @@ class VisaService
 
     {
       success: true,
-      
+
       # Primary visa information
       visa_status: primary_rule[:name] || "Unknown",
       visa_duration: primary_rule[:duration],
       visa_color: primary_rule[:color] || "yellow",
       visa_link: primary_rule[:link],
-      
+
       # Secondary visa option (alternative)
       alternative_visa: secondary_rule[:name],
       alternative_duration: secondary_rule[:duration],
       alternative_link: secondary_rule[:link],
-      
+
       # Mandatory registration (e.g., e-Arrival)
       mandatory_registration: mandatory_reg[:name],
       registration_link: mandatory_reg[:link],
       registration_color: mandatory_reg[:color],
-      
+
       # Passport requirements
       passport_validity: destination_info[:passport_validity],
-      
+
       # Exception rules (e.g., visa waiver for US visa holders)
       exception_available: exception_rule.present?,
       exception_text: exception_rule[:full_text],
       exception_countries: exception_rule[:country_codes],
-      
+
       # Destination info (optional)
       destination_capital: destination_info[:capital],
       destination_currency: destination_info[:currency],
       embassy_url: destination_info[:embassy_url],
-      
+
       # Metadata
       passport_code: visa_data[:passport][:code],
       destination_code: visa_data[:destination][:code],

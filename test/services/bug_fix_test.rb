@@ -47,7 +47,7 @@ if miami_result[:success]
   puts "  Route: #{miami_result[:details][:departure_airport]} → #{miami_result[:details][:arrival_airport]}"
   puts "  Expected: ORD → MIA"
   puts "  Price: $#{miami_result[:price]}"
-  
+
   # Verify it's using the correct airports
   if miami_result[:details][:arrival_airport] == "MIA"
     puts "  ✓ Correct arrival airport (MIA)"
@@ -80,7 +80,7 @@ travelers = 1
 
 begin
   flight_price = flight_result[:price].to_f
-  
+
   budget_breakdown = {
     flights: {
       description: "Round-trip flight from #{flight_result[:details][:departure_airport]} to #{flight_result[:details][:arrival_airport]} × #{travelers} travelers via #{flight_result[:details][:airline]}",
@@ -90,13 +90,13 @@ begin
       stops: flight_result[:details][:stops].to_i
     }
   }
-  
+
   puts "✓ Budget breakdown created successfully"
   puts "  Flight total: $#{budget_breakdown[:flights][:total_cost]}"
   puts "  Per person: $#{budget_breakdown[:flights][:cost_per_person]}"
   puts "  Duration: #{budget_breakdown[:flights][:duration]}"
   puts "  Type check passed - no coercion errors"
-  
+
 rescue => e
   puts "✗ Type coercion error: #{e.message}"
 end

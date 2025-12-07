@@ -1,7 +1,7 @@
 # app/models/concerns/profanity_filterable.rb
 module ProfanityFilterable
   extend ActiveSupport::Concern
-  
+
   class_methods do
     # Add profanity validation to specified attributes
     def validates_profanity_of(*attributes)
@@ -14,7 +14,7 @@ module ProfanityFilterable
         end
       end
     end
-    
+
     # Sanitize profanity from specified attributes (replace with stars)
     def sanitizes_profanity_from(*attributes)
       attributes.each do |attribute|

@@ -10,24 +10,24 @@ Rails.application.routes.draw do
   get "/login", to: "sessions#new"
   post "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy"
-  
-  # OAuth routes
-  get '/auth/:provider/callback', to: 'sessions#google_oauth2'
-  post '/auth/:provider/callback', to: 'sessions#google_oauth2'
-  get '/auth/failure', to: 'sessions#failure'
-  
-  # Complete profile after OAuth
-  get '/complete_profile', to: 'users#complete_profile'
-  
-  # Static pages
-  get '/community_guidelines', to: 'pages#community_guidelines'
-  get '/terms_of_service', to: 'pages#terms_of_service'
 
-  get '/users/:id/send_test_email', to: 'users#send_test_email', as: :send_test_email_user
-  
+  # OAuth routes
+  get "/auth/:provider/callback", to: "sessions#google_oauth2"
+  post "/auth/:provider/callback", to: "sessions#google_oauth2"
+  get "/auth/failure", to: "sessions#failure"
+
+  # Complete profile after OAuth
+  get "/complete_profile", to: "users#complete_profile"
+
+  # Static pages
+  get "/community_guidelines", to: "pages#community_guidelines"
+  get "/terms_of_service", to: "pages#terms_of_service"
+
+  get "/users/:id/send_test_email", to: "users#send_test_email", as: :send_test_email_user
+
   # Content reporting
-  resources :content_reports, only: [:index, :new, :create]
-  resources :password_resets, only: [:new, :create, :edit, :update]
+  resources :content_reports, only: [ :index, :new, :create ]
+  resources :password_resets, only: [ :new, :create, :edit, :update ]
 
   # API routes
   namespace :api do
@@ -35,22 +35,22 @@ Rails.application.routes.draw do
       resources :users
       resources :destinations
       resources :travel_plans
-      resources :travel_recommendations, only: [:index, :show, :create]
+      resources :travel_recommendations, only: [ :index, :show, :create ]
     end
   end
 
   # Traditional web routes (for backward compatibility)
-  resources :travel_recommendations, only: [:index, :show, :new, :create, :destroy] do
+  resources :travel_recommendations, only: [ :index, :show, :new, :create, :destroy ] do
     collection do
-      get 'fetch_photos', to: 'travel_recommendations#fetch_photos'
+      get "fetch_photos", to: "travel_recommendations#fetch_photos"
     end
   end
   resources :travel_plans
   resources :destinations
   resources :users
-  resources :recommendation_feedbacks, only: [:create, :destroy, :index] do
+  resources :recommendation_feedbacks, only: [ :create, :destroy, :index ] do
     collection do
-      delete 'remove', to: 'recommendation_feedbacks#remove'
+      delete "remove", to: "recommendation_feedbacks#remove"
     end
   end
 
@@ -83,5 +83,5 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   # Catch all unmatched routes and show custom 404 page (must be last)
-  match '*path', to: 'errors#not_found', via: :all
+  match "*path", to: "errors#not_found", via: :all
 end

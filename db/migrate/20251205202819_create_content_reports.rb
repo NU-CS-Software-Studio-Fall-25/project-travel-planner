@@ -12,8 +12,8 @@ class CreateContentReports < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     add_index :content_reports, :status
-    add_index :content_reports, [:reportable_type, :reportable_id]
+    add_index :content_reports, [ :reportable_type, :reportable_id ]
   end
 end

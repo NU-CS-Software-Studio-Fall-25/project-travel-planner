@@ -1,9 +1,9 @@
 # Load environment variables from config/local_env.yml for local development.
 # This file is gitignored and intended for local secrets only.
-local_env_path = Rails.root.join('config', 'local_env.yml')
+local_env_path = Rails.root.join("config", "local_env.yml")
 if (Rails.env.development? || Rails.env.test?) && File.exist?(local_env_path)
   begin
-    require 'yaml'
+    require "yaml"
     YAML.load_file(local_env_path).each do |key, value|
       if value.is_a?(Hash)
         value.each do |subkey, subval|

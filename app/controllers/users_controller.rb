@@ -1,9 +1,9 @@
 # app/controllers/users_controller.rb
 class UsersController < ApplicationController
-  before_action :require_login, only: [:show, :edit, :update, :destroy, :change_password, :update_password, :verify_password]
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :change_password, :update_password, :verify_password]
-  before_action :authorize_user, only: [:show, :edit, :update, :destroy, :change_password, :update_password, :verify_password]
-  before_action :redirect_if_logged_in, only: [:new, :create]
+  before_action :require_login, only: [ :show, :edit, :update, :destroy, :change_password, :update_password, :verify_password ]
+  before_action :set_user, only: [ :show, :edit, :update, :destroy, :change_password, :update_password, :verify_password ]
+  before_action :authorize_user, only: [ :show, :edit, :update, :destroy, :change_password, :update_password, :verify_password ]
+  before_action :redirect_if_logged_in, only: [ :new, :create ]
 
   # GET /users or /users.json
   def index
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
   # GET /users/new
   def new
     @user = User.new
-    
+
     # Pre-fill from OAuth if coming from Google Sign In
     if session[:omniauth_user_id]
       oauth_user = User.find_by(id: session[:omniauth_user_id])
@@ -34,7 +34,7 @@ class UsersController < ApplicationController
   # Complete profile after OAuth (similar to new but for existing OAuth users)
   def complete_profile
     @user = User.find_by(id: session[:omniauth_user_id])
-    
+
     if @user.nil?
       redirect_to signup_path, alert: "Session expired. Please sign in again."
     end
@@ -52,7 +52,7 @@ class UsersController < ApplicationController
       if @user
         # Update only the additional required fields
         @user.current_country = user_params[:current_country]
-        
+
         respond_to do |format|
           if @user.save
             session.delete(:omniauth_user_id)
@@ -67,7 +67,7 @@ class UsersController < ApplicationController
         return
       end
     end
-    
+
     # Regular signup flow
     @user = User.new(user_params)
 

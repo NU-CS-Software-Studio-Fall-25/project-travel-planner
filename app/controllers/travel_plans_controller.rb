@@ -1,6 +1,6 @@
 # app/controllers/travel_plans_controller.rb
-require 'prawn'
-require 'prawn/table'
+require "prawn"
+require "prawn/table"
 class TravelPlansController < ApplicationController
   include Pagy::Backend if defined?(Pagy::Backend)
   before_action :set_travel_plan, only: %i[ show edit update destroy ]
@@ -18,10 +18,10 @@ class TravelPlansController < ApplicationController
     accent_color  = "F0F4F8" # Very light blue/grey for backgrounds
     text_color    = "333333" # Dark Grey
 
-    pdf = Prawn::Document.new(page_size: 'A4', margin: [50, 50, 50, 50])
+    pdf = Prawn::Document.new(page_size: "A4", margin: [ 50, 50, 50, 50 ])
 
     # --- FONTS ---
-    ttf_path = File.join(Prawn::DATADIR, 'fonts', 'DejaVuSans.ttf')
+    ttf_path = File.join(Prawn::DATADIR, "fonts", "DejaVuSans.ttf")
     if File.exist?(ttf_path)
       pdf.font_families.update("DejaVuSans" => { normal: ttf_path })
       pdf.font "DejaVuSans"
@@ -59,9 +59,9 @@ class TravelPlansController < ApplicationController
     # TRIP SUMMARY (Boxed Style)
     # =====================
     summary_height = 60
-    pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.width, height: summary_height) do
+    pdf.bounding_box([ 0, pdf.cursor ], width: pdf.bounds.width, height: summary_height) do
       pdf.fill_color accent_color
-      pdf.fill_rectangle [0, pdf.bounds.height], pdf.bounds.width, pdf.bounds.height
+      pdf.fill_rectangle [ 0, pdf.bounds.height ], pdf.bounds.width, pdf.bounds.height
 
       pdf.fill_color text_color
 
@@ -80,7 +80,7 @@ class TravelPlansController < ApplicationController
 
         pdf.table(summary_data, width: pdf.bounds.width - 20) do
           cells.borders = []
-          cells.padding = [2, 0]
+          cells.padding = [ 2, 0 ]
           column(0).font_style = :bold
           column(0).size = 9
           column(0).text_color = theme_color
@@ -115,7 +115,6 @@ class TravelPlansController < ApplicationController
 
       if travel_plan.itinerary.is_a?(Hash)
         travel_plan.itinerary.each do |day, activities|
-
           # --- LOGIC FIX ---
           # Estimate height needed for this block:
           # Header (~20pts) + Spacing (~10pts) + Lines of text (~15pts per line)
@@ -157,7 +156,7 @@ class TravelPlansController < ApplicationController
       pdf.start_new_page if pdf.cursor < 250
       draw_section_header(pdf, "Estimated Budget", theme_color)
 
-      rows = [["CATEGORY", "NOTE", "TOTAL"]]
+      rows = [ [ "CATEGORY", "NOTE", "TOTAL" ] ]
       grand_total = 0.0
 
       travel_plan.budget_breakdown.each do |category, data|
@@ -197,13 +196,13 @@ class TravelPlansController < ApplicationController
       end
 
       pdf.table(rows, header: true, width: pdf.bounds.width) do
-        cells.style(size: 9, padding: [8, 10], border_width: 0, text_color: text_color)
+        cells.style(size: 9, padding: [ 8, 10 ], border_width: 0, text_color: text_color)
 
         row(0).style(
           background_color: theme_color,
           text_color: "FFFFFF",
           font_style: :bold,
-          borders: [:bottom],
+          borders: [ :bottom ],
           border_width: 0
         )
 
@@ -232,14 +231,14 @@ class TravelPlansController < ApplicationController
     pdf.number_pages "Page <page> of <total>", {
       start_count_at: 1,
       page_filter: :all,
-      at: [pdf.bounds.right - 150, 0],
+      at: [ pdf.bounds.right - 150, 0 ],
       align: :right,
       size: 8,
       color: "999999"
     }
 
     filename = "#{travel_plan.name.presence || "travel_plan_#{travel_plan.id}"}.pdf"
-    send_data pdf.render, filename: filename, type: 'application/pdf', disposition: 'attachment'
+    send_data pdf.render, filename: filename, type: "application/pdf", disposition: "attachment"
   end
 
   # GET /travel_plans or /travel_plans.json
@@ -266,7 +265,7 @@ class TravelPlansController < ApplicationController
     unless params[:travel_plan].present?
       respond_to do |format|
         format.turbo_stream do
-          render turbo_stream: turbo_stream.prepend("notifications", 
+          render turbo_stream: turbo_stream.prepend("notifications",
                                                      partial: "shared/error_notification",
                                                      locals: { message: "Invalid request: missing travel plan data" })
         end
@@ -275,13 +274,13 @@ class TravelPlansController < ApplicationController
       end
       return
     end
-    
+
     # Find or create destination based on recommendation data
     destination = find_or_create_destination_from_params
-    
+
     # Build travel plan with the destination
     plan_params = travel_plan_params
-    
+
     # Convert safety_level to safety_score if present
     if plan_params[:safety_level].present?
       plan_params[:safety_score] = case plan_params[:safety_level]
@@ -293,14 +292,14 @@ class TravelPlansController < ApplicationController
       end
       plan_params.delete(:safety_level)
     end
-    
+
     # Remove destination fields from plan_params as they're handled separately
     plan_params.delete(:destination_name)
     plan_params.delete(:destination_country)
-    
+
     @travel_plan = current_user.travel_plans.build(plan_params)
     @travel_plan.destination = destination if destination
-    
+
     # Set default dates if not provided
     set_default_dates if @travel_plan.start_date.nil? || @travel_plan.end_date.nil?
 
@@ -308,8 +307,8 @@ class TravelPlansController < ApplicationController
       if @travel_plan.save
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.prepend("notifications", partial: "shared/success_notification", 
-                                 locals: { message: "Travel plan saved successfully!", 
+            turbo_stream.prepend("notifications", partial: "shared/success_notification",
+                                 locals: { message: "Travel plan saved successfully!",
                                           travel_plan: @travel_plan })
           ]
         end
@@ -319,7 +318,7 @@ class TravelPlansController < ApplicationController
         # If save fails, re-render the form with errors
         flash.now[:alert] = @travel_plan.errors.full_messages.to_sentence
         format.turbo_stream do
-          render turbo_stream: turbo_stream.prepend("notifications", 
+          render turbo_stream: turbo_stream.prepend("notifications",
                                                      partial: "shared/error_notification",
                                                      locals: { message: @travel_plan.errors.full_messages.to_sentence })
         end
@@ -371,7 +370,7 @@ class TravelPlansController < ApplicationController
       :name, :description, :details, :budget_min, :budget_max,
       :safety_score, :safety_level, :travel_style, :length_of_stay, :travel_month,
       :trip_scope, :number_of_travelers, :general_purpose, :status, :notes,
-      :visa_info, :safety_preference, :start_date, :end_date, 
+      :visa_info, :safety_preference, :start_date, :end_date,
       :passport_country, :current_location, :destination_country, :destination_name,
       :destination_id,
       itinerary: {}, budget_breakdown: {}, safety_levels: []
@@ -389,27 +388,27 @@ class TravelPlansController < ApplicationController
   def find_or_create_destination_from_params
     # Return nil if travel_plan params don't exist
     return nil unless params[:travel_plan].present?
-    
+
     # If a destination_id is selected, use that (validate it's a valid ID)
     if params[:travel_plan][:destination_id].present?
       destination_id = params[:travel_plan][:destination_id].to_i
       return Destination.find_by(id: destination_id) if destination_id > 0
     end
-    
+
     # Otherwise, try to create from destination_name and destination_country
     # Sanitize inputs to prevent XSS and injection attacks
     destination_name = ActionController::Base.helpers.sanitize(params[:travel_plan][:destination_name]&.strip)
     destination_country = ActionController::Base.helpers.sanitize(params[:travel_plan][:destination_country]&.strip)
-    
+
     # Return nil if no destination info provided (it's optional now)
     return nil unless destination_name.present? && destination_country.present?
-    
+
     # Try to find existing destination by name and country
     destination = Destination.find_by(
       name: destination_name,
       country: destination_country
     )
-    
+
     # Create new destination if not found
     unless destination
       # Convert safety_level to numeric safety_score for backward compatibility
@@ -424,7 +423,7 @@ class TravelPlansController < ApplicationController
       else
         params[:travel_plan][:safety_score]&.to_i || 5
       end
-      
+
       # Calculate average cost from budget
       average_cost = if params[:travel_plan][:budget_min].present? && params[:travel_plan][:budget_max].present?
         (params[:travel_plan][:budget_min].to_f + params[:travel_plan][:budget_max].to_f) / 2
@@ -433,24 +432,24 @@ class TravelPlansController < ApplicationController
       else
         nil
       end
-      
+
       # Get best season from travel_month
       best_season = params[:travel_plan][:travel_month] || params[:travel_plan][:best_season]
-      
+
       destination = Destination.create(
         name: destination_name,
         city: destination_name,
         country: destination_country,
         description: params[:travel_plan][:description],
         safety_score: safety_score_value,
-        visa_required: params[:travel_plan][:visa_info]&.downcase&.include?('required'),
+        visa_required: params[:travel_plan][:visa_info]&.downcase&.include?("required"),
         average_cost: average_cost,
         best_season: best_season
         # Note: latitude and longitude will be auto-geocoded by the Destination model
         # based on the city and country (or name and country if city is blank) through the geocoded_by callback
       )
     end
-    
+
     destination
   end
 
@@ -459,21 +458,21 @@ class TravelPlansController < ApplicationController
     if @travel_plan.travel_month.present? && @travel_plan.length_of_stay.present?
       # Parse the travel month to get a date
       month_map = {
-        'january' => 1, 'february' => 2, 'march' => 3, 'april' => 4,
-        'may' => 5, 'june' => 6, 'july' => 7, 'august' => 8,
-        'september' => 9, 'october' => 10, 'november' => 11, 'december' => 12
+        "january" => 1, "february" => 2, "march" => 3, "april" => 4,
+        "may" => 5, "june" => 6, "july" => 7, "august" => 8,
+        "september" => 9, "october" => 10, "november" => 11, "december" => 12
       }
-      
+
       month_num = month_map[@travel_plan.travel_month.downcase]
       if month_num
         year = Date.today.year
         year += 1 if month_num < Date.today.month # If the month has passed, use next year
-        
+
         @travel_plan.start_date ||= Date.new(year, month_num, 1)
         @travel_plan.end_date ||= @travel_plan.start_date + @travel_plan.length_of_stay.days
       end
     end
-    
+
     # Fallback: use today and a week from now
     @travel_plan.start_date ||= Date.today
     @travel_plan.end_date ||= Date.today + 7.days

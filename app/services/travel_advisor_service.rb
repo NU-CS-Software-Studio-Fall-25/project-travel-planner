@@ -1,15 +1,15 @@
-require 'httparty'
+require "httparty"
 
 class TravelAdvisorService
   include HTTParty
 
-  def initialize(key: ENV['RAPIDAPI_KEY'] || (ENV['RAPIDAPI_KEY'] = ENV.dig('rapidapi','key')), host: ENV['RAPIDAPI_HOST'] || (ENV['RAPIDAPI_HOST'] = ENV.dig('rapidapi','host')))
+  def initialize(key: ENV["RAPIDAPI_KEY"] || (ENV["RAPIDAPI_KEY"] = ENV.dig("rapidapi", "key")), host: ENV["RAPIDAPI_HOST"] || (ENV["RAPIDAPI_HOST"] = ENV.dig("rapidapi", "host")))
     @key = key
-    @host = host || 'travel-advisor.p.rapidapi.com'
+    @host = host || "travel-advisor.p.rapidapi.com"
     @headers = {
-      'X-RapidAPI-Key' => @key,
-      'X-RapidAPI-Host' => @host,
-      'Accept' => 'application/json'
+      "X-RapidAPI-Key" => @key,
+      "X-RapidAPI-Host" => @host,
+      "Accept" => "application/json"
     }
   end
 
@@ -40,18 +40,18 @@ class TravelAdvisorService
 
   def parse_places(json)
     # parse a couple of common keys; actual structure depends on provider
-    items = json['data'] || json['results'] || json['data'] || []
+    items = json["data"] || json["results"] || json["data"] || []
     items = items.first(50) if items.is_a?(Array)
 
     Array(items).map do |item|
       {
-        id: item['location_id'] || item['id'] || item['place_id'],
-        name: item['name'] || item['title'],
-        rating: item['rating'] || item['score'],
-        address: item['address'] || item['vicinity'],
-        photo: item.dig('photo','images','small','url') || item.dig('photo','images','thumbnail','url') || item['thumbnail'],
-        url: item['web_url'] || item['url'] || item['link'],
-        distance_km: item['distance'] || item['distance_km']
+        id: item["location_id"] || item["id"] || item["place_id"],
+        name: item["name"] || item["title"],
+        rating: item["rating"] || item["score"],
+        address: item["address"] || item["vicinity"],
+        photo: item.dig("photo", "images", "small", "url") || item.dig("photo", "images", "thumbnail", "url") || item["thumbnail"],
+        url: item["web_url"] || item["url"] || item["link"],
+        distance_km: item["distance"] || item["distance_km"]
       }
     end
   end

@@ -18,7 +18,7 @@ class TravelRecommendationsController < ApplicationController
     last_prefs = session[:last_preferences] || {}
     @travel_plan = TravelPlan.new(last_prefs)
 
-    @max_trip_days = (current_user&.subscription_tier == 'premium') ? 14 : 7
+    @max_trip_days = (current_user&.subscription_tier == "premium") ? 14 : 7
 
     # If we have recommendations, show a helpful message
     if @recommendations.present?
@@ -128,7 +128,7 @@ class TravelRecommendationsController < ApplicationController
 
     unless destination_city.present? && destination_country.present?
       Rails.logger.error "Missing destination information!"
-      render json: { success: false, error: 'Missing destination information' }, status: :bad_request
+      render json: { success: false, error: "Missing destination information" }, status: :bad_request
       return
     end
 

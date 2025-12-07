@@ -58,19 +58,19 @@ RSpec.describe TravelAdvisorService do
           .to_return(status: 200, body: mock_response.to_json, headers: { 'Content-Type' => 'application/json' })
 
         result = service.places_near(lat: lat, lng: lng)
-        
+
         expect(result).to be_an(Array)
         expect(result.length).to be > 0
       end
 
       it 'uses caching for repeated requests' do
         cache_key = "ta:places:near:#{lat}:#{lng}:2000:8"
-        
+
         expect(Rails.cache).to receive(:fetch).with(cache_key, expires_in: 12.hours).and_call_original
-        
+
         stub_request(:get, "https://#{api_host}/attractions/list-by-lat-lng")
           .to_return(status: 200, body: { data: [] }.to_json)
-        
+
         service.places_near(lat: lat, lng: lng)
       end
 
@@ -124,7 +124,7 @@ RSpec.describe TravelAdvisorService do
 
       it 'handles network exceptions gracefully' do
         allow(HTTParty).to receive(:get).and_raise(StandardError.new('Network error'))
-        
+
         expect(Rails.logger).to receive(:error).with(/TravelAdvisorService error/)
         result = service.places_near(lat: lat, lng: lng)
         expect(result).to eq([])
@@ -145,7 +145,7 @@ RSpec.describe TravelAdvisorService do
       }
 
       result = service.send(:parse_places, json_data)
-      
+
       expect(result).to be_an(Array)
       expect(result.first[:id]).to eq('789')
       expect(result.first[:name]).to eq('Test Place')
@@ -154,13 +154,13 @@ RSpec.describe TravelAdvisorService do
 
     it 'limits results to 50 items' do
       large_data = { 'data' => Array.new(100) { |i| { 'id' => i.to_s } } }
-      
+
       result = service.send(:parse_places, large_data)
       expect(result.length).to be <= 50
     end
 
     it 'handles different response structures' do
-      json_with_results = { 'results' => [{ 'id' => '1', 'name' => 'Place 1' }] }
+      json_with_results = { 'results' => [ { 'id' => '1', 'name' => 'Place 1' } ] }
       result = service.send(:parse_places, json_with_results)
       expect(result).to be_an(Array)
     end

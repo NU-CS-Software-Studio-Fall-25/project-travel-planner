@@ -131,19 +131,19 @@ class CountryCodeMapper
     # @return [String, nil] Two-letter ISO code or nil if not found
     def to_iso_code(country_name)
       return nil if country_name.blank?
-      
+
       # Normalize the input
       normalized = country_name.to_s.strip
-      
+
       # Try exact match first
       code = COUNTRY_CODES[normalized]
       return code if code
-      
+
       # Try case-insensitive match
       COUNTRY_CODES.each do |name, code|
         return code if name.casecmp?(normalized)
       end
-      
+
       # If no match found, log warning and return nil
       Rails.logger.warn "⚠️  Country code not found for: '#{country_name}'"
       nil
@@ -154,7 +154,7 @@ class CountryCodeMapper
     # @return [String, nil] Full country name or nil if not found
     def to_country_name(iso_code)
       return nil if iso_code.blank?
-      
+
       normalized_code = iso_code.to_s.upcase.strip
       COUNTRY_CODES.invert[normalized_code]
     end
@@ -164,7 +164,7 @@ class CountryCodeMapper
     # @return [Boolean]
     def valid_code?(iso_code)
       return false if iso_code.blank?
-      
+
       normalized_code = iso_code.to_s.upcase.strip
       COUNTRY_CODES.values.include?(normalized_code)
     end

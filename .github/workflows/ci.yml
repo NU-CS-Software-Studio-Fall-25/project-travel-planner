@@ -1,14 +1,37 @@
-# .github/workflows/ci.yml
-name: Ruby on Rails CI
+name: CI
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+  push:
+    branches: [ main ]
 
 jobs:
-  test:
+  security_scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - run: bundle install --jobs 4 --retry 3
+      - run: bundle exec brakeman --no-pager
+      - run: ruby bin/importmap audit
+
+  lint:
+    name: Code Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - run: bundle exec rubocop
+
+  rspec:
+    name: Run RSpec Tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -24,29 +47,49 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     env:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        # Replace '3.1' with the Ruby version from your .ruby-version file or Gemfile
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.1'
-          bundler-cache: true # Installs and caches gems
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - run: bundle install --jobs 4 --retry 3
+      - run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+      - run: bundle exec rspec
 
-      - name: Set up database
-        run: |
-          bin/rails db:create
-          bin/rails db:schema:load
-
-      - name: Run RSpec tests
-        run: bin/rspec
-
-      - name: Run Cucumber tests
-        run: bin/cucumber
+  cucumber:
+    name: Run Cucumber Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_DB: rails_test
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - run: bundle install --jobs 4 --retry 3
+      - run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+      - run: bundle exec cucumber

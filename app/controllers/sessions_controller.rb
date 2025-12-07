@@ -1,6 +1,6 @@
 # app/controllers/sessions_controller.rb
 class SessionsController < ApplicationController
-  before_action :redirect_if_logged_in, only: [:new, :create]
+  before_action :redirect_if_logged_in, only: [ :new, :create ]
 
   def new
     # Login form is now protected by the before_action
@@ -13,21 +13,21 @@ class SessionsController < ApplicationController
       # Redirect to the travel plans index to create a new trip
       redirect_to travel_plans_path, notice: "Welcome back, #{user.name}! Let's plan a new trip."
     else
-      flash.now[:alert] = 'Invalid email or password'
+      flash.now[:alert] = "Invalid email or password"
       render :new, status: :unprocessable_entity
     end
   end
 
   # OAuth callback handler
   def google_oauth2
-    auth = request.env['omniauth.auth']
+    auth = request.env["omniauth.auth"]
     user = User.from_omniauth(auth)
-    
+
     if user.persisted?
       # Check if this is a new user (created_at and updated_at are very close)
       # OR if they never completed profile (we check using session)
       is_new_user = (user.updated_at - user.created_at) < 5.seconds
-      
+
       if is_new_user
         # Store user info in session and redirect to complete profile
         session[:omniauth_user_id] = user.id
@@ -49,7 +49,7 @@ class SessionsController < ApplicationController
 
   def destroy
     log_out
-    redirect_to root_path, notice: 'You have been logged out.'
+    redirect_to root_path, notice: "You have been logged out."
   end
 
   private

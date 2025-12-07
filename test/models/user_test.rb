@@ -34,7 +34,7 @@ class UserTest < ActiveSupport::TestCase
     assert_includes user.errors[:password], "must be at least 7 characters and include one uppercase letter, one lowercase letter, one digit and one special character (@#$%&!*)"
 
     # Test: valid password with each allowed special character
-    ["@", "#", "$", "%", "&", "!", "*"].each do |special_char|
+    [ "@", "#", "$", "%", "&", "!", "*" ].each do |special_char|
       user.password = user.password_confirmation = "Abc123#{special_char}x"
       assert user.valid?, "Password with special char #{special_char} should be valid"
     end

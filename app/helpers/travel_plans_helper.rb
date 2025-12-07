@@ -2,7 +2,7 @@ module TravelPlansHelper
   # Convert numeric safety_score to categorical safety_level
   def safety_score_to_level(score)
     return "level_1" if score.nil?
-    
+
     case score
     when 8..10 then "level_1"
     when 6..7 then "level_2"
@@ -11,7 +11,7 @@ module TravelPlansHelper
     else "level_1"
     end
   end
-  
+
   # Get human-readable safety level text
   def safety_level_text(level)
     case level
@@ -22,7 +22,7 @@ module TravelPlansHelper
     else "Unknown"
     end
   end
-  
+
   # Get Bootstrap badge class for safety level
   def safety_level_badge_class(level)
     case level

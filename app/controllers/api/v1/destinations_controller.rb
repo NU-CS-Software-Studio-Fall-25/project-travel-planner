@@ -1,15 +1,15 @@
 class Api::V1::DestinationsController < Api::V1::BaseController
-  before_action :set_destination, only: [:show, :update, :destroy]
+  before_action :set_destination, only: [ :show, :update, :destroy ]
 
   # GET /api/v1/destinations
   def index
     @destinations = Destination.all
-    
+
     # Apply filters if provided
     @destinations = @destinations.safe_destinations(params[:min_safety]) if params[:min_safety].present?
-    @destinations = @destinations.visa_not_required if params[:visa_free] == 'true'
+    @destinations = @destinations.visa_not_required if params[:visa_free] == "true"
     @destinations = @destinations.by_season(params[:season]) if params[:season].present?
-    
+
     render_success(@destinations)
   end
 

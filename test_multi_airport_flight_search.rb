@@ -19,10 +19,10 @@ service = SerpapiFlightService.new(preferences)
 
 # Test cities with multiple airports
 test_cases = [
-  { city: "New York", country: "United States", expected_airports: ["LGA", "JFK", "JRB", "JRA"] },
-  { city: "London", country: "United Kingdom", expected_airports: ["LTN", "LGW", "LCY", "LHR", "STN"] },
-  { city: "Tokyo", country: "Japan", expected_airports: ["NRT", "HND"] },
-  { city: "Paris", country: "France", expected_airports: ["LBG", "CDG", "ORY"] }
+  { city: "New York", country: "United States", expected_airports: [ "LGA", "JFK", "JRB", "JRA" ] },
+  { city: "London", country: "United Kingdom", expected_airports: [ "LTN", "LGW", "LCY", "LHR", "STN" ] },
+  { city: "Tokyo", country: "Japan", expected_airports: [ "NRT", "HND" ] },
+  { city: "Paris", country: "France", expected_airports: [ "LBG", "CDG", "ORY" ] }
 ]
 
 test_cases.each do |test_case|
@@ -30,9 +30,9 @@ test_cases.each do |test_case|
   puts "Testing: #{test_case[:city]}, #{test_case[:country]}"
   puts "Expected airports: #{test_case[:expected_airports].join(', ')}"
   puts "-" * 70
-  
+
   result = service.get_flight_price(test_case[:city], test_case[:country])
-  
+
   if result[:success]
     puts "✓ SUCCESS"
     puts "  Best Price: $#{result[:price]}"

@@ -13,7 +13,7 @@ puts "\nResult:"
 puts "Success: #{result[:success]}"
 puts "Location ID: #{result[:location_id]}"
 puts "Location Name: #{result[:location_name]}"
-puts "Description: #{result[:description]&.[]( 0, 200)}..."
+puts "Description: #{result[:description]&.[](0, 200)}..."
 puts "Photos Count: #{result[:photos]&.length || 0}"
 
 if result[:photos]&.any?

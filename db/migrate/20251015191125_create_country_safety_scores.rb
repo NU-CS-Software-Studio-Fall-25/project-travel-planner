@@ -8,10 +8,10 @@ class CreateCountrySafetyScores < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     add_index :country_safety_scores, :country_name
     add_index :country_safety_scores, :gpi_score
     add_index :country_safety_scores, :gpi_rank
-    add_index :country_safety_scores, [:year, :country_name], unique: true
+    add_index :country_safety_scores, [ :year, :country_name ], unique: true
   end
 end

@@ -67,7 +67,7 @@ module TravelPlanHelpers
     false
   end
 
-  def tp_click_submit_button(labels = ['Create Travel plan', 'Create Travel Plan', 'Create', 'Save', 'Submit', 'Login', 'Log in', 'Sign in'])
+  def tp_click_submit_button(labels = [ 'Create Travel plan', 'Create Travel Plan', 'Create', 'Save', 'Submit', 'Login', 'Log in', 'Sign in' ])
     labels.each do |label|
       if page.has_button?(label)
         click_button(label)
@@ -128,21 +128,21 @@ end
 When("I create a new travel plan with name {string}") do |plan_name|
   visit new_travel_plan_path
 
-  filled = tp_fill_field(['Name', 'travel_plan[name]', 'travel_plan_name', 'name'], plan_name)
+  filled = tp_fill_field([ 'Name', 'travel_plan[name]', 'travel_plan_name', 'name' ], plan_name)
   unless filled
     raise "Unable to find a name field for travel plan"
   end
 
-  selected = tp_select_option(['Destination', 'travel_plan[destination_id]', 'destination_id', 'destination'], @destination.name)
+  selected = tp_select_option([ 'Destination', 'travel_plan[destination_id]', 'destination_id', 'destination' ], @destination.name)
   unless selected
     # try to create a destination option fallback (non-destructive)
     # if no select present, assume destination may be prefilled - continue
   end
 
   today = Date.today.strftime('%Y-%m-%d')
-  tp_fill_field(['Start date', 'Start Date', 'travel_plan[start_date]', 'start_date', 'start_date_field'], today)
+  tp_fill_field([ 'Start date', 'Start Date', 'travel_plan[start_date]', 'start_date', 'start_date_field' ], today)
 
-  clicked = tp_click_submit_button(['Create Travel plan', 'Create Travel Plan', 'Create', 'Save', 'Submit'])
+  clicked = tp_click_submit_button([ 'Create Travel plan', 'Create Travel Plan', 'Create', 'Save', 'Submit' ])
   unless clicked
     raise "Unable to submit travel plan form"
   end

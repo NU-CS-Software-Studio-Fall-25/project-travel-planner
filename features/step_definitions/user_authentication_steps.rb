@@ -36,8 +36,8 @@ module AuthStepHelpers
   end
 
   def click_login_button
-    ['Log in', 'Login', 'Sign in', 'Submit', 'Sign up'].each do |label|
-      return true if (page.has_button?(label) && click_button(label))
+    [ 'Log in', 'Login', 'Sign in', 'Submit', 'Sign up' ].each do |label|
+      return true if page.has_button?(label) && click_button(label)
     end
 
     # fallback: submit the first form
@@ -87,8 +87,8 @@ end
 When("I log in with invalid credentials") do
   visit login_path
 
-  email_locators = ["Email", "E-mail", "Email address", "user[email]", "user_email", "email"]
-  pass_locators  = ["Password", "password", "user[password]", "user_password"]
+  email_locators = [ "Email", "E-mail", "Email address", "user[email]", "user_email", "email" ]
+  pass_locators  = [ "Password", "password", "user[password]", "user_password" ]
 
   filled_email = fill_any_field(email_locators, @user.email)
   filled_pass  = fill_any_field(pass_locators, "WrongPassword!")

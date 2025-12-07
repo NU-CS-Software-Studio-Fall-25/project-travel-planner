@@ -1,5 +1,5 @@
 # app/controllers/application_controller.rb
-require 'ostruct'
+require "ostruct"
 
 class ApplicationController < ActionController::Base
   # If the real Pagy backend is available, include it. Otherwise we'll
@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
     pagy_obj = Struct.new(:count, :page, :items, :pages).new(total, page, items, pages)
     page_collection = Array(array)[offset, items] || []
 
-    [pagy_obj, page_collection]
+    [ pagy_obj, page_collection ]
   end
 
   # Fallback minimal pagy method when Pagy::Backend isn't available.
@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
           Array(collection)[offset, items] || []
         end
 
-      [pagy_obj, page_collection]
+      [ pagy_obj, page_collection ]
     end
   end
 

@@ -5,10 +5,10 @@ RSpec.describe Destination, type: :model do
   # Test validations
   describe 'validations' do
     subject { build(:destination) }
-    
+
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:country) }
-    
+
     it 'allows blank city' do
       destination = build(:destination, city: '')
       expect(destination).to be_valid

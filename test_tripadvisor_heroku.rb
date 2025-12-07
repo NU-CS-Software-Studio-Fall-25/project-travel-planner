@@ -11,7 +11,7 @@ def test_location(city, country)
   puts "\n" + "="*60
   puts "Testing: #{city}, #{country}"
   puts "="*60
-  
+
   # Search for location
   search_query = "#{city}, #{country}"
   uri = URI("#{BASE_URL}/location/search")
@@ -20,21 +20,21 @@ def test_location(city, country)
     searchQuery: search_query,
     language: 'en'
   })
-  
+
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
-  
+
   request = Net::HTTP::Get.new(uri)
   request['Accept'] = 'application/json'
   request['Referer'] = 'https://travel-planner-cs397-9396d2cb2102.herokuapp.com'
-  
+
   puts "Request URL: #{uri}"
   puts "Referer: #{request['Referer']}"
-  
+
   response = http.request(request)
-  
+
   puts "Response Code: #{response.code}"
-  
+
   if response.code == '200'
     data = JSON.parse(response.body)
     if data['data'] && data['data'].any?

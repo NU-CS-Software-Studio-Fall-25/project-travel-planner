@@ -29,7 +29,7 @@ test_cases = [
 test_cases.each do |location|
   puts "\nLocation: #{location}"
   airports = service.find_airports(location)
-  
+
   if airports.any?
     puts "  ✓ Found #{airports.length} airport(s): #{airports.take(3).join(', ')}"
     if airports.length > 3

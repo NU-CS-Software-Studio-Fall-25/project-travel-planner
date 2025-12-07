@@ -1,5 +1,5 @@
 # test/services/serpapi_integration_test.rb
-# 
+#
 # Quick manual test for the SerpAPI integration
 # Run with: rails runner test/services/serpapi_integration_test.rb
 

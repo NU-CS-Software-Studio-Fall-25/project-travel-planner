@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Specify Ruby version - using 3.4.1 to match local development
-#ruby "3.4.1"
+# ruby "3.4.1"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.3"
@@ -23,8 +23,8 @@ gem "jbuilder"
 gem "openai"
 gem "openai-ruby"
 
-gem 'prawn'
-gem 'prawn-table'
+gem "prawn"
+gem "prawn-table"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
@@ -63,11 +63,11 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 # Pagination
-gem 'pagy'
+gem "pagy"
 
 # Trust and Safety Features
-gem 'obscenity', '~> 1.0.2'  # Profanity filtering
-gem 'rack-attack', '~> 6.7'  # Rate limiting and abuse prevention
+gem "obscenity", "~> 1.0.2"  # Profanity filtering
+gem "rack-attack", "~> 6.7"  # Rate limiting and abuse prevention
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -77,10 +77,10 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
-  
+
   # Use sqlite3 for development and test environments (easier local setup)
   gem "sqlite3", ">= 2.1"
-  
+
   # RSpec testing framework
   gem "rspec-rails", "~> 6.1"
   gem "factory_bot_rails", "~> 6.4"
@@ -98,10 +98,11 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
-  gem 'cucumber-rails', require: false
-  gem 'database_cleaner-active_record'
-  gem 'securerandom'
-  
+  gem "cucumber-rails", require: false
+  gem "database_cleaner-active_record"
+  gem "securerandom"
+  gem "database_cleaner-active_record"
+
   # Additional RSpec testing tools
   gem "shoulda-matchers", "~> 6.0"
   gem "webmock", "~> 3.19"

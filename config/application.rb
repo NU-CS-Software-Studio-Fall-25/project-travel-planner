@@ -23,18 +23,18 @@ module ProjectTravelPlanner
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-    
+
     # CORS configuration for frontend integration
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins 'localhost:3000', 'localhost:3001', 'localhost:8080', '127.0.0.1:3000', '127.0.0.1:3001', '127.0.0.1:8080'
-        resource '*',
+        origins "localhost:3000", "localhost:3001", "localhost:8080", "127.0.0.1:3000", "127.0.0.1:3001", "127.0.0.1:8080"
+        resource "*",
           headers: :any,
-          methods: [:get, :post, :put, :patch, :delete, :options, :head],
+          methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
           credentials: true
       end
     end
-    
+
     # Enable Rack::Attack for rate limiting and abuse prevention
     config.middleware.use Rack::Attack
   end

@@ -1,5 +1,5 @@
 # test/services/openai_iterative_test.rb
-# 
+#
 # Test the full iterative OpenAI + SerpAPI recommendation algorithm
 # Run with: rails runner test/services/openai_iterative_test.rb
 
@@ -41,10 +41,10 @@ puts
 begin
   openai_service = OpenaiService.new(preferences)
   recommendations = openai_service.get_recommendations
-  
+
   puts "\n=== Results ==="
   puts "-" * 50
-  
+
   if recommendations.empty?
     puts "✗ No recommendations returned"
   else
@@ -53,7 +53,7 @@ begin
       puts "  Name: #{rec[:name]}"
       puts "  Destination: #{rec[:destination_city]}, #{rec[:destination_country]}"
       puts "  Description: #{rec[:description][0..150]}..."
-      
+
       if rec[:budget_breakdown].present? && rec[:budget_breakdown][:flights]
         puts "\n  Flight Details:"
         puts "    Cost: $#{rec[:budget_breakdown][:flights][:total_cost]}"
@@ -61,17 +61,17 @@ begin
         puts "    Duration: #{rec[:budget_breakdown][:flights][:duration]}"
         puts "    Stops: #{rec[:budget_breakdown][:flights][:stops]}"
       end
-      
+
       puts "\n  Budget:"
       puts "    Min: $#{rec[:budget_min]}"
       puts "    Max: $#{rec[:budget_max]}"
-      
+
       if rec[:budget_breakdown][:total_trip_cost]
         puts "    Total: $#{rec[:budget_breakdown][:total_trip_cost]}"
       end
-      
+
       puts "\n  Itinerary Days: #{rec[:itinerary]&.keys&.count || 0}"
-      
+
       # Check if destination is a "No Suitable Destination Found" error
       if rec[:name].include?("No Suitable Destination") || rec[:name].include?("Error")
         puts "\n  ⚠️  Note: This is an error/fallback response"
@@ -81,9 +81,9 @@ begin
       end
     end
   end
-  
+
   puts "\n=== Test Complete ==="
-  
+
 rescue => e
   puts "\n✗ Error during test:"
   puts "  #{e.class}: #{e.message}"

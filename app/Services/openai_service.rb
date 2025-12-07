@@ -5,7 +5,7 @@ class OpenaiService
   FLIGHT_BUDGET_THRESHOLD = 0.5 # Flight should not exceed 50% of max budget
 
   def initialize(preferences)
-    @client = OpenAI::Client.new(api_key: ENV.fetch('OPENAI_API_KEY'))
+    @client = OpenAI::Client.new(api_key: ENV.fetch("OPENAI_API_KEY"))
     @preferences = preferences
     @serpapi_service = SerpapiFlightService.new(preferences)
     @rejected_cities = []
@@ -13,30 +13,30 @@ class OpenaiService
 
   def get_recommendations
     Rails.logger.info "=== Starting Iterative Recommendation Process ==="
-    
+
     # Iterate to find an acceptable destination
     MAX_ITERATIONS.times do |iteration|
       Rails.logger.info "=== Iteration #{iteration + 1}/#{MAX_ITERATIONS} ==="
-      
+
       # Step 1: Get city recommendation from OpenAI
       city_result = get_city_recommendation
-      
+
       if city_result[:error]
         Rails.logger.error "Failed to get city recommendation: #{city_result[:error]}"
         next
       end
-      
+
       destination_city = city_result[:city]
       destination_country = city_result[:country]
-      
+
       Rails.logger.info "OpenAI recommended: #{destination_city}, #{destination_country}"
-      
+
       # Step 2: Get visa information (NEW - only for international travel)
       visa_result = get_visa_info(destination_country)
-      
+
       # Step 3: Check flight price with SerpAPI
       flight_result = @serpapi_service.get_flight_price(destination_city, destination_country)
-      
+
       if !flight_result[:success]
         Rails.logger.warn "Flight search failed: #{flight_result[:error]}"
         @rejected_cities << {
@@ -46,13 +46,13 @@ class OpenaiService
         }
         next
       end
-      
+
       flight_price = flight_result[:price]
       max_budget = @preferences[:budget_max].to_f
       flight_budget_limit = max_budget * FLIGHT_BUDGET_THRESHOLD
-      
+
       Rails.logger.info "Flight Price: $#{flight_price}, Budget Limit (50%): $#{flight_budget_limit}"
-      
+
       # Step 4: Validate flight price
       if flight_price > flight_budget_limit
         Rails.logger.warn "Flight too expensive: $#{flight_price} > $#{flight_budget_limit}"
@@ -63,12 +63,12 @@ class OpenaiService
         }
         next
       end
-      
+
       # Step 5: Flight is acceptable! Get full travel plan with visa info
       Rails.logger.info "✓ Acceptable destination found: #{destination_city}"
-      
+
       full_plan = get_full_travel_plan(destination_city, destination_country, flight_result, visa_result)
-      
+
       if full_plan[:error]
         Rails.logger.error "Failed to get full plan: #{full_plan[:error]}"
         @rejected_cities << {
@@ -78,14 +78,14 @@ class OpenaiService
         }
         next
       end
-      
+
       return full_plan[:recommendations]
     end
-    
+
     # If we get here, we failed to find an acceptable destination
     Rails.logger.error "=== Failed to find acceptable destination after #{MAX_ITERATIONS} attempts ==="
-    
-    return [{
+
+    [ {
       name: "No Suitable Destination Found",
       destination_country: "N/A",
       description: "We couldn't find a suitable travel destination within your budget after checking #{MAX_ITERATIONS} options.",
@@ -104,7 +104,7 @@ class OpenaiService
       general_purpose: @preferences[:general_purpose] || "Unknown",
       start_date: @preferences[:start_date],
       end_date: @preferences[:end_date]
-    }]
+    } ]
   end
 
   private
@@ -112,26 +112,26 @@ class OpenaiService
   # Get city recommendation from OpenAI (first phase)
   def get_city_recommendation
     prompt = build_city_prompt
-    
+
     begin
       Rails.logger.info "=== Requesting City Recommendation from OpenAI ==="
-      
+
       response = @client.chat.completions.create(
         model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
+        messages: [ { role: "user", content: prompt } ],
         temperature: 0.7,
         max_tokens: 500,
         response_format: { type: "json_object" }
       )
-      
+
       raw_content = response.choices.first&.message&.content
       parsed = JSON.parse(raw_content, symbolize_names: true)
-      
+
       {
         city: parsed[:city],
         country: parsed[:country]
       }
-      
+
     rescue => e
       Rails.logger.error "Error getting city recommendation: #{e.message}"
       { error: e.message }
@@ -141,27 +141,27 @@ class OpenaiService
   # Get full travel plan from OpenAI (second phase - after flight validation)
   def get_full_travel_plan(destination_city, destination_country, flight_result, visa_result = nil)
     prompt = build_full_plan_prompt(destination_city, destination_country, flight_result, visa_result)
-    
+
     begin
       Rails.logger.info "=== Requesting Full Travel Plan from OpenAI ==="
-      
+
       response = @client.chat.completions.create(
         model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
+        messages: [ { role: "user", content: prompt } ],
         temperature: 0.7,
         max_tokens: 5000,
         response_format: { type: "json_object" }
       )
-      
+
       parsed_recommendations = parse_response(response)
-      
+
       # Inject actual flight price and visa info into the recommendations
       parsed_recommendations.each do |rec|
         if rec[:budget_breakdown].is_a?(Hash)
           # Ensure flight_result[:price] is a number
           flight_price = flight_result[:price].to_f
           travelers = (@preferences[:number_of_travelers] || 1).to_i
-          
+
           rec[:budget_breakdown][:flights] = {
             description: "Round-trip flight from #{flight_result[:details][:departure_airport]} to #{flight_result[:details][:arrival_airport]} × #{travelers} travelers via #{flight_result[:details][:airline]}",
             cost_per_person: (flight_price / travelers).round(2),
@@ -170,7 +170,7 @@ class OpenaiService
             stops: flight_result[:details][:stops].to_i
           }
         end
-        
+
         # Inject structured visa information (NEW)
         if visa_result && visa_result[:success]
           rec[:visa_data] = {
@@ -187,9 +187,9 @@ class OpenaiService
           }
         end
       end
-      
+
       { recommendations: parsed_recommendations }
-      
+
     rescue => e
       Rails.logger.error "Error getting full plan: #{e.message}"
       { error: e.message }
@@ -199,25 +199,25 @@ class OpenaiService
   # Build prompt for city recommendation only
   def build_city_prompt
     safety_context = build_safety_context(@preferences[:safety_preference])
-    
+
     rejected_list = if @rejected_cities.empty?
                       "None yet"
-                    else
+    else
                       @rejected_cities.map { |r| "#{r[:city]}, #{r[:country]} (#{r[:reason]})" }.join("\n")
-                    end
-    
+    end
+
     <<~PROMPT
       You are a professional travel planner. Based on the user's preferences, suggest ONE destination city that matches their requirements.
-      
+
       CRITICAL SAFETY REQUIREMENT:
       User's Safety Preference: "#{@preferences[:safety_preference] || 'Generally Safe'}"
-      
+
       YOU CAN ONLY RECOMMEND DESTINATIONS FROM THE FOLLOWING #{safety_context[:country_count]} COUNTRIES:
       #{safety_context[:country_list]}
-      
+
       Previously Rejected Cities (DO NOT recommend these again):
       #{rejected_list}
-      
+
       User Requirements:
       - Travel Dates: #{@preferences[:start_date]} to #{@preferences[:end_date]}
       - Budget: $#{@preferences[:budget_min]} - $#{@preferences[:budget_max]} (TOTAL for #{@preferences[:number_of_travelers] || 1} travelers)
@@ -225,13 +225,13 @@ class OpenaiService
       - Travel Style: #{@preferences[:travel_style]}
       - Purpose: #{@preferences[:general_purpose]}
       - From: #{@preferences[:current_location]} (#{@preferences[:passport_country]})
-      
+
       Return ONLY a JSON object with:
       {
         "city": "City Name",
         "country": "Country Name"
       }
-      
+
       The city must be in one of the allowed countries above, have reasonable flight connections, and match the user's preferences.
       DO NOT suggest any city from the rejected list.
     PROMPT
@@ -244,45 +244,45 @@ class OpenaiService
     length_of_stay = @preferences[:length_of_stay] ||
                      (start_date && end_date ? (end_date - start_date).to_i + 1 : 4)
     travel_month = @preferences[:travel_month] || (start_date ? start_date.strftime("%B") : "")
-    
+
     date_range = if start_date && end_date
                    "#{start_date.strftime('%B %d, %Y')} to #{end_date.strftime('%B %d, %Y')}"
-                 elsif travel_month.present?
+    elsif travel_month.present?
                    "during #{travel_month}"
-                 else
+    else
                    "within the next few months"
-                 end
-    
+    end
+
     flight_cost = flight_result[:price]
     remaining_budget_max = @preferences[:budget_max].to_f - flight_cost
-    remaining_budget_min = [@preferences[:budget_min].to_f - flight_cost, 0].max
-    
+    remaining_budget_min = [ @preferences[:budget_min].to_f - flight_cost, 0 ].max
+
     # Build visa information section (NEW)
     visa_info_section = build_visa_info_section(visa_result)
-    
+
     <<~PROMPT
       You are a professional travel planner. Create a detailed travel plan for #{destination_city}, #{destination_country}.
-      
+
       CONFIRMED FLIGHT INFORMATION:
       - Flight Cost: $#{flight_cost} (already booked/confirmed)
       - Route: #{flight_result[:details][:departure_airport]} to #{flight_result[:details][:arrival_airport]}
       - Airline: #{flight_result[:details][:airline]}
-      
+
       #{visa_info_section}
-      
+
       REMAINING BUDGET for accommodation, food, activities, and transportation:
       - Minimum: $#{remaining_budget_min.round(2)}
       - Maximum: $#{remaining_budget_max.round(2)}
-      
+
       User Preferences:
       - Travel Dates: #{date_range}
       - Length of Stay: #{length_of_stay} days
       - Number of Travelers: #{@preferences[:number_of_travelers] || 1} people
       - Travel Style: #{@preferences[:travel_style]}
       - Purpose: #{@preferences[:general_purpose]}
-      
+
       Return a JSON object with a "destinations" key containing an array with ONE destination object:
-      
+
       {
         "destinations": [{
           "name": "Creative trip name (e.g., '#{destination_city} Adventure')",
@@ -329,7 +329,7 @@ class OpenaiService
           "general_purpose": "#{@preferences[:general_purpose]}"
         }]
       }
-      
+
       IMPORTANT:
       - Flight cost of $#{flight_cost} is already confirmed and will be added separately
       - Budget breakdown should focus on: hotel, food, activities, car_rental
@@ -341,20 +341,20 @@ class OpenaiService
   # Build summary of rejected cities for user feedback
   def build_rejection_summary
     return "No destinations checked yet." if @rejected_cities.empty?
-    
+
     summary = "We checked the following destinations but they didn't meet your budget requirements:\n\n"
-    
+
     @rejected_cities.each_with_index do |rejected, index|
       summary += "#{index + 1}. #{rejected[:city]}, #{rejected[:country]}\n"
       summary += "   Reason: #{rejected[:reason]}\n\n"
     end
-    
+
     summary += "\nSuggestions:\n"
     summary += "- Try increasing your budget\n"
     summary += "- Consider different travel dates (off-peak seasons are cheaper)\n"
     summary += "- Look for destinations closer to your location\n"
     summary += "- Reduce the number of travelers\n"
-    
+
     summary
   end
 
@@ -363,13 +363,13 @@ class OpenaiService
   # Falls back to passport_country if parsing fails
   def get_current_country
     current_location = @preferences[:current_location].to_s.strip
-    
+
     if current_location.present?
       # Google Maps typically formats addresses as: "City, State/Province, Country"
       # Examples: "Chicago, IL, USA", "Toronto, ON, Canada", "London, UK", "Paris, France"
-      
-      parts = current_location.split(',').map(&:strip)
-      
+
+      parts = current_location.split(",").map(&:strip)
+
       # If there are 3 or more parts, the last part is usually the country
       if parts.length >= 3
         country = parts.last
@@ -389,7 +389,7 @@ class OpenaiService
         # Format might be "City, Country" (e.g., "Paris, France", "London, England")
         potential_country = parts.last
         # Check if it looks like a country (not a state abbreviation)
-        if potential_country.length > 2 || ["UK", "US"].include?(potential_country)
+        if potential_country.length > 2 || [ "UK", "US" ].include?(potential_country)
           country_mapping = {
             "USA" => "United States",
             "US" => "United States",
@@ -404,9 +404,9 @@ class OpenaiService
           return country
         end
       end
-      
+
       # Fallback: Check for US states in the location string (in case format is different)
-      us_states = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+      us_states = [ "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
                    "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
                    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
                    "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
@@ -416,24 +416,24 @@ class OpenaiService
                    "Wisconsin", "Wyoming", "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
                    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS",
                    "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA",
-                   "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
-      
+                   "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY" ]
+
       if us_states.any? { |state| current_location.include?(state) }
         Rails.logger.info "Detected USA from current_location (state found): #{current_location}"
         return "United States"
       end
-      
+
       # Check for Canadian provinces
-      canadian_provinces = ["Alberta", "British Columbia", "Manitoba", "New Brunswick", 
+      canadian_provinces = [ "Alberta", "British Columbia", "Manitoba", "New Brunswick",
                            "Newfoundland and Labrador", "Nova Scotia", "Ontario", "Prince Edward Island",
-                           "Quebec", "Saskatchewan", "AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK"]
-      
+                           "Quebec", "Saskatchewan", "AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK" ]
+
       if canadian_provinces.any? { |province| current_location.include?(province) }
         Rails.logger.info "Detected Canada from current_location (province found): #{current_location}"
         return "Canada"
       end
     end
-    
+
     # Fallback to passport_country if we can't determine from current_location
     Rails.logger.info "Could not parse country from current_location '#{current_location}', using passport_country: #{@preferences[:passport_country]}"
     @preferences[:passport_country]
@@ -450,7 +450,7 @@ class OpenaiService
       # For domestic trips, use the country inferred from current_location
       # (domestic = within the country they're currently in)
       current_country = get_current_country
-      
+
       if current_country.present?
         # For domestic trips, check if current country meets safety criteria
         country_record = CountrySafetyScore.find_by(country_name: current_country, year: 2025)
@@ -572,7 +572,7 @@ class OpenaiService
       Rails.logger.error "Raw content: #{raw_content}"
 
       # Return an error object that can be displayed in the view
-      [{
+      [ {
          name: "Error Generating Recommendations",
          destination_country: "Error",
          description: "There was an issue parsing the response from the AI. It may have returned an invalid format. Please try adjusting your preferences and submit again.",
@@ -591,14 +591,14 @@ class OpenaiService
          general_purpose: @preferences[:general_purpose] || "Unknown",
          start_date: @preferences[:start_date],
          end_date: @preferences[:end_date]
-       }]
+       } ]
     end
   end
 
   # Get visa information for a destination (NEW METHOD)
   def get_visa_info(destination_country)
     passport_country = @preferences[:passport_country]
-    
+
     # Skip visa check for domestic travel
     if @preferences[:trip_scope] == "Domestic"
       Rails.logger.info "ℹ️  Domestic travel - skipping visa check"
@@ -609,7 +609,7 @@ class OpenaiService
         domestic: true
       }
     end
-    
+
     # Skip if no passport country provided
     if passport_country.blank?
       Rails.logger.warn "⚠️  No passport country provided"
@@ -619,12 +619,12 @@ class OpenaiService
         visa_color: "yellow"
       }
     end
-    
+
     begin
       Rails.logger.info "🔍 Fetching visa info: #{passport_country} → #{destination_country}"
       visa_service = VisaService.new(passport_country, destination_country)
       visa_result = visa_service.get_visa_requirements
-      
+
       Rails.logger.info "✅ Visa info retrieved: #{visa_result[:visa_status]}"
       visa_result
     rescue => e
@@ -641,57 +641,57 @@ class OpenaiService
   # Build visa information section for GPT prompt (NEW METHOD)
   def build_visa_info_section(visa_result)
     return "" unless visa_result && visa_result[:success]
-    
+
     section = <<~VISA
       VERIFIED VISA INFORMATION (from official sources):
       Passport: #{@preferences[:passport_country]} → Destination: #{visa_result[:destination_code] || 'N/A'}
-      
+
       Primary Visa Requirement:
       - Status: #{visa_result[:visa_status]}
       - Maximum Stay: #{visa_result[:visa_duration] || 'Check with embassy'}
       - Difficulty Level: #{visa_color_to_description(visa_result[:visa_color])}
     VISA
-    
+
     # Add alternative visa option if available
     if visa_result[:alternative_visa].present?
       section += <<~ALT
-      
+
       Alternative Option:
       - Type: #{visa_result[:alternative_visa]}
       - Duration: #{visa_result[:alternative_duration]}
       - Apply: #{visa_result[:alternative_link] || 'Contact embassy'}
       ALT
     end
-    
+
     # Add mandatory registration if required
     if visa_result[:mandatory_registration].present?
       section += <<~MAND
-      
+
       ⚠️  MANDATORY REGISTRATION REQUIRED:
       - Type: #{visa_result[:mandatory_registration]}
       - Apply: #{visa_result[:registration_link] || 'Check official website'}
       - Note: This is FREE but REQUIRED for all travelers
       MAND
     end
-    
+
     # Add passport validity requirement
     if visa_result[:passport_validity].present?
       section += <<~PASS
-      
+
       Passport Requirement:
       - Validity: #{visa_result[:passport_validity]}
       PASS
     end
-    
+
     # Add exception rules if available
     if visa_result[:exception_text].present?
       section += <<~EXCEPT
-      
+
       💡 Special Exception Available:
       - #{visa_result[:exception_text]}
       EXCEPT
     end
-    
+
     section += "\nIMPORTANT: Use this official visa information to provide specific, accurate guidance in the travel plan.\n"
     section
   end

@@ -5,16 +5,16 @@
 # pagy, pagy_array and pagy_bootstrap_nav.
 
 begin
-  require 'pagy'
+  require "pagy"
 rescue LoadError
   Rails.logger.warn "Pagy gem not available - skipping Pagy initializer"
 else
-  pagy_spec = Gem.loaded_specs['pagy']
+  pagy_spec = Gem.loaded_specs["pagy"]
   pagy_gem_path = pagy_spec&.full_gem_path
 
   if pagy_gem_path
     # require the toolbox loader (defines Pagy::Loader for helper fragments)
-    loader = File.join(pagy_gem_path, 'lib', 'pagy', 'toolbox', 'helpers', 'loader.rb')
+    loader = File.join(pagy_gem_path, "lib", "pagy", "toolbox", "helpers", "loader.rb")
     require loader if File.exist?(loader)
 
     # require some bootstrap helper fragments if present (used by pagy_bootstrap_nav)
@@ -23,7 +23,7 @@ else
       bootstrap/series_nav
       bootstrap/input_nav_js
     ].each do |frag|
-      path = File.join(pagy_gem_path, 'lib', 'pagy', 'toolbox', 'helpers', "#{frag}.rb")
+      path = File.join(pagy_gem_path, "lib", "pagy", "toolbox", "helpers", "#{frag}.rb")
       require path if File.exist?(path)
     end
   end
@@ -61,7 +61,7 @@ else
             from: from,
             to: to
           )
-          [pagy, page_slice]
+          [ pagy, page_slice ]
         end
 
         # Simple pagy for ActiveRecord-like relations or arrays
@@ -88,7 +88,7 @@ else
               from: offset_val,
               to: offset_val + records.size - 1
             )
-            [pagy, records]
+            [ pagy, records ]
           else
             # fallback to array pagination
             pagy_array(collection, **vars)
@@ -105,32 +105,32 @@ else
 
         # Minimal pagy_nav (Prev / Next)
         def pagy_nav(pagy)
-          return '' unless pagy && pagy.pages.to_i > 1
-          prev_link = (pagy.page > 1) ? link_to('Prev', url_for(page: pagy.page - 1)) : nil
-          next_link = (pagy.page < pagy.pages) ? link_to('Next', url_for(page: pagy.page + 1)) : nil
+          return "" unless pagy && pagy.pages.to_i > 1
+          prev_link = (pagy.page > 1) ? link_to("Prev", url_for(page: pagy.page - 1)) : nil
+          next_link = (pagy.page < pagy.pages) ? link_to("Next", url_for(page: pagy.page + 1)) : nil
           content = []
           content << prev_link if prev_link
           content << next_link if next_link
-          content.join(' ').html_safe
+          content.join(" ").html_safe
         end
 
         # Minimal Bootstrap-compatible nav
         def pagy_bootstrap_nav(pagy)
-          return '' unless pagy && pagy.pages.to_i > 1
+          return "" unless pagy && pagy.pages.to_i > 1
           prev_disabled = (pagy.page <= 1)
           next_disabled = (pagy.page >= pagy.pages)
 
           prev_li = if prev_disabled
                       "<li class=\"page-item disabled\"><a class=\"page-link\">Previous</a></li>"
-                    else
+          else
                       "<li class=\"page-item\"><a class=\"page-link\" href=\"#{url_for(page: pagy.page - 1)}\">Previous</a></li>"
-                    end
+          end
 
           next_li = if next_disabled
                       "<li class=\"page-item disabled\"><a class=\"page-link\">Next</a></li>"
-                    else
+          else
                       "<li class=\"page-item\"><a class=\"page-link\" href=\"#{url_for(page: pagy.page + 1)}\">Next</a></li>"
-                    end
+          end
 
           "<nav aria-label=\"pagination\"><ul class=\"pagination\">#{prev_li}#{next_li}</ul></nav>".html_safe
         end

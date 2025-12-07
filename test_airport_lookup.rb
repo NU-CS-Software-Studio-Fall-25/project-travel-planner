@@ -31,7 +31,7 @@ test_cases.each do |location|
   puts "\nTesting: #{location}"
   airports = service.find_airports(location)
   nearest = service.find_nearest_airport(location)
-  
+
   if airports.any?
     puts "  ✓ Found airports: #{airports.join(', ')}"
     puts "  ✓ Nearest: #{nearest}"

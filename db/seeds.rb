@@ -300,5 +300,3 @@ end
 
 puts "Sample data created successfully!"
 puts "#{Destination.count} destinations, #{User.count} users, and #{CountrySafetyScore.count} country safety scores in database."
-
-
