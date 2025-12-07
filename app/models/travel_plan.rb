@@ -25,16 +25,22 @@ class TravelPlan < ApplicationRecord
         # Not JSON, continue to Ruby hash parsing
       end
 
-      # Try to parse as Ruby hash literal (e.g., {"key" => "value"})
-      begin
-        # Only eval if it looks like a hash (starts with { and ends with })
-        if value.strip.start_with?("{") && value.strip.end_with?("}")
-          # Use eval with a clean binding to parse Ruby hash syntax
-          result = eval(value)
-          return result if result.is_a?(Hash)
+      # Safely attempt to interpret simple Ruby hash literal (e.g., {"key" => "value"})
+      str = value.strip
+      if str.start_with?("{") && str.end_with?("}")
+        # Allow only a restrictive set of characters/tokens to avoid code injection
+        if str =~ /\A[\s\{\}\[\]\:\,=>0-9A-Za-z_\-'"\.]+\z/
+          # Convert Ruby hash rocket syntax to JSON-style and single quotes to double quotes
+          json_like = str.gsub(/=>/, ':').gsub(/'([^'\\]*)'/, '"\1"')
+          begin
+            parsed = JSON.parse(json_like)
+            return parsed if parsed.is_a?(Hash)
+          rescue JSON::ParserError => e
+            Rails.logger.warn "Failed to parse itinerary after conversion: #{e.message}"
+          end
+        else
+          Rails.logger.warn "Rejected unsafe itinerary string for parsing"
         end
-      rescue SyntaxError, StandardError => e
-        Rails.logger.warn "Failed to parse itinerary: #{e.message}"
       end
 
       # If all parsing fails, return the raw string

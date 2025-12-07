@@ -13,12 +13,12 @@ module ApplicationHelper
 
       if current > 1
         prev_params = request.query_parameters.merge("page" => current - 1)
-        prev_link = link_to("Previous", url_for(params.permit!.to_h.merge(prev_params)))
+        prev_link = link_to("Previous", url_for(prev_params))
       end
 
       if pagy && pagy.pages && current < pagy.pages
         next_params = request.query_parameters.merge("page" => current + 1)
-        next_link = link_to("Next", url_for(params.permit!.to_h.merge(next_params)))
+        next_link = link_to("Next", url_for(next_params))
       end
 
       content_tag(:nav, class: "pagy-nav") do
@@ -36,16 +36,16 @@ module ApplicationHelper
       pages = (pagy.pages || 1).to_i
 
       prev_link = if page > 1
-        link_to("&laquo;".html_safe, url_for(params.permit!.to_h.merge("page" => page - 1)), class: "page-link")
-      else
-        content_tag(:span, "&laquo;".html_safe, class: "page-link disabled")
-      end
+                    link_to("&laquo;".html_safe, url_for(request.query_parameters.merge("page" => page - 1)), class: "page-link")
+                  else
+                    content_tag(:span, "&laquo;".html_safe, class: "page-link disabled")
+                  end
 
       next_link = if page < pages
-        link_to("&raquo;".html_safe, url_for(params.permit!.to_h.merge("page" => page + 1)), class: "page-link")
-      else
-        content_tag(:span, "&raquo;".html_safe, class: "page-link disabled")
-      end
+                    link_to("&raquo;".html_safe, url_for(request.query_parameters.merge("page" => page + 1)), class: "page-link")
+                  else
+                    content_tag(:span, "&raquo;".html_safe, class: "page-link disabled")
+                  end
 
       content_tag(:nav, aria: { label: "Pagination" }) do
         content_tag(:ul, class: "pagination") do
