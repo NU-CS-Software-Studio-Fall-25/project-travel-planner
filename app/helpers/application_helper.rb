@@ -37,15 +37,15 @@ module ApplicationHelper
 
       prev_link = if page > 1
                     link_to("&laquo;".html_safe, url_for(request.query_parameters.merge("page" => page - 1)), class: "page-link")
-                  else
+      else
                     content_tag(:span, "&laquo;".html_safe, class: "page-link disabled")
-                  end
+      end
 
       next_link = if page < pages
                     link_to("&raquo;".html_safe, url_for(request.query_parameters.merge("page" => page + 1)), class: "page-link")
-                  else
+      else
                     content_tag(:span, "&raquo;".html_safe, class: "page-link disabled")
-                  end
+      end
 
       content_tag(:nav, aria: { label: "Pagination" }) do
         content_tag(:ul, class: "pagination") do

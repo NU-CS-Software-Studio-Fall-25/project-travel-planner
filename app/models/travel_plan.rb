@@ -31,7 +31,7 @@ class TravelPlan < ApplicationRecord
         # Allow only a restrictive set of characters/tokens to avoid code injection
         if str =~ /\A[\s\{\}\[\]\:\,=>0-9A-Za-z_\-'"\.]+\z/
           # Convert Ruby hash rocket syntax to JSON-style and single quotes to double quotes
-          json_like = str.gsub(/=>/, ':').gsub(/'([^'\\]*)'/, '"\1"')
+          json_like = str.gsub(/=>/, ":").gsub(/'([^'\\]*)'/, '"\1"')
           begin
             parsed = JSON.parse(json_like)
             return parsed if parsed.is_a?(Hash)
