@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>TRUST_SAFETY_README - Travel Planner Documentation</title>
+
+  <meta name="keywords" content="ruby,documentation,TRUST_SAFETY_README">
+  <meta name="description" content="TRUST_SAFETY_README: Profanity Filtering (obscenity gem) - Automatically detects and prevents inappropriate language in user content - Applied to travel plans, notes, desc">
+
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<div id="navigation-toggle" role="button" tabindex="0" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="navigation">
+  <span aria-hidden="true">&#9776;</span>
+</div>
+
+
+<nav id="navigation" role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+
+
+  <ul class="link-list" role="directory">
+              <li>
+            <details open>
+              <summary>      <a href="#label-Trust+and+Safety+Features+-+Quick+Start+Guide">Trust and Safety Features - Quick Start Guide</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>
+            <details open>
+              <summary>      <a href="#label-E2-9C-85+Implementation+Summary">✅ Implementation Summary</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+-F0-9F-9A-AB+Profanity+Filtering+-28obscenity+gem-29">1. 🚫 Profanity Filtering (obscenity gem)</a>
+          <li>      <a href="#label-2.+-F0-9F-9B-A1-EF-B8-8F+Rate+Limiting+-28rack-attack+gem-29">2. 🛡️ Rate Limiting (rack-attack gem)</a>
+          <li>      <a href="#label-3.+-F0-9F-93-8B+Community+Guidelines+Page">3. 📋 Community Guidelines Page</a>
+          <li>      <a href="#label-4.+-F0-9F-93-9C+Terms+of+Service+with+Required+Acceptance">4. 📜 Terms of Service with Required Acceptance</a>
+          <li>      <a href="#label-5.+-F0-9F-9A-A9+Content+Flagging-2FReporting+System">5. 🚩 Content Flagging/Reporting System</a>
+          <li>      <a href="#label-6.+-F0-9F-A4-96+Automated+Content+Moderation">6. 🤖 Automated Content Moderation</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-9A-80+How+to+Use">🚀 How to Use</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-For+End+Users">For End Users</a>
+          <li>      <a href="#label-For+Developers">For Developers</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-93-81+Key+Files">📁 Key Files</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Configuration">Configuration</a>
+          <li>      <a href="#label-Models">Models</a>
+          <li>      <a href="#label-Controllers">Controllers</a>
+          <li>      <a href="#label-Views">Views</a>
+          <li>      <a href="#label-Database">Database</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-F0-9F-94-8D+Verification">🔍 Verification</a>
+          <li>      <a href="#label-F0-9F-93-8A+Feature+Checklist">📊 Feature Checklist</a>
+          <li>      <a href="#label-F0-9F-8E-AF+Recommended+Gems+Used">🎯 Recommended Gems Used</a>
+          <li>      <a href="#label-F0-9F-93-9A+Documentation">📚 Documentation</a>
+          <li>      <a href="#label-F0-9F-9A-A8+Important+Notes">🚨 Important Notes</a>
+          <li>      <a href="#label-F0-9F-94-AE+Future+Enhancements">🔮 Future Enhancements</a>
+          <li>      <a href="#label-E2-9C-85+Ready+for+Production">✅ Ready for Production</a>
+
+              </ul>
+            </details>
+          </li>
+
+  </ul>
+</div>
+
+  
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./AIRPORT_LOOKUP_ENHANCEMENT_md.html">AIRPORT_LOOKUP_ENHANCEMENT</a>
+    <li><a href="./BUG_FIX_SAFETY_PARAMETER_md.html">BUG_FIX_SAFETY_PARAMETER</a>
+    <li><a href="./DESTINATION_UI_IMPROVEMENTS_md.html">DESTINATION_UI_IMPROVEMENTS</a>
+    <li><a href="./DEVELOPMENT_GUIDE_md.html">DEVELOPMENT_GUIDE</a>
+    <li><a href="./Dockerfile.html">Dockerfile</a>
+    <li><a href="./FINAL_SECURITY_CHECKLIST_md.html">FINAL_SECURITY_CHECKLIST</a>
+    <li><a href="./GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE</a>
+    <li><a href="./Gemfile.html">Gemfile</a>
+    <li><a href="./Gemfile_lock.html">Gemfile.lock</a>
+    <li><a href="./HEROKU_DEPLOY_md.html">HEROKU_DEPLOY</a>
+    <li><a href="./JAVASCRIPT_VALIDATION_FIX_md.html">JAVASCRIPT_VALIDATION_FIX</a>
+    <li><a href="./LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE</a>
+    <li><a href="./PWA_IMPLEMENTATION_md.html">PWA_IMPLEMENTATION</a>
+    <li><a href="./README_md.html">README</a>
+    <li><a href="./RSPEC_FIXES_SUMMARY_md.html">RSPEC_FIXES_SUMMARY</a>
+    <li><a href="./RSPEC_TESTING_GUIDE_md.html">RSPEC_TESTING_GUIDE</a>
+    <li><a href="./RUBY_COMPATIBILITY_md.html">RUBY_COMPATIBILITY</a>
+    <li><a href="./Rakefile.html">Rakefile</a>
+    <li><a href="./SAFETY_LEVEL_DISPLAY_UPDATE_md.html">SAFETY_LEVEL_DISPLAY_UPDATE</a>
+    <li><a href="./SECURITY_AUDIT_LIKE_DISLIKE_md.html">SECURITY_AUDIT_LIKE_DISLIKE</a>
+    <li><a href="./SERPAPI_INTEGRATION_md.html">SERPAPI_INTEGRATION</a>
+    <li><a href="./TEAM_SETUP_GUIDE_md.html">TEAM_SETUP_GUIDE</a>
+    <li><a href="./TRIPADVISOR_SETUP_md.html">TRIPADVISOR_SETUP</a>
+    <li><a href="./TRUST_AND_SAFETY_FEATURES_md.html">TRUST_AND_SAFETY_FEATURES</a>
+    <li><a href="./TRUST_SAFETY_README_md.html">TRUST_SAFETY_README</a>
+    <li><a href="./VISA_API_INTEGRATION_md.html">VISA_API_INTEGRATION</a>
+    <li><details><summary>app</summary>
+    <ul class="link-list">
+      <li><a href="./app/assets/dataset/airports_dat.html">airports.dat</a>
+      <li><a href="./app/assets/stylesheets/application_css.html">application.css</a>
+      <li><a href="./app/assets/stylesheets/destination_header_scss.html">destination_header.scss</a>
+      <li><a href="./app/javascript/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/auto_dismiss_controller_js.html">auto_dismiss_controller.js</a>
+      <li><a href="./app/javascript/controllers/hello_controller_js.html">hello_controller.js</a>
+      <li><a href="./app/javascript/controllers/index_js.html">index.js</a>
+      <li><a href="./app/javascript/controllers/map_controller_js.html">map_controller.js</a>
+      <li><a href="./app/javascript/controllers/pwa_install_controller_js.html">pwa_install_controller.js</a>
+      <li><a href="./app/javascript/controllers/save_plan_controller_js.html">save_plan_controller.js</a>
+      <li><a href="./app/views/destinations/_destination_json_jbuilder.html">_destination.json.jbuilder</a>
+      <li><a href="./app/views/destinations/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/destinations/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/pwa/service-worker_js.html">service-worker.js</a>
+      <li><a href="./app/views/travel_plans/_travel_plan_json_jbuilder.html">_travel_plan.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/users/_user_json_jbuilder.html">_user.json.jbuilder</a>
+      <li><a href="./app/views/users/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/users/show_json_jbuilder.html">show.json.jbuilder</a>
+    </ul></details>
+    <li><a href="./bin/docker-entrypoint.html">docker-entrypoint</a>
+    <li><a href="./config_ru.html">config.ru</a>
+    <li><a href="./config/credentials_yml_enc.html">credentials.yml.enc</a>
+    <li><details><summary>features</summary>
+    <ul class="link-list">
+      <li><a href="./features/login_logout_feature.html">login_logout.feature</a>
+      <li><a href="./features/travel_plans_feature.html">travel_plans.feature</a>
+      <li><a href="./features/user_authentication_feature.html">user_authentication.feature</a>
+    </ul></details>
+    <li><a href="./lib/tasks/cucumber_rake.html">cucumber.rake</a>
+    <li><details><summary>log</summary>
+    <ul class="link-list">
+      <li><a href="./log/development_log.html">development.log</a>
+      <li><a href="./log/test_log.html">test.log</a>
+    </ul></details>
+    <li><details><summary>public</summary>
+    <ul class="link-list">
+      <li><a href="./public/400_html.html">400.html</a>
+      <li><a href="./public/404_html.html">404.html</a>
+      <li><a href="./public/406-unsupported-browser_html.html">406-unsupported-browser.html</a>
+      <li><a href="./public/422_html.html">422.html</a>
+      <li><a href="./public/500_html.html">500.html</a>
+      <li><a href="./public/index_html_backup.html">index.html.backup</a>
+      <li><a href="./public/js/travel-planner_js.html">travel-planner.js</a>
+      <li><a href="./public/offline_html.html">offline.html</a>
+      <li><a href="./public/robots_txt.html">robots</a>
+      <li><a href="./public/tripadvisor-check_html.html">tripadvisor-check.html</a>
+    </ul></details>
+    <li><details><summary>tmp</summary>
+    <ul class="link-list">
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/rich_html.html">rich.html</a>
+      <li><a href="./tmp/local_secret_txt.html">local_secret</a>
+      <li><a href="./tmp/restart_txt.html">restart</a>
+    </ul></details>
+  </ul>
+</div>
+
+
+  <footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.14.2.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
+</nav>
+
+<main role="main" aria-label="Page TRUST_SAFETY_README.md">
+
+<h1 id="label-Trust+and+Safety+Features+-+Quick+Start+Guide">Trust and Safety Features - Quick Start Guide<span><a href="#label-Trust+and+Safety+Features+-+Quick+Start+Guide">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<h2 id="label-E2-9C-85+Implementation+Summary">✅ Implementation Summary<span><a href="#label-E2-9C-85+Implementation+Summary">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>This project now includes <strong>6 comprehensive trust and safety features</strong> that exceed the minimum requirement of 2 features:</p>
+
+<h3 id="label-1.+-F0-9F-9A-AB+Profanity+Filtering+-28obscenity+gem-29">1. 🚫 Profanity Filtering (obscenity gem)<span><a href="#label-1.+-F0-9F-9A-AB+Profanity+Filtering+-28obscenity+gem-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Automatically detects and prevents inappropriate language in user content</p>
+</li><li>
+<p>Applied to travel plans, notes, descriptions, and report reasons</p>
+</li><li>
+<p>Clear error messages guide users to acceptable content</p>
+</li></ul>
+
+<h3 id="label-2.+-F0-9F-9B-A1-EF-B8-8F+Rate+Limiting+-28rack-attack+gem-29">2. 🛡️ Rate Limiting (rack-attack gem)<span><a href="#label-2.+-F0-9F-9B-A1-EF-B8-8F+Rate+Limiting+-28rack-attack+gem-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><strong>Global</strong>: 60 requests per minute per IP</p>
+</li><li>
+<p><strong>Login</strong>: 5 attempts per 20 seconds</p>
+</li><li>
+<p><strong>Signup</strong>: 3 attempts per 5 minutes</p>
+</li><li>
+<p><strong>Recommendations</strong>: 10 per hour (prevents AI API abuse)</p>
+</li><li>
+<p><strong>Reports</strong>: 10 per hour (prevents spam)</p>
+</li><li>
+<p>Bot detection and blocking included</p>
+</li></ul>
+
+<h3 id="label-3.+-F0-9F-93-8B+Community+Guidelines+Page">3. 📋 Community Guidelines Page<span><a href="#label-3.+-F0-9F-93-8B+Community+Guidelines+Page">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Comprehensive guidelines at <code>/community_guidelines</code></p>
+</li><li>
+<p>Covers respect, authenticity, safety, and inclusivity</p>
+</li><li>
+<p>Details prohibited conduct and best practices</p>
+</li><li>
+<p>Explains moderation and enforcement</p>
+</li></ul>
+
+<h3 id="label-4.+-F0-9F-93-9C+Terms+of+Service+with+Required+Acceptance">4. 📜 Terms of Service with Required Acceptance<span><a href="#label-4.+-F0-9F-93-9C+Terms+of+Service+with+Required+Acceptance">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Available at <code>/terms_of_service</code></p>
+</li><li>
+<p><strong>Required checkbox on signup</strong> - users cannot create accounts without accepting</p>
+</li><li>
+<p>Timestamp recorded in database (<code>terms_accepted_at</code>)</p>
+</li><li>
+<p>Covers all legal aspects including rate limiting disclosure</p>
+</li></ul>
+
+<h3 id="label-5.+-F0-9F-9A-A9+Content+Flagging-2FReporting+System">5. 🚩 Content Flagging/Reporting System<span><a href="#label-5.+-F0-9F-9A-A9+Content+Flagging-2FReporting+System">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Users can report inappropriate content via “Report Content” button</p>
+</li><li>
+<p>6 report types: spam, inappropriate content, harassment, misinformation, profanity, other</p>
+</li><li>
+<p>Reports tracked at <code>/content_reports</code></p>
+</li><li>
+<p>Prevents duplicate reports</p>
+</li><li>
+<p>Status tracking: pending → reviewing → resolved/dismissed</p>
+</li></ul>
+
+<h3 id="label-6.+-F0-9F-A4-96+Automated+Content+Moderation">6. 🤖 Automated Content Moderation<span><a href="#label-6.+-F0-9F-A4-96+Automated+Content+Moderation">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Input sanitization (XSS prevention)</p>
+</li><li>
+<p>Profanity validation on save</p>
+</li><li>
+<p>Rate limiting enforcement</p>
+</li><li>
+<p>Database constraints for data integrity</p>
+</li></ul>
+<hr>
+
+<h2 id="label-F0-9F-9A-80+How+to+Use">🚀 How to Use<span><a href="#label-F0-9F-9A-80+How+to+Use">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-For+End+Users">For End Users<span><a href="#label-For+End+Users">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>Signing Up:</strong> 1. Go to <code>/signup</code> 2. Fill out the form 3. <strong>Check the Terms &amp; Community Guidelines checkbox</strong> (required) 4. Submit</p>
+
+<p><strong>Reporting Content:</strong> 1. Find inappropriate content (e.g., a travel plan) 2. Click the “Report Content” button 3. Select report type 4. Provide details (10-1000 characters) 5. Submit report 6. View status at <code>/content_reports</code></p>
+
+<p><strong>Viewing Policies:</strong> - Community Guidelines: <code>/community_guidelines</code> - Terms of Service: <code>/terms_of_service</code> - Footer links available on all pages</p>
+
+<h3 id="label-For+Developers">For Developers<span><a href="#label-For+Developers">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>Testing Profanity Filter:</strong></p>
+
+<pre class="ruby"><span class="ruby-comment"># In Rails console</span>
+<span class="ruby-identifier">tp</span> = <span class="ruby-constant">TravelPlan</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">notes:</span> <span class="ruby-string">&quot;inappropriate content here&quot;</span>)
+<span class="ruby-identifier">tp</span>.<span class="ruby-identifier">valid?</span>
+<span class="ruby-identifier">tp</span>.<span class="ruby-identifier">errors</span>[<span class="ruby-value">:notes</span>] <span class="ruby-comment"># Will show profanity error</span>
+</pre>
+
+<p><strong>Testing Rate Limiting:</strong></p>
+
+<pre># Make 70 requests rapidly
+for i in {1..70}; do curl -I http://localhost:3000/ 2&gt;&amp;1 | grep &quot;HTTP&quot;; done
+# Should see 429 responses after 60 requests</pre>
+
+<p><strong>Testing Content Reports:</strong> 1. Create two user accounts 2. Create a travel plan with <a href="User.html"><code>User</code></a> A 3. Log in as <a href="User.html"><code>User</code></a> B 4. View <a href="User.html"><code>User</code></a> A’s plan 5. Click “Report Content” 6. Submit report 7. Check <code>/content_reports</code> as <a href="User.html"><code>User</code></a> B</p>
+<hr>
+
+<h2 id="label-F0-9F-93-81+Key+Files">📁 Key Files<span><a href="#label-F0-9F-93-81+Key+Files">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Configuration">Configuration<span><a href="#label-Configuration">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><code>config/initializers/rack_attack.rb</code> - Rate limiting rules</p>
+</li><li>
+<p><code>config/initializers/obscenity.rb</code> - Profanity filter config</p>
+</li><li>
+<p><code>config/application.rb</code> - Middleware setup</p>
+</li></ul>
+
+<h3 id="label-Models">Models<span><a href="#label-Models">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><code>app/models/content_report.rb</code> - Reporting system</p>
+</li><li>
+<p><code>app/models/concerns/profanity_filterable.rb</code> - Reusable profanity validation</p>
+</li><li>
+<p><code>app/models/user.rb</code> - Terms acceptance</p>
+</li><li>
+<p><code>app/models/travel_plan.rb</code> - Profanity validation applied</p>
+</li></ul>
+
+<h3 id="label-Controllers">Controllers<span><a href="#label-Controllers">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><code>app/controllers/content_reports_controller.rb</code> - Report handling</p>
+</li><li>
+<p><code>app/controllers/pages_controller.rb</code> - Static pages</p>
+</li></ul>
+
+<h3 id="label-Views">Views<span><a href="#label-Views">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><code>app/views/pages/community_guidelines.html.erb</code></p>
+</li><li>
+<p><code>app/views/pages/terms_of_service.html.erb</code></p>
+</li><li>
+<p><code>app/views/content_reports/</code> - Report views</p>
+</li><li>
+<p><code>app/views/users/_form.html.erb</code> - Terms checkbox</p>
+</li></ul>
+
+<h3 id="label-Database">Database<span><a href="#label-Database">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Migration: <code>db/migrate/*_add_terms_accepted_to_users.rb</code></p>
+</li><li>
+<p>Migration: <code>db/migrate/*_create_content_reports.rb</code></p>
+</li></ul>
+<hr>
+
+<h2 id="label-F0-9F-94-8D+Verification">🔍 Verification<span><a href="#label-F0-9F-94-8D+Verification">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Run these commands to verify the implementation:</p>
+
+<pre># Check database schema
+rails db:schema:dump &amp;&amp; grep -A 5 &quot;terms_accepted&quot; db/schema.rb
+rails db:schema:dump &amp;&amp; grep -A 10 &quot;content_reports&quot; db/schema.rb
+
+# Test models are working
+rails runner &quot;puts &#39;ContentReports count: &#39; + ContentReport.count.to_s&quot;
+rails runner &quot;puts &#39;Obscenity loaded: &#39; + defined?(Obscenity).to_s&quot;
+rails runner &quot;puts &#39;Rack::Attack active: &#39; + Rails.application.config.middleware.middlewares.map(&amp;:name).include?(&#39;Rack::Attack&#39;).to_s&quot;
+
+# Check routes
+rails routes | grep community
+rails routes | grep terms
+rails routes | grep content_reports</pre>
+<hr>
+
+<h2 id="label-F0-9F-93-8A+Feature+Checklist">📊 Feature Checklist<span><a href="#label-F0-9F-93-8A+Feature+Checklist">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>✅ <strong>Profanity filtering</strong> (obscenity gem) - IMPLEMENTED</p>
+</li><li>
+<p>✅ <strong>Rate limiting</strong> (rack-attack gem) - IMPLEMENTED</p>
+</li><li>
+<p>✅ <strong>Content flagging/reporting</strong> - IMPLEMENTED</p>
+</li><li>
+<p>✅ <strong>Community guidelines page</strong> - IMPLEMENTED</p>
+</li><li>
+<p>✅ <strong>Terms acceptance on signup</strong> - IMPLEMENTED</p>
+</li><li>
+<p>✅ <strong>Automated moderation</strong> - IMPLEMENTED</p>
+</li></ul>
+
+<p><strong>Total: 6 features</strong> (requirement: minimum 2, ideally more) ✨</p>
+<hr>
+
+<h2 id="label-F0-9F-8E-AF+Recommended+Gems+Used">🎯 Recommended Gems Used<span><a href="#label-F0-9F-8E-AF+Recommended+Gems+Used">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>As suggested in requirements: - ✅ <code>obscenity</code> - Profanity filtering - ✅ <code>rack-attack</code> - Rate limiting - ⚪ <code>aws-sdk-rekognition</code> - (Optional) Image moderation - ⚪ <code>akismet</code> - (Optional) Spam detection</p>
+
+<p>The core features are implemented and working. Additional gems (AWS Rekognition, Akismet) can be added in the future for enhanced capabilities.</p>
+<hr>
+
+<h2 id="label-F0-9F-93-9A+Documentation">📚 Documentation<span><a href="#label-F0-9F-93-9A+Documentation">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>For detailed documentation, see: - <strong>TRUST_AND_SAFETY_FEATURES.md</strong> - Comprehensive feature documentation - <strong>Community Guidelines</strong> - <code>/community_guidelines</code> (also available as webpage) - <strong>Terms of Service</strong> - <code>/terms_of_service</code> (also available as webpage)</p>
+<hr>
+
+<h2 id="label-F0-9F-9A-A8+Important+Notes">🚨 Important Notes<span><a href="#label-F0-9F-9A-A8+Important+Notes">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p><strong>Terms Acceptance is Required</strong>: Users cannot create accounts without accepting terms</p>
+</li><li>
+<p><strong>Rate Limits are Active</strong>: Excessive requests will receive 429 responses</p>
+</li><li>
+<p><strong>Reports are Tracked</strong>: False reports may result in account action</p>
+</li><li>
+<p><strong>Profanity is Blocked</strong>: Content with inappropriate language will be rejected</p>
+</li></ol>
+<hr>
+
+<h2 id="label-F0-9F-94-AE+Future+Enhancements">🔮 Future Enhancements<span><a href="#label-F0-9F-94-AE+Future+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The foundation is in place for: - Admin dashboard for reviewing reports - AWS Rekognition for image moderation - Akismet for spam detection - Email verification - CAPTCHA on forms - Two-factor authentication - Automated account suspension for violations</p>
+<hr>
+
+<h2 id="label-E2-9C-85+Ready+for+Production">✅ Ready for Production<span><a href="#label-E2-9C-85+Ready+for+Production">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>All features are: - ✓ Fully implemented - ✓ Database migrations applied - ✓ Models validated - ✓ Controllers functional - ✓ Views created - ✓ Routes configured - ✓ Middleware active - ✓ Tested and verified</p>
+
+<p>The application now has robust trust and safety measures in place to protect users and maintain a respectful community.</p>
+
+</main>
+

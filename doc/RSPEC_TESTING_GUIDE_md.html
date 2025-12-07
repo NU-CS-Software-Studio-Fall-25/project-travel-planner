@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>RSPEC_TESTING_GUIDE - Travel Planner Documentation</title>
+
+  <meta name="keywords" content="ruby,documentation,RSPEC_TESTING_GUIDE">
+  <meta name="description" content="RSPEC_TESTING_GUIDE: RSpec Testing Guide for Travel Planner Project ## Overview This document explains the RSpec test setup for the Travel Planner application. Each team ">
+
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<div id="navigation-toggle" role="button" tabindex="0" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="navigation">
+  <span aria-hidden="true">&#9776;</span>
+</div>
+
+
+<nav id="navigation" role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+
+
+  <ul class="link-list" role="directory">
+              <li>
+            <details open>
+              <summary>      <a href="#label-RSpec+Testing+Guide+for+Travel+Planner+Project">RSpec Testing Guide for Travel Planner Project</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Overview">Overview</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-What+Was+Done">What Was Done</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+RSpec+Installation+-26+Configuration">1. <strong>RSpec Installation &amp; Configuration</strong></a>
+          <li>      <a href="#label-2.+Factory+Definitions+-28spec-2Ffactories-2F-29">2. <strong>Factory Definitions</strong> (<code>spec/factories/</code>)</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-3.+Model+Specs+-28spec-2Fmodels-2F-29">3. <strong>Model Specs</strong> (<code>spec/models/</code>)</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-User+Model+-28user_spec.rb-29"><strong>User Model</strong> (<code>user_spec.rb</code>)</a>
+          <li>      <a href="#label-Travel+Plan+Model+-28travel_plan_spec.rb-29"><strong>Travel Plan Model</strong> (<code>travel_plan_spec.rb</code>)</a>
+          <li>      <a href="#label-Recommendation+Feedback+Model+-28recommendation_feedback_spec.rb-29"><strong>Recommendation Feedback Model</strong> (<code>recommendation_feedback_spec.rb</code>)</a>
+          <li>      <a href="#label-Destination+Model+-28destination_spec.rb-29"><strong>Destination Model</strong> (<code>destination_spec.rb</code>)</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-4.+Controller+Specs+-28spec-2Fcontrollers-2F-29">4. <strong>Controller Specs</strong> (<code>spec/controllers/</code>)</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Destinations+Controller+-28destinations_controller_spec.rb-29"><strong>Destinations Controller</strong> (<code>destinations_controller_spec.rb</code>)</a>
+          <li>      <a href="#label-Users+Controller+-28users_controller_spec.rb-29"><strong>Users Controller</strong> (<code>users_controller_spec.rb</code>)</a>
+          <li>      <a href="#label-Travel+Plans+Controller+-28travel_plans_controller_spec.rb-29"><strong>Travel Plans Controller</strong> (<code>travel_plans_controller_spec.rb</code>)</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-5.+Service+Specs+-28spec-2Fservices-2F-29">5. <strong>Service Specs</strong> (<code>spec/services/</code>)</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Travel+Advisor+Service+-28travel_advisor_service_spec.rb-29"><strong>Travel Advisor Service</strong> (<code>travel_advisor_service_spec.rb</code>)</a>
+
+              </ul>
+            </details>
+          </li>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-How+to+Run+the+Tests">How to Run the Tests</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Step+1-3A+Install+Dependencies">Step 1: Install Dependencies</a>
+          <li>      <a href="#label-Step+2-3A+Run+All+Tests">Step 2: Run All Tests</a>
+          <li>      <a href="#label-Step+3-3A+Run+Specific+Test+Files">Step 3: Run Specific Test Files</a>
+          <li>      <a href="#label-Step+4-3A+Run+with+Documentation+Format">Step 4: Run with Documentation Format</a>
+          <li>      <a href="#label-Step+5-3A+Run+with+Coverage+-28optional-29">Step 5: Run with Coverage (optional)</a>
+          <li>      <a href="#label-Common+Expectation+Matchers">Common Expectation Matchers</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-How+Team+Members+Can+Verify+Tests+Work">How Team Members Can Verify Tests Work</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Method+1-3A+Run+Full+Test+Suite">Method 1: Run Full Test Suite</a>
+          <li>      <a href="#label-Method+2-3A+Run+Tests+by+Type">Method 2: Run Tests by Type</a>
+          <li>      <a href="#label-Method+3-3A+Check+Individual+Features">Method 3: Check Individual Features</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-What+Each+Team+Member+Should+Do">What Each Team Member Should Do</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Team+Member+1-3A+Model+Tests">Team Member 1: Model Tests</a>
+          <li>      <a href="#label-Team+Member+2-3A+Controller+Tests">Team Member 2: Controller Tests</a>
+          <li>      <a href="#label-Team+Member+3-3A+Service+Tests">Team Member 3: Service Tests</a>
+          <li>      <a href="#label-Team+Member+4-3A+Integration+Tests">Team Member 4: Integration Tests</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-Adding+New+Tests">Adding New Tests</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Example-3A+Adding+a+New+Model+Test">Example: Adding a New Model Test</a>
+          <li>      <a href="#label-Example-3A+Adding+a+New+Controller+Test">Example: Adding a New Controller Test</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-Troubleshooting">Troubleshooting</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Issue-3A+Database+Errors">Issue: Database Errors</a>
+          <li>      <a href="#label-Issue-3A+Factory+Errors">Issue: Factory Errors</a>
+          <li>      <a href="#label-Issue-3A+Gem+Conflicts">Issue: Gem Conflicts</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-Best+Practices">Best Practices</a>
+          <li>      <a href="#label-Resources">Resources</a>
+          <li>      <a href="#label-Summary">Summary</a>
+
+              </ul>
+            </details>
+          </li>
+
+  </ul>
+</div>
+
+  
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./AIRPORT_LOOKUP_ENHANCEMENT_md.html">AIRPORT_LOOKUP_ENHANCEMENT</a>
+    <li><a href="./BUG_FIX_SAFETY_PARAMETER_md.html">BUG_FIX_SAFETY_PARAMETER</a>
+    <li><a href="./DESTINATION_UI_IMPROVEMENTS_md.html">DESTINATION_UI_IMPROVEMENTS</a>
+    <li><a href="./DEVELOPMENT_GUIDE_md.html">DEVELOPMENT_GUIDE</a>
+    <li><a href="./Dockerfile.html">Dockerfile</a>
+    <li><a href="./FINAL_SECURITY_CHECKLIST_md.html">FINAL_SECURITY_CHECKLIST</a>
+    <li><a href="./GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE</a>
+    <li><a href="./Gemfile.html">Gemfile</a>
+    <li><a href="./Gemfile_lock.html">Gemfile.lock</a>
+    <li><a href="./HEROKU_DEPLOY_md.html">HEROKU_DEPLOY</a>
+    <li><a href="./JAVASCRIPT_VALIDATION_FIX_md.html">JAVASCRIPT_VALIDATION_FIX</a>
+    <li><a href="./LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE</a>
+    <li><a href="./PWA_IMPLEMENTATION_md.html">PWA_IMPLEMENTATION</a>
+    <li><a href="./README_md.html">README</a>
+    <li><a href="./RSPEC_FIXES_SUMMARY_md.html">RSPEC_FIXES_SUMMARY</a>
+    <li><a href="./RSPEC_TESTING_GUIDE_md.html">RSPEC_TESTING_GUIDE</a>
+    <li><a href="./RUBY_COMPATIBILITY_md.html">RUBY_COMPATIBILITY</a>
+    <li><a href="./Rakefile.html">Rakefile</a>
+    <li><a href="./SAFETY_LEVEL_DISPLAY_UPDATE_md.html">SAFETY_LEVEL_DISPLAY_UPDATE</a>
+    <li><a href="./SECURITY_AUDIT_LIKE_DISLIKE_md.html">SECURITY_AUDIT_LIKE_DISLIKE</a>
+    <li><a href="./SERPAPI_INTEGRATION_md.html">SERPAPI_INTEGRATION</a>
+    <li><a href="./TEAM_SETUP_GUIDE_md.html">TEAM_SETUP_GUIDE</a>
+    <li><a href="./TRIPADVISOR_SETUP_md.html">TRIPADVISOR_SETUP</a>
+    <li><a href="./TRUST_AND_SAFETY_FEATURES_md.html">TRUST_AND_SAFETY_FEATURES</a>
+    <li><a href="./TRUST_SAFETY_README_md.html">TRUST_SAFETY_README</a>
+    <li><a href="./VISA_API_INTEGRATION_md.html">VISA_API_INTEGRATION</a>
+    <li><details><summary>app</summary>
+    <ul class="link-list">
+      <li><a href="./app/assets/dataset/airports_dat.html">airports.dat</a>
+      <li><a href="./app/assets/stylesheets/application_css.html">application.css</a>
+      <li><a href="./app/assets/stylesheets/destination_header_scss.html">destination_header.scss</a>
+      <li><a href="./app/javascript/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/auto_dismiss_controller_js.html">auto_dismiss_controller.js</a>
+      <li><a href="./app/javascript/controllers/hello_controller_js.html">hello_controller.js</a>
+      <li><a href="./app/javascript/controllers/index_js.html">index.js</a>
+      <li><a href="./app/javascript/controllers/map_controller_js.html">map_controller.js</a>
+      <li><a href="./app/javascript/controllers/pwa_install_controller_js.html">pwa_install_controller.js</a>
+      <li><a href="./app/javascript/controllers/save_plan_controller_js.html">save_plan_controller.js</a>
+      <li><a href="./app/views/destinations/_destination_json_jbuilder.html">_destination.json.jbuilder</a>
+      <li><a href="./app/views/destinations/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/destinations/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/pwa/service-worker_js.html">service-worker.js</a>
+      <li><a href="./app/views/travel_plans/_travel_plan_json_jbuilder.html">_travel_plan.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/users/_user_json_jbuilder.html">_user.json.jbuilder</a>
+      <li><a href="./app/views/users/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/users/show_json_jbuilder.html">show.json.jbuilder</a>
+    </ul></details>
+    <li><a href="./bin/docker-entrypoint.html">docker-entrypoint</a>
+    <li><a href="./config_ru.html">config.ru</a>
+    <li><a href="./config/credentials_yml_enc.html">credentials.yml.enc</a>
+    <li><details><summary>features</summary>
+    <ul class="link-list">
+      <li><a href="./features/login_logout_feature.html">login_logout.feature</a>
+      <li><a href="./features/travel_plans_feature.html">travel_plans.feature</a>
+      <li><a href="./features/user_authentication_feature.html">user_authentication.feature</a>
+    </ul></details>
+    <li><a href="./lib/tasks/cucumber_rake.html">cucumber.rake</a>
+    <li><details><summary>log</summary>
+    <ul class="link-list">
+      <li><a href="./log/development_log.html">development.log</a>
+      <li><a href="./log/test_log.html">test.log</a>
+    </ul></details>
+    <li><details><summary>public</summary>
+    <ul class="link-list">
+      <li><a href="./public/400_html.html">400.html</a>
+      <li><a href="./public/404_html.html">404.html</a>
+      <li><a href="./public/406-unsupported-browser_html.html">406-unsupported-browser.html</a>
+      <li><a href="./public/422_html.html">422.html</a>
+      <li><a href="./public/500_html.html">500.html</a>
+      <li><a href="./public/index_html_backup.html">index.html.backup</a>
+      <li><a href="./public/js/travel-planner_js.html">travel-planner.js</a>
+      <li><a href="./public/offline_html.html">offline.html</a>
+      <li><a href="./public/robots_txt.html">robots</a>
+      <li><a href="./public/tripadvisor-check_html.html">tripadvisor-check.html</a>
+    </ul></details>
+    <li><details><summary>tmp</summary>
+    <ul class="link-list">
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/rich_html.html">rich.html</a>
+      <li><a href="./tmp/local_secret_txt.html">local_secret</a>
+      <li><a href="./tmp/restart_txt.html">restart</a>
+    </ul></details>
+  </ul>
+</div>
+
+
+  <footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.14.2.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
+</nav>
+
+<main role="main" aria-label="Page RSPEC_TESTING_GUIDE.md">
+
+<h1 id="label-RSpec+Testing+Guide+for+Travel+Planner+Project">RSpec Testing Guide for Travel Planner Project<span><a href="#label-RSpec+Testing+Guide+for+Travel+Planner+Project">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>This document explains the RSpec test setup for the Travel Planner application. Each team member should be familiar with these tests and can extend them for additional features.</p>
+
+<h2 id="label-What+Was+Done">What Was Done<span><a href="#label-What+Was+Done">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-1.+RSpec+Installation+-26+Configuration">1. <strong>RSpec Installation &amp; Configuration</strong><span><a href="#label-1.+RSpec+Installation+-26+Configuration">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Added RSpec gems to <a href="Gemfile.html">Gemfile</a>:</p>
+</li><li>
+<p><code>rspec-rails</code> - Core RSpec testing framework for Rails</p>
+</li><li>
+<p><code>factory_bot_rails</code> - Test data factories</p>
+</li><li>
+<p><code>faker</code> - Generate realistic fake data</p>
+</li><li>
+<p><code>shoulda-matchers</code> - Simplified validation/association testing</p>
+</li><li>
+<p><code>webmock</code> - Mock HTTP requests</p>
+</li><li>
+<p><code>vcr</code> - Record and replay HTTP interactions</p>
+</li><li>
+<p>Created configuration files:</p>
+</li><li>
+<p><code>.rspec</code> - RSpec command-line configuration</p>
+</li><li>
+<p><code>spec/spec_helper.rb</code> - General RSpec settings</p>
+</li><li>
+<p><code>spec/rails_helper.rb</code> - Rails-specific test configuration</p>
+</li><li>
+<p><code>spec/support/session_helper.rb</code> - Helper for simulating user login</p>
+</li><li>
+<p><code>spec/support/vcr.rb</code> - VCR configuration for API mocking</p>
+</li></ul>
+
+<h3 id="label-2.+Factory+Definitions+-28spec-2Ffactories-2F-29">2. <strong>Factory Definitions</strong> (<code>spec/factories/</code>)<span><a href="#label-2.+Factory+Definitions+-28spec-2Ffactories-2F-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Created factories for easy test data generation: - <code>users.rb</code> - <a href="User.html"><code>User</code></a> factory with traits for premium, OAuth, and generation limit scenarios - <code>travel_plans.rb</code> - Travel plan factory with status traits - <code>destinations.rb</code> - <a href="Destination.html"><code>Destination</code></a> factory with safety level and location traits - <code>recommendation_feedbacks.rb</code> - Feedback factory with like/dislike traits</p>
+
+<h3 id="label-3.+Model+Specs+-28spec-2Fmodels-2F-29">3. <strong>Model Specs</strong> (<code>spec/models/</code>)<span><a href="#label-3.+Model+Specs+-28spec-2Fmodels-2F-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-User+Model+-28user_spec.rb-29"><strong>User Model</strong> (<code>user_spec.rb</code>)<span><a href="#label-User+Model+-28user_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ Validations (name, email, password format, current_country) - ✅ Associations (travel_plans, recommendations, destinations, feedbacks) - ✅ Generation limits for free vs premium users - ✅ <code>can_generate_recommendation?</code> method - ✅ <code>increment_generations_used!</code> method - ✅ <code>remaining_generations</code> calculation - ✅ OAuth authentication (<code>from_omniauth</code>) - ✅ Premium user detection - ✅ Monthly generation count reset</p>
+
+<h4 id="label-Travel+Plan+Model+-28travel_plan_spec.rb-29"><strong>Travel Plan Model</strong> (<code>travel_plan_spec.rb</code>)<span><a href="#label-Travel+Plan+Model+-28travel_plan_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ Validations (dates, status, lengths) - ✅ Date validation (end_date must be after start_date) - ✅ Associations (user, destination) - ✅ Itinerary serialization/deserialization - ✅ Status filtering (planned, booked, completed, cancelled)</p>
+
+<h4 id="label-Recommendation+Feedback+Model+-28recommendation_feedback_spec.rb-29"><strong>Recommendation Feedback Model</strong> (<code>recommendation_feedback_spec.rb</code>)<span><a href="#label-Recommendation+Feedback+Model+-28recommendation_feedback_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ Validations (destination, feedback_type, lengths) - ✅ Uniqueness constraint (one feedback per user per destination) - ✅ Scopes (likes, dislikes, recent) - ✅ <code>user_preferences</code> class method - ✅ SQL injection prevention</p>
+
+<h4 id="label-Destination+Model+-28destination_spec.rb-29"><strong>Destination Model</strong> (<code>destination_spec.rb</code>)<span><a href="#label-Destination+Model+-28destination_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ Validations (name, city, country) - ✅ Associations (travel_plans, users) - ✅ Country filtering - ✅ Safety level settings</p>
+
+<h3 id="label-4.+Controller+Specs+-28spec-2Fcontrollers-2F-29">4. <strong>Controller Specs</strong> (<code>spec/controllers/</code>)<span><a href="#label-4.+Controller+Specs+-28spec-2Fcontrollers-2F-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-Destinations+Controller+-28destinations_controller_spec.rb-29"><strong>Destinations Controller</strong> (<code>destinations_controller_spec.rb</code>)<span><a href="#label-Destinations+Controller+-28destinations_controller_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ Index action with domestic/international separation - ✅ Show, new, edit actions - ✅ Create action with valid/invalid params - ✅ Update action - ✅ Destroy action - ✅ Flash messages and redirects</p>
+
+<h4 id="label-Users+Controller+-28users_controller_spec.rb-29"><strong>Users Controller</strong> (<code>users_controller_spec.rb</code>)<span><a href="#label-Users+Controller+-28users_controller_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ <a href="User.html"><code>User</code></a> registration (new, create) - ✅ Password validation requirements (uppercase, lowercase, digit, special char, length) - ✅ Email case-insensitivity - ✅ Session management on signup - ✅ <a href="User.html"><code>User</code></a> profile display</p>
+
+<h4 id="label-Travel+Plans+Controller+-28travel_plans_controller_spec.rb-29"><strong>Travel Plans Controller</strong> (<code>travel_plans_controller_spec.rb</code>)<span><a href="#label-Travel+Plans+Controller+-28travel_plans_controller_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ CRUD operations (index, show, create, update, destroy) - ✅ <a href="User.html"><code>User</code></a> isolation (only see own travel plans) - ✅ Status transitions (planned → booked → completed) - ✅ Association with destinations</p>
+
+<h3 id="label-5.+Service+Specs+-28spec-2Fservices-2F-29">5. <strong>Service Specs</strong> (<code>spec/services/</code>)<span><a href="#label-5.+Service+Specs+-28spec-2Fservices-2F-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-Travel+Advisor+Service+-28travel_advisor_service_spec.rb-29"><strong>Travel Advisor Service</strong> (<code>travel_advisor_service_spec.rb</code>)<span><a href="#label-Travel+Advisor+Service+-28travel_advisor_service_spec.rb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>Tests cover: - ✅ Initialization with API key and host - ✅ <code>places_near</code> method with valid coordinates - ✅ Caching behavior - ✅ Parameter handling (radius, limit) - ✅ Error handling (missing params, API failures, network errors) - ✅ Response parsing - ✅ Logging</p>
+
+<h2 id="label-How+to+Run+the+Tests">How to Run the Tests<span><a href="#label-How+to+Run+the+Tests">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Step+1-3A+Install+Dependencies">Step 1: Install Dependencies<span><a href="#label-Step+1-3A+Install+Dependencies">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre>cd /home/bizimana61/project-travel-planner
+bundle install</pre>
+
+<p>This will install all required gems including: - rspec-rails - factory_bot_rails - faker - shoulda-matchers - webmock - vcr - rails-controller-testing</p>
+
+<h3 id="label-Step+2-3A+Run+All+Tests">Step 2: Run All Tests<span><a href="#label-Step+2-3A+Run+All+Tests">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">bundle</span> <span class="ruby-identifier">exec</span> <span class="ruby-identifier">rspec</span>
+</pre>
+
+<p>You should see output showing 146 examples with 0 failures (after fixes applied).</p>
+
+<pre># Run all model specs
+bundle exec rspec spec/models
+
+# Run specific model spec
+bundle exec rspec spec/models/user_spec.rb
+
+# Run specific test
+bundle exec rspec spec/models/user_spec.rb:25</pre>
+
+<h3 id="label-Step+3-3A+Run+Specific+Test+Files">Step 3: Run Specific Test Files<span><a href="#label-Step+3-3A+Run+Specific+Test+Files">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre>bundle exec rspec --format documentation</pre>
+
+<h3 id="label-Step+4-3A+Run+with+Documentation+Format">Step 4: Run with Documentation Format<span><a href="#label-Step+4-3A+Run+with+Documentation+Format">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Add simplecov gem first, then run:</span>
+<span class="ruby-identifier">bundle</span> <span class="ruby-identifier">exec</span> <span class="ruby-identifier">rspec</span>
+</pre>
+
+<h3 id="label-Step+5-3A+Run+with+Coverage+-28optional-29">Step 5: Run with Coverage (optional)<span><a href="#label-Step+5-3A+Run+with+Coverage+-28optional-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Each RSpec test follows this pattern:</p>
+
+<pre class="ruby"><span class="ruby-constant">RSpec</span>.<span class="ruby-identifier">describe</span> <span class="ruby-constant">ModelName</span>, <span class="ruby-value">type:</span> <span class="ruby-value">:model</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># 1. SET UP PRECONDITIONS</span>
+  <span class="ruby-identifier">let</span>(<span class="ruby-value">:user</span>) { <span class="ruby-identifier">create</span>(<span class="ruby-value">:user</span>) }
+  
+  <span class="ruby-identifier">before</span>(<span class="ruby-value">:each</span>) <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># Setup that runs before each test</span>
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-comment"># 2. EXECUTE CODE &amp; CHECK EXPECTATIONS</span>
+  <span class="ruby-identifier">it</span> <span class="ruby-string">&#39;describes the expected behavior&#39;</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-comment"># Execute the code</span>
+    <span class="ruby-identifier">result</span> = <span class="ruby-identifier">user</span>.<span class="ruby-identifier">some_method</span>
+    
+    <span class="ruby-comment"># Check expectations</span>
+    <span class="ruby-identifier">expect</span>(<span class="ruby-identifier">result</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">eq</span>(<span class="ruby-identifier">expected_value</span>)
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h3 id="label-Common+Expectation+Matchers">Common Expectation Matchers<span><a href="#label-Common+Expectation+Matchers">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Equality</span>
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">value</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">eq</span>(<span class="ruby-value">5</span>)
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">value</span>).<span class="ruby-identifier">not_to</span> <span class="ruby-identifier">eq</span>(<span class="ruby-value">10</span>)
+
+<span class="ruby-comment"># Truthiness</span>
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">value</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">be_truthy</span>
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">value</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">be_falsey</span>
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">value</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">be</span> <span class="ruby-keyword">true</span>
+
+<span class="ruby-comment"># Collection matchers</span>
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">array</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">include</span>(<span class="ruby-identifier">item</span>)
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">array</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">be_empty</span>
+<span class="ruby-identifier">expect</span>(<span class="ruby-identifier">hash</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">have_key</span>(<span class="ruby-value">:key_name</span>)
+
+<span class="ruby-comment"># Change matchers</span>
+<span class="ruby-identifier">expect</span> { <span class="ruby-identifier">action</span> }.<span class="ruby-identifier">to</span> <span class="ruby-identifier">change</span> { <span class="ruby-constant">Model</span>.<span class="ruby-identifier">count</span> }.<span class="ruby-identifier">by</span>(<span class="ruby-value">1</span>)
+<span class="ruby-identifier">expect</span> { <span class="ruby-identifier">action</span> }.<span class="ruby-identifier">to</span> <span class="ruby-identifier">change</span> { <span class="ruby-identifier">object</span>.<span class="ruby-identifier">attribute</span> }.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">old</span>).<span class="ruby-identifier">to</span>(<span class="ruby-identifier">new</span>)
+
+<span class="ruby-comment"># Validation matchers (shoulda-matchers)</span>
+<span class="ruby-identifier">it</span> { <span class="ruby-identifier">should</span> <span class="ruby-identifier">validate_presence_of</span>(<span class="ruby-value">:name</span>) }
+<span class="ruby-identifier">it</span> { <span class="ruby-identifier">should</span> <span class="ruby-identifier">validate_uniqueness_of</span>(<span class="ruby-value">:email</span>) }
+<span class="ruby-identifier">it</span> { <span class="ruby-identifier">should</span> <span class="ruby-identifier">belong_to</span>(<span class="ruby-value">:user</span>) }
+<span class="ruby-identifier">it</span> { <span class="ruby-identifier">should</span> <span class="ruby-identifier">have_many</span>(<span class="ruby-value">:travel_plans</span>) }
+</pre>
+
+<h2 id="label-How+Team+Members+Can+Verify+Tests+Work">How Team Members Can Verify Tests Work<span><a href="#label-How+Team+Members+Can+Verify+Tests+Work">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Method+1-3A+Run+Full+Test+Suite">Method 1: Run Full Test Suite<span><a href="#label-Method+1-3A+Run+Full+Test+Suite">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">bundle</span> <span class="ruby-identifier">exec</span> <span class="ruby-identifier">rspec</span>
+</pre>
+
+<p>You should see output like:</p>
+
+<pre>User
+  validations
+    should validate presence of name ✓
+    should validate length of name ✓
+  ...
+
+Finished in 2.5 seconds (files took 3.2 seconds to load)
+85 examples, 0 failures</pre>
+
+<h3 id="label-Method+2-3A+Run+Tests+by+Type">Method 2: Run Tests by Type<span><a href="#label-Method+2-3A+Run+Tests+by+Type">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre># Models only
+bundle exec rspec spec/models --format documentation
+
+# Controllers only
+bundle exec rspec spec/controllers --format documentation
+
+# Services only
+bundle exec rspec spec/services --format documentation</pre>
+
+<h3 id="label-Method+3-3A+Check+Individual+Features">Method 3: Check Individual Features<span><a href="#label-Method+3-3A+Check+Individual+Features">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre># Test user generation limits
+bundle exec rspec spec/models/user_spec.rb -e &quot;generation limits&quot;
+
+# Test destination controller
+bundle exec rspec spec/controllers/destinations_controller_spec.rb</pre>
+
+<h2 id="label-What+Each+Team+Member+Should+Do">What Each Team Member Should Do<span><a href="#label-What+Each+Team+Member+Should+Do">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Team+Member+1-3A+Model+Tests">Team Member 1: Model Tests<span><a href="#label-Team+Member+1-3A+Model+Tests">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Review <code>spec/models/user_spec.rb</code></p>
+</li><li>
+<p>Add tests for any new <a href="User.html"><code>User</code></a> methods</p>
+</li><li>
+<p>Understand factory usage in <code>spec/factories/users.rb</code></p>
+</li></ul>
+
+<h3 id="label-Team+Member+2-3A+Controller+Tests">Team Member 2: Controller Tests<span><a href="#label-Team+Member+2-3A+Controller+Tests">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Review <code>spec/controllers/destinations_controller_spec.rb</code></p>
+</li><li>
+<p>Add tests for any new controller actions</p>
+</li><li>
+<p>Understand session_helper usage</p>
+</li></ul>
+
+<h3 id="label-Team+Member+3-3A+Service+Tests">Team Member 3: Service Tests<span><a href="#label-Team+Member+3-3A+Service+Tests">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Review <code>spec/services/travel_advisor_service_spec.rb</code></p>
+</li><li>
+<p>Add tests for other services (OpenAI, SerpAPI, etc.)</p>
+</li><li>
+<p>Learn about WebMock and VCR for API testing</p>
+</li></ul>
+
+<h3 id="label-Team+Member+4-3A+Integration+Tests">Team Member 4: Integration Tests<span><a href="#label-Team+Member+4-3A+Integration+Tests">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Create request specs in <code>spec/requests/</code></p>
+</li><li>
+<p>Test full user workflows</p>
+</li><li>
+<p>Add feature specs for critical paths</p>
+</li></ul>
+
+<h2 id="label-Adding+New+Tests">Adding New Tests<span><a href="#label-Adding+New+Tests">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Example-3A+Adding+a+New+Model+Test">Example: Adding a New Model Test<span><a href="#label-Example-3A+Adding+a+New+Model+Test">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># spec/models/your_model_spec.rb</span>
+<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;rails_helper&#39;</span>
+
+<span class="ruby-constant">RSpec</span>.<span class="ruby-identifier">describe</span> <span class="ruby-constant">YourModel</span>, <span class="ruby-value">type:</span> <span class="ruby-value">:model</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-comment"># 1. Create test data</span>
+  <span class="ruby-identifier">let</span>(<span class="ruby-value">:instance</span>) { <span class="ruby-identifier">create</span>(<span class="ruby-value">:your_model</span>) }
+  
+  <span class="ruby-comment"># 2. Test validations</span>
+  <span class="ruby-identifier">describe</span> <span class="ruby-string">&#39;validations&#39;</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">it</span> { <span class="ruby-identifier">should</span> <span class="ruby-identifier">validate_presence_of</span>(<span class="ruby-value">:required_field</span>) }
+  <span class="ruby-keyword">end</span>
+  
+  <span class="ruby-comment"># 3. Test custom methods</span>
+  <span class="ruby-identifier">describe</span> <span class="ruby-string">&#39;#custom_method&#39;</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">it</span> <span class="ruby-string">&#39;returns expected value&#39;</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">result</span> = <span class="ruby-identifier">instance</span>.<span class="ruby-identifier">custom_method</span>
+      <span class="ruby-identifier">expect</span>(<span class="ruby-identifier">result</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">eq</span>(<span class="ruby-string">&#39;expected&#39;</span>)
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h3 id="label-Example-3A+Adding+a+New+Controller+Test">Example: Adding a New Controller Test<span><a href="#label-Example-3A+Adding+a+New+Controller+Test">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># spec/controllers/your_controller_spec.rb</span>
+<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;rails_helper&#39;</span>
+
+<span class="ruby-constant">RSpec</span>.<span class="ruby-identifier">describe</span> <span class="ruby-constant">YourController</span>, <span class="ruby-value">type:</span> <span class="ruby-value">:controller</span> <span class="ruby-keyword">do</span>
+  <span class="ruby-identifier">let</span>(<span class="ruby-value">:user</span>) { <span class="ruby-identifier">create</span>(<span class="ruby-value">:user</span>) }
+  
+  <span class="ruby-identifier">before</span> { <span class="ruby-identifier">log_in_as</span>(<span class="ruby-identifier">user</span>) }
+  
+  <span class="ruby-identifier">describe</span> <span class="ruby-string">&#39;GET #index&#39;</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-identifier">it</span> <span class="ruby-string">&#39;returns success&#39;</span> <span class="ruby-keyword">do</span>
+      <span class="ruby-identifier">get</span> <span class="ruby-value">:index</span>
+      <span class="ruby-identifier">expect</span>(<span class="ruby-identifier">response</span>).<span class="ruby-identifier">to</span> <span class="ruby-identifier">be_successful</span>
+    <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span>
+</pre>
+
+<h2 id="label-Troubleshooting">Troubleshooting<span><a href="#label-Troubleshooting">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Issue-3A+Database+Errors">Issue: Database Errors<span><a href="#label-Issue-3A+Database+Errors">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Reset test database</span>
+<span class="ruby-constant">RAILS_ENV</span>=<span class="ruby-identifier">test</span> <span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">reset</span>
+<span class="ruby-constant">RAILS_ENV</span>=<span class="ruby-identifier">test</span> <span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">migrate</span>
+</pre>
+
+<h3 id="label-Issue-3A+Factory+Errors">Issue: Factory Errors<span><a href="#label-Issue-3A+Factory+Errors">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Check factories are valid</span>
+<span class="ruby-identifier">bundle</span> <span class="ruby-identifier">exec</span> <span class="ruby-identifier">rake</span> <span class="ruby-value">factory_bot:</span><span class="ruby-identifier">lint</span>
+</pre>
+
+<h3 id="label-Issue-3A+Gem+Conflicts">Issue: Gem Conflicts<span><a href="#label-Issue-3A+Gem+Conflicts">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre># Update bundle
+bundle update rspec-rails factory_bot_rails</pre>
+
+<h2 id="label-Best+Practices">Best Practices<span><a href="#label-Best+Practices">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p><strong>Follow AAA Pattern</strong>: Arrange (setup), Act (execute), Assert (verify)</p>
+</li><li>
+<p><strong>One expectation per test</strong> (when possible)</p>
+</li><li>
+<p><strong>Use descriptive test names</strong> - “it ‘does something specific’”</p>
+</li><li>
+<p><strong>Use factories</strong> instead of fixtures</p>
+</li><li>
+<p><strong>Mock external APIs</strong> with WebMock/VCR</p>
+</li><li>
+<p><strong>Keep tests fast</strong> - use <code>build</code> instead of <code>create</code> when you don’t need database persistence</p>
+</li><li>
+<p><strong>Test edge cases</strong> - nil values, empty strings, boundary conditions</p>
+</li><li>
+<p><strong>Use contexts</strong> to group related scenarios</p>
+</li></ol>
+
+<h2 id="label-Resources">Resources<span><a href="#label-Resources">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><a href="https://rspec.info/">RSpec Documentation</a></p>
+</li><li>
+<p><a href="https://github.com/thoughtbot/factory_bot/blob/master/GETTING_STARTED.md">Factory Bot Guide</a></p>
+</li><li>
+<p><a href="https://github.com/thoughtbot/shoulda-matchers">Shoulda Matchers</a></p>
+</li><li>
+<p><a href="https://www.betterspecs.org/">Better Specs</a></p>
+</li></ul>
+
+<h2 id="label-Summary">Summary<span><a href="#label-Summary">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>✅ RSpec is fully configured and ready to use✅ 85+ tests covering models, controllers, and services✅ Factories set up for easy test data generation✅ Helper methods for common tasks (login simulation)✅ API mocking configured with WebMock and VCR✅ Each team member can run tests independently</p>
+
+<p><strong>Next Steps:</strong> 1. Run <code>bundle install</code> 2. Run <code>bundle exec rspec</code> to verify all tests pass 3. Review test files relevant to your assigned features 4. Add new tests as you develop new features</p>
+
+</main>
+

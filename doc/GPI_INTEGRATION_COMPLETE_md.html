@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>GPI_INTEGRATION_COMPLETE - Travel Planner Documentation</title>
+
+  <meta name="keywords" content="ruby,documentation,GPI_INTEGRATION_COMPLETE">
+  <meta name="description" content="GPI_INTEGRATION_COMPLETE: GPI Safety Integration - Implementation Complete! 🎉 ## Overview Successfully integrated the 2025 Global Peace Index (GPI) data into the travel recomm">
+
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<div id="navigation-toggle" role="button" tabindex="0" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="navigation">
+  <span aria-hidden="true">&#9776;</span>
+</div>
+
+
+<nav id="navigation" role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+
+
+  <ul class="link-list" role="directory">
+              <li>
+            <details open>
+              <summary>      <a href="#label-GPI+Safety+Integration+-+Implementation+Complete-21+-F0-9F-8E-89">GPI Safety Integration - Implementation Complete! 🎉</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Overview">Overview</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-What+Was+Implemented">What Was Implemented</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+Database+Layer+-E2-9C-85">1. Database Layer ✅</a>
+          <li>      <a href="#label-2.+Safety+Level+Thresholds+-28Mixed+Approach-29+-E2-9C-85">2. Safety Level Thresholds (Mixed Approach) ✅</a>
+          <li>      <a href="#label-3.+Model+Layer+-E2-9C-85">3. Model Layer ✅</a>
+          <li>      <a href="#label-4.+Service+Layer+Enhancement+-E2-9C-85">4. Service Layer Enhancement ✅</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-5.+View+Layer+Updates+-E2-9C-85">5. View Layer Updates ✅</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Form+-28index.html.erb-29">Form (index.html.erb)</a>
+          <li>      <a href="#label-Recommendations+Display+-28_recommendations_list.html.erb-29">Recommendations Display (_recommendations_list.html.erb)</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-6.+Seeds+Data+-E2-9C-85">6. Seeds Data ✅</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-How+It+Works+-+Complete+Flow">How It Works - Complete Flow</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-Key+Benefits">Key Benefits</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-E2-9C-85+Data-Backed+Safety">✅ Data-Backed Safety</a>
+          <li>      <a href="#label-E2-9C-85+User+Control">✅ User Control</a>
+          <li>      <a href="#label-E2-9C-85+LLM+Constraints">✅ LLM Constraints</a>
+          <li>      <a href="#label-E2-9C-85+Visual+Feedback">✅ Visual Feedback</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-Database+Statistics">Database Statistics</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-Files+Modified-2FCreated">Files Modified/Created</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-New+Files-3A">New Files:</a>
+          <li>      <a href="#label-Modified+Files-3A">Modified Files:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-Testing+Checklist">Testing Checklist</a>
+          <li>      <a href="#label-Future+Enhancements">Future Enhancements</a>
+          <li>      <a href="#label-Commands+Reference">Commands Reference</a>
+          <li>      <a href="#label-Data+Source+Attribution">Data Source Attribution</a>
+          <li>      <a href="#label-Summary">Summary</a>
+
+              </ul>
+            </details>
+          </li>
+
+  </ul>
+</div>
+
+  
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./AIRPORT_LOOKUP_ENHANCEMENT_md.html">AIRPORT_LOOKUP_ENHANCEMENT</a>
+    <li><a href="./BUG_FIX_SAFETY_PARAMETER_md.html">BUG_FIX_SAFETY_PARAMETER</a>
+    <li><a href="./DESTINATION_UI_IMPROVEMENTS_md.html">DESTINATION_UI_IMPROVEMENTS</a>
+    <li><a href="./DEVELOPMENT_GUIDE_md.html">DEVELOPMENT_GUIDE</a>
+    <li><a href="./Dockerfile.html">Dockerfile</a>
+    <li><a href="./FINAL_SECURITY_CHECKLIST_md.html">FINAL_SECURITY_CHECKLIST</a>
+    <li><a href="./GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE</a>
+    <li><a href="./Gemfile.html">Gemfile</a>
+    <li><a href="./Gemfile_lock.html">Gemfile.lock</a>
+    <li><a href="./HEROKU_DEPLOY_md.html">HEROKU_DEPLOY</a>
+    <li><a href="./JAVASCRIPT_VALIDATION_FIX_md.html">JAVASCRIPT_VALIDATION_FIX</a>
+    <li><a href="./LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE</a>
+    <li><a href="./PWA_IMPLEMENTATION_md.html">PWA_IMPLEMENTATION</a>
+    <li><a href="./README_md.html">README</a>
+    <li><a href="./RSPEC_FIXES_SUMMARY_md.html">RSPEC_FIXES_SUMMARY</a>
+    <li><a href="./RSPEC_TESTING_GUIDE_md.html">RSPEC_TESTING_GUIDE</a>
+    <li><a href="./RUBY_COMPATIBILITY_md.html">RUBY_COMPATIBILITY</a>
+    <li><a href="./Rakefile.html">Rakefile</a>
+    <li><a href="./SAFETY_LEVEL_DISPLAY_UPDATE_md.html">SAFETY_LEVEL_DISPLAY_UPDATE</a>
+    <li><a href="./SECURITY_AUDIT_LIKE_DISLIKE_md.html">SECURITY_AUDIT_LIKE_DISLIKE</a>
+    <li><a href="./SERPAPI_INTEGRATION_md.html">SERPAPI_INTEGRATION</a>
+    <li><a href="./TEAM_SETUP_GUIDE_md.html">TEAM_SETUP_GUIDE</a>
+    <li><a href="./TRIPADVISOR_SETUP_md.html">TRIPADVISOR_SETUP</a>
+    <li><a href="./TRUST_AND_SAFETY_FEATURES_md.html">TRUST_AND_SAFETY_FEATURES</a>
+    <li><a href="./TRUST_SAFETY_README_md.html">TRUST_SAFETY_README</a>
+    <li><a href="./VISA_API_INTEGRATION_md.html">VISA_API_INTEGRATION</a>
+    <li><details><summary>app</summary>
+    <ul class="link-list">
+      <li><a href="./app/assets/dataset/airports_dat.html">airports.dat</a>
+      <li><a href="./app/assets/stylesheets/application_css.html">application.css</a>
+      <li><a href="./app/assets/stylesheets/destination_header_scss.html">destination_header.scss</a>
+      <li><a href="./app/javascript/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/auto_dismiss_controller_js.html">auto_dismiss_controller.js</a>
+      <li><a href="./app/javascript/controllers/hello_controller_js.html">hello_controller.js</a>
+      <li><a href="./app/javascript/controllers/index_js.html">index.js</a>
+      <li><a href="./app/javascript/controllers/map_controller_js.html">map_controller.js</a>
+      <li><a href="./app/javascript/controllers/pwa_install_controller_js.html">pwa_install_controller.js</a>
+      <li><a href="./app/javascript/controllers/save_plan_controller_js.html">save_plan_controller.js</a>
+      <li><a href="./app/views/destinations/_destination_json_jbuilder.html">_destination.json.jbuilder</a>
+      <li><a href="./app/views/destinations/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/destinations/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/pwa/service-worker_js.html">service-worker.js</a>
+      <li><a href="./app/views/travel_plans/_travel_plan_json_jbuilder.html">_travel_plan.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/users/_user_json_jbuilder.html">_user.json.jbuilder</a>
+      <li><a href="./app/views/users/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/users/show_json_jbuilder.html">show.json.jbuilder</a>
+    </ul></details>
+    <li><a href="./bin/docker-entrypoint.html">docker-entrypoint</a>
+    <li><a href="./config_ru.html">config.ru</a>
+    <li><a href="./config/credentials_yml_enc.html">credentials.yml.enc</a>
+    <li><details><summary>features</summary>
+    <ul class="link-list">
+      <li><a href="./features/login_logout_feature.html">login_logout.feature</a>
+      <li><a href="./features/travel_plans_feature.html">travel_plans.feature</a>
+      <li><a href="./features/user_authentication_feature.html">user_authentication.feature</a>
+    </ul></details>
+    <li><a href="./lib/tasks/cucumber_rake.html">cucumber.rake</a>
+    <li><details><summary>log</summary>
+    <ul class="link-list">
+      <li><a href="./log/development_log.html">development.log</a>
+      <li><a href="./log/test_log.html">test.log</a>
+    </ul></details>
+    <li><details><summary>public</summary>
+    <ul class="link-list">
+      <li><a href="./public/400_html.html">400.html</a>
+      <li><a href="./public/404_html.html">404.html</a>
+      <li><a href="./public/406-unsupported-browser_html.html">406-unsupported-browser.html</a>
+      <li><a href="./public/422_html.html">422.html</a>
+      <li><a href="./public/500_html.html">500.html</a>
+      <li><a href="./public/index_html_backup.html">index.html.backup</a>
+      <li><a href="./public/js/travel-planner_js.html">travel-planner.js</a>
+      <li><a href="./public/offline_html.html">offline.html</a>
+      <li><a href="./public/robots_txt.html">robots</a>
+      <li><a href="./public/tripadvisor-check_html.html">tripadvisor-check.html</a>
+    </ul></details>
+    <li><details><summary>tmp</summary>
+    <ul class="link-list">
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/rich_html.html">rich.html</a>
+      <li><a href="./tmp/local_secret_txt.html">local_secret</a>
+      <li><a href="./tmp/restart_txt.html">restart</a>
+    </ul></details>
+  </ul>
+</div>
+
+
+  <footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.14.2.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
+</nav>
+
+<main role="main" aria-label="Page GPI_INTEGRATION_COMPLETE.md">
+
+<h1 id="label-GPI+Safety+Integration+-+Implementation+Complete-21+-F0-9F-8E-89">GPI Safety Integration - Implementation Complete! 🎉<span><a href="#label-GPI+Safety+Integration+-+Implementation+Complete-21+-F0-9F-8E-89">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Successfully integrated the 2025 Global Peace Index (GPI) data into the travel recommendation system to provide data-backed safety screening for destination recommendations.</p>
+
+<h2 id="label-What+Was+Implemented">What Was Implemented<span><a href="#label-What+Was+Implemented">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-1.+Database+Layer+-E2-9C-85">1. Database Layer ✅<span><a href="#label-1.+Database+Layer+-E2-9C-85">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><strong>Created <code>country_safety_scores</code> table</strong> with 163 countries</p>
+</li><li>
+<p><strong>Fields:</strong></p>
+</li><li>
+<p><code>country_name</code> (string, indexed)</p>
+</li><li>
+<p><code>gpi_score</code> (decimal 5,3 - e.g., 1.095)</p>
+</li><li>
+<p><code>gpi_rank</code> (integer, 1-163)</p>
+</li><li>
+<p><code>year</code> (integer, default 2025)</p>
+</li><li>
+<p><strong>Indexes:</strong> Optimized for fast queries on country_name, gpi_score, gpi_rank</p>
+</li><li>
+<p><strong>Data Source:</strong> 2025 Global Peace Index by Institute for Economics &amp; Peace</p>
+</li></ul>
+
+<h3 id="label-2.+Safety+Level+Thresholds+-28Mixed+Approach-29+-E2-9C-85">2. Safety Level Thresholds (Mixed Approach) ✅<span><a href="#label-2.+Safety+Level+Thresholds+-28Mixed+Approach-29+-E2-9C-85">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Based on percentile distribution + actual safety meaning:</p>
+
+<table role="table">
+<thead>
+<tr>
+<th>Safety Level</th>
+<th>GPI Score Range</th>
+<th>Rank Range</th>
+<th>Country Count</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Very Safe</strong></td>
+<td>&lt; 1.6</td>
+<td>1-27</td>
+<td>27</td>
+<td>Top-tier safety, most peaceful countries</td>
+</tr>
+<tr>
+<td><strong>Generally Safe</strong></td>
+<td>1.6 - 2.15</td>
+<td>28-104</td>
+<td>79</td>
+<td>Safe with standard precautions</td>
+</tr>
+<tr>
+<td><strong>Partly Safe</strong></td>
+<td>2.15 - 2.7</td>
+<td>105-136</td>
+<td>34</td>
+<td>Moderate risk, requires awareness</td>
+</tr>
+<tr>
+<td><strong>Not Safe</strong></td>
+<td>≥ 2.7</td>
+<td>137-163</td>
+<td>23</td>
+<td>Higher risk destinations</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Examples:</strong> - Very Safe: Iceland, Japan, Singapore, Canada, Australia - Generally Safe: France, Italy, Thailand, China, Egypt - Partly Safe: India, Brazil, Kenya, South Africa - Not Safe: Pakistan, Nigeria, Syria, Russia, Ukraine</p>
+
+<h3 id="label-3.+Model+Layer+-E2-9C-85">3. Model Layer ✅<span><a href="#label-3.+Model+Layer+-E2-9C-85">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File:</strong> <code>app/models/country_safety_score.rb</code></p>
+
+<p><strong>Features:</strong> - Scopes for each safety level: <code>very_safe</code>, <code>generally_safe</code>, <code>partly_safe</code>, <code>not_safe</code> - <code>for_safety_level(level)</code> method - returns countries matching safety preference - <code>safety_level</code> method - returns categorical level for a country - <code>badge_color</code> method - returns Bootstrap color for display - <code>safety_description</code> method - human-readable description - Validations for data integrity</p>
+
+<h3 id="label-4.+Service+Layer+Enhancement+-E2-9C-85">4. Service Layer Enhancement ✅<span><a href="#label-4.+Service+Layer+Enhancement+-E2-9C-85">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File:</strong> <code>app/Services/openai_service.rb</code></p>
+
+<p><strong>New Methods:</strong></p>
+
+<pre class="ruby"><span class="ruby-identifier">get_safe_countries</span>(<span class="ruby-identifier">safety_preference</span>)
+<span class="ruby-comment"># - Queries GPI database for eligible countries</span>
+<span class="ruby-comment"># - Respects trip scope (International/Domestic)</span>
+<span class="ruby-comment"># - Returns filtered country list</span>
+
+<span class="ruby-identifier">build_safety_context</span>(<span class="ruby-identifier">safety_preference</span>)
+<span class="ruby-comment"># - Builds detailed context for LLM</span>
+<span class="ruby-comment"># - Includes country list, GPI scores, and rankings</span>
+<span class="ruby-comment"># - Formats safety restrictions for the prompt</span>
+</pre>
+
+<p><strong>Updated <code>build_prompt</code> Method:</strong> - Queries GPI database BEFORE sending to LLM - Passes pre-filtered country list to LLM with strict instructions - LLM can ONLY recommend from the approved country list - Includes GPI scores and rankings for LLM reference</p>
+
+<h3 id="label-5.+View+Layer+Updates+-E2-9C-85">5. View Layer Updates ✅<span><a href="#label-5.+View+Layer+Updates+-E2-9C-85">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-Form+-28index.html.erb-29">Form (index.html.erb)<span><a href="#label-Form+-28index.html.erb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p>Replaced multi-checkbox safety levels with single select dropdown</p>
+</li><li>
+<p>Four clear options with descriptions</p>
+</li><li>
+<p>Added GPI attribution: “Based on 2025 Global Peace Index data”</p>
+</li><li>
+<p>Shield icon for security/safety visual cue</p>
+</li></ul>
+
+<h4 id="label-Recommendations+Display+-28_recommendations_list.html.erb-29">Recommendations Display (_recommendations_list.html.erb)<span><a href="#label-Recommendations+Display+-28_recommendations_list.html.erb-29">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p>Looks up actual GPI data for each recommended country</p>
+</li><li>
+<p>Displays safety level with color-coded badge</p>
+</li><li>
+<p>Shows GPI score and global rank (e.g., “GPI: 1.095, Rank #1/163”)</p>
+</li><li>
+<p>Includes data source attribution</p>
+</li><li>
+<p>Fallback to numeric safety_score if GPI data not found</p>
+</li></ul>
+
+<h3 id="label-6.+Seeds+Data+-E2-9C-85">6. Seeds Data ✅<span><a href="#label-6.+Seeds+Data+-E2-9C-85">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File:</strong> <code>db/seeds/gpi_2025_data.rb</code></p>
+<ul><li>
+<p>Complete dataset of 163 countries with 2025 GPI scores</p>
+</li><li>
+<p>Includes all data from Vision of Humanity</p>
+</li><li>
+<p>Can be re-run safely (clears existing 2025 data first)</p>
+</li><li>
+<p>Provides summary statistics after seeding</p>
+</li></ul>
+
+<h2 id="label-How+It+Works+-+Complete+Flow">How It Works - Complete Flow<span><a href="#label-How+It+Works+-+Complete+Flow">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<pre>┌─────────────────────────────────────────────────────────────┐
+│ 1. USER INPUT                                                │
+│    User selects: &quot;Generally Safe&quot;                            │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 2. BACKEND QUERY (Before LLM)                               │
+│    CountrySafetyScore.for_safety_level(&quot;Generally Safe&quot;)    │
+│    → Returns 79 countries with GPI 1.6-2.15                 │
+│    → List: France, Italy, UK, Thailand, China, etc.         │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 3. BUILD PROMPT with RESTRICTIONS                           │
+│    &quot;YOU CAN ONLY RECOMMEND FROM THESE 79 COUNTRIES:         │
+│     France, Italy, United Kingdom, Thailand, China...&quot;      │
+│                                                              │
+│    &quot;Top countries by safety:                                │
+│     - Slovakia (GPI: 1.609, Rank #28)                       │
+│     - Bulgaria (GPI: 1.61, Rank #29)                        │
+│     - United Kingdom (GPI: 1.634, Rank #30)...&quot;             │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 4. LLM GENERATES RECOMMENDATIONS                            │
+│    - Only selects from approved list                        │
+│    - Creates detailed itineraries                           │
+│    - Considers other preferences (budget, dates, style)     │
+│    - Returns 5 recommendations                              │
+└───────────────────────┬─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 5. DISPLAY WITH GPI DATA                                    │
+│    &quot;France - Generally Safe                                 │
+│     GPI Score: 1.967 (Rank #74/163)                         │
+│     Source: 2025 Global Peace Index&quot;                        │
+└─────────────────────────────────────────────────────────────┘</pre>
+
+<h2 id="label-Key+Benefits">Key Benefits<span><a href="#label-Key+Benefits">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-E2-9C-85+Data-Backed+Safety">✅ Data-Backed Safety<span><a href="#label-E2-9C-85+Data-Backed+Safety">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>No longer relying solely on LLM’s judgment</p>
+</li><li>
+<p>Real, verified safety data from authoritative source</p>
+</li><li>
+<p>Updated annually (2025 data is current)</p>
+</li></ul>
+
+<h3 id="label-E2-9C-85+User+Control">✅ <a href="User.html"><code>User</code></a> Control<span><a href="#label-E2-9C-85+User+Control">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Clear, easy-to-understand safety categories</p>
+</li><li>
+<p>Users know what they’re getting</p>
+</li><li>
+<p>Transparent about data source</p>
+</li></ul>
+
+<h3 id="label-E2-9C-85+LLM+Constraints">✅ LLM Constraints<span><a href="#label-E2-9C-85+LLM+Constraints">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>LLM cannot recommend unsafe countries for safety-conscious users</p>
+</li><li>
+<p>Pre-filtering ensures compliance</p>
+</li><li>
+<p>LLM focuses on itinerary quality, not safety judgment</p>
+</li></ul>
+
+<h3 id="label-E2-9C-85+Visual+Feedback">✅ Visual Feedback<span><a href="#label-E2-9C-85+Visual+Feedback">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Color-coded safety badges</p>
+</li><li>
+<p>GPI scores and rankings visible</p>
+</li><li>
+<p>Source attribution builds trust</p>
+</li></ul>
+
+<h2 id="label-Database+Statistics">Database Statistics<span><a href="#label-Database+Statistics">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>After seeding:</p>
+
+<pre>✅ Successfully seeded 163 countries with GPI 2025 data!
+
+Safety Level Distribution:
+  Very Safe (GPI &lt; 1.6):           27 countries (16.6%)
+  Generally Safe (GPI 1.6-2.15):   79 countries (48.5%)
+  Partly Safe (GPI 2.15-2.7):      34 countries (20.9%)
+  Not Safe (GPI &gt;= 2.7):           23 countries (14.1%)</pre>
+
+<h2 id="label-Files+Modified-2FCreated">Files Modified/Created<span><a href="#label-Files+Modified-2FCreated">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-New+Files-3A">New Files:<span><a href="#label-New+Files-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p><code>db/migrate/[timestamp]_create_country_safety_scores.rb</code></p>
+</li><li>
+<p><code>app/models/country_safety_score.rb</code></p>
+</li><li>
+<p><code>db/seeds/gpi_2025_data.rb</code></p>
+</li><li>
+<p><code>SAFETY_PREFERENCE_CHANGES.md</code> (previous feature doc)</p>
+</li><li>
+<p><a href="GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE.md</a> (this file)</p>
+</li></ol>
+
+<h3 id="label-Modified+Files-3A">Modified Files:<span><a href="#label-Modified+Files-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p><code>app/Services/openai_service.rb</code> - Added GPI integration</p>
+</li><li>
+<p><code>app/views/travel_recommendations/index.html.erb</code> - Updated form</p>
+</li><li>
+<p><code>app/views/travel_recommendations/_recommendations_list.html.erb</code> - Display GPI data</p>
+</li><li>
+<p><code>db/schema.rb</code> - Auto-updated by migration</p>
+</li></ol>
+
+<h2 id="label-Testing+Checklist">Testing Checklist<span><a href="#label-Testing+Checklist">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>[x] Database migration successful</p>
+</li><li>
+<p>[x] Seeds data loaded (163 countries)</p>
+</li><li>
+<p>[x] Model scopes working correctly</p>
+</li><li>
+<p>[x] Service layer queries GPI database</p>
+</li><li>
+<p>[x] Prompt includes country restrictions</p>
+</li><li>
+<p>[ ] Test with “Very Safe” - should only get top 27 countries</p>
+</li><li>
+<p>[ ] Test with “Generally Safe” - should get 79 countries</p>
+</li><li>
+<p>[ ] Test with “Partly Safe” - should include India, Brazil, etc.</p>
+</li><li>
+<p>[ ] Test with “Not Safe” - should include higher-risk destinations</p>
+</li><li>
+<p>[ ] Verify GPI data displays correctly in results</p>
+</li><li>
+<p>[ ] Test International vs Domestic filtering</p>
+</li></ul>
+
+<h2 id="label-Future+Enhancements">Future Enhancements<span><a href="#label-Future+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p><strong>Annual Updates</strong></p>
+</li><li>
+<p>GPI releases new data every June</p>
+</li><li>
+<p>Create a rake task for easy updates</p>
+</li><li>
+<p><strong>Additional Visualizations</strong></p>
+</li><li>
+<p>Safety map visualization</p>
+</li><li>
+<p>Comparison tool between countries</p>
+</li><li>
+<p>Trend analysis over years</p>
+</li><li>
+<p><strong>User Education</strong></p>
+</li><li>
+<p>Dedicated page explaining GPI methodology</p>
+</li><li>
+<p>Safety tips for each level</p>
+</li><li>
+<p>Country-specific travel advisories</p>
+</li><li>
+<p><strong>Advanced Filtering</strong></p>
+</li><li>
+<p>Combine GPI with other factors (crime rates, political stability)</p>
+</li><li>
+<p>Regional safety scores (not just country-level)</p>
+</li><li>
+<p>Real-time conflict alerts</p>
+</li></ol>
+
+<h2 id="label-Commands+Reference">Commands Reference<span><a href="#label-Commands+Reference">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<pre># Run migration
+bin/rails db:migrate
+
+# Load GPI data
+bin/rails runner db/seeds/gpi_2025_data.rb
+
+# Check data in console
+bin/rails console
+&gt; CountrySafetyScore.count  # Should be 163
+&gt; CountrySafetyScore.very_safe.count  # Should be 27
+&gt; CountrySafetyScore.find_by(country_name: &quot;Iceland&quot;)
+
+# Rollback if needed
+bin/rails db:rollback</pre>
+
+<h2 id="label-Data+Source+Attribution">Data Source Attribution<span><a href="#label-Data+Source+Attribution">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p><strong>Source:</strong> Global Peace Index 2025<br> <strong>Publisher:</strong> Institute for Economics &amp; Peace<br> <strong>Website:</strong> <a href="https://www.visionofhumanity.org/maps">www.visionofhumanity.org/maps</a>/<br> <strong>Methodology:</strong> 23 quantitative and qualitative indicators weighted on a scale of 1-5<br> <strong>Coverage:</strong> 163 countries, 99.7% of world’s population<br> <strong>License:</strong> Public data for non-commercial use</p>
+<hr>
+
+<h2 id="label-Summary">Summary<span><a href="#label-Summary">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>🎉 <strong>Implementation Complete!</strong></p>
+
+<p>The travel planner now uses real-world safety data to pre-screen destinations before sending recommendations to the LLM. Users can trust that their safety preferences are backed by authoritative global peace data, while the LLM focuses on creating amazing, personalized itineraries within safe boundaries.</p>
+
+<p><strong>Safety + Creativity = Perfect Travel Recommendations!</strong> ✈️🌍🔒</p>
+
+</main>
+

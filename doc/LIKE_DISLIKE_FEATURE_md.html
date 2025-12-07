@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>LIKE_DISLIKE_FEATURE - Travel Planner Documentation</title>
+
+  <meta name="keywords" content="ruby,documentation,LIKE_DISLIKE_FEATURE">
+  <meta name="description" content="LIKE_DISLIKE_FEATURE: Dislike Recommendation Feature ## Overview This feature allows users to provide feedback on travel recommendations by liking or disliking them. The s">
+
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<div id="navigation-toggle" role="button" tabindex="0" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="navigation">
+  <span aria-hidden="true">&#9776;</span>
+</div>
+
+
+<nav id="navigation" role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+
+
+  <ul class="link-list" role="directory">
+              <li>
+            <details open>
+              <summary>      <a href="#label-Like-2FDislike+Recommendation+Feature">Like/Dislike Recommendation Feature</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Overview">Overview</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-Implementation+Details">Implementation Details</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+Database+Schema">1. Database Schema</a>
+          <li>      <a href="#label-2.+Model+Layer">2. Model Layer</a>
+          <li>      <a href="#label-3.+Controller+Layer">3. Controller Layer</a>
+          <li>      <a href="#label-4.+Routes">4. Routes</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-5.+View+Layer">5. View Layer</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Like-2FDislike+Buttons">Like/Dislike Buttons</a>
+          <li>      <a href="#label-Feedback+History+View">Feedback History View</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-6.+AI+Integration">6. AI Integration</a>
+          <li>      <a href="#label-7.+Security+Considerations">7. Security Considerations</a>
+          <li>      <a href="#label-8.+Usage+Flow">8. Usage Flow</a>
+          <li>      <a href="#label-9.+Testing+the+Feature">9. Testing the Feature</a>
+          <li>      <a href="#label-10.+Future+Enhancements">10. Future Enhancements</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-Migration+Instructions">Migration Instructions</a>
+          <li>      <a href="#label-Files+Created-2FModified">Files Created/Modified</a>
+          <li>      <a href="#label-Dependencies">Dependencies</a>
+
+              </ul>
+            </details>
+          </li>
+
+  </ul>
+</div>
+
+  
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./AIRPORT_LOOKUP_ENHANCEMENT_md.html">AIRPORT_LOOKUP_ENHANCEMENT</a>
+    <li><a href="./BUG_FIX_SAFETY_PARAMETER_md.html">BUG_FIX_SAFETY_PARAMETER</a>
+    <li><a href="./DESTINATION_UI_IMPROVEMENTS_md.html">DESTINATION_UI_IMPROVEMENTS</a>
+    <li><a href="./DEVELOPMENT_GUIDE_md.html">DEVELOPMENT_GUIDE</a>
+    <li><a href="./Dockerfile.html">Dockerfile</a>
+    <li><a href="./FINAL_SECURITY_CHECKLIST_md.html">FINAL_SECURITY_CHECKLIST</a>
+    <li><a href="./GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE</a>
+    <li><a href="./Gemfile.html">Gemfile</a>
+    <li><a href="./Gemfile_lock.html">Gemfile.lock</a>
+    <li><a href="./HEROKU_DEPLOY_md.html">HEROKU_DEPLOY</a>
+    <li><a href="./JAVASCRIPT_VALIDATION_FIX_md.html">JAVASCRIPT_VALIDATION_FIX</a>
+    <li><a href="./LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE</a>
+    <li><a href="./PWA_IMPLEMENTATION_md.html">PWA_IMPLEMENTATION</a>
+    <li><a href="./README_md.html">README</a>
+    <li><a href="./RSPEC_FIXES_SUMMARY_md.html">RSPEC_FIXES_SUMMARY</a>
+    <li><a href="./RSPEC_TESTING_GUIDE_md.html">RSPEC_TESTING_GUIDE</a>
+    <li><a href="./RUBY_COMPATIBILITY_md.html">RUBY_COMPATIBILITY</a>
+    <li><a href="./Rakefile.html">Rakefile</a>
+    <li><a href="./SAFETY_LEVEL_DISPLAY_UPDATE_md.html">SAFETY_LEVEL_DISPLAY_UPDATE</a>
+    <li><a href="./SECURITY_AUDIT_LIKE_DISLIKE_md.html">SECURITY_AUDIT_LIKE_DISLIKE</a>
+    <li><a href="./SERPAPI_INTEGRATION_md.html">SERPAPI_INTEGRATION</a>
+    <li><a href="./TEAM_SETUP_GUIDE_md.html">TEAM_SETUP_GUIDE</a>
+    <li><a href="./TRIPADVISOR_SETUP_md.html">TRIPADVISOR_SETUP</a>
+    <li><a href="./TRUST_AND_SAFETY_FEATURES_md.html">TRUST_AND_SAFETY_FEATURES</a>
+    <li><a href="./TRUST_SAFETY_README_md.html">TRUST_SAFETY_README</a>
+    <li><a href="./VISA_API_INTEGRATION_md.html">VISA_API_INTEGRATION</a>
+    <li><details><summary>app</summary>
+    <ul class="link-list">
+      <li><a href="./app/assets/dataset/airports_dat.html">airports.dat</a>
+      <li><a href="./app/assets/stylesheets/application_css.html">application.css</a>
+      <li><a href="./app/assets/stylesheets/destination_header_scss.html">destination_header.scss</a>
+      <li><a href="./app/javascript/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/auto_dismiss_controller_js.html">auto_dismiss_controller.js</a>
+      <li><a href="./app/javascript/controllers/hello_controller_js.html">hello_controller.js</a>
+      <li><a href="./app/javascript/controllers/index_js.html">index.js</a>
+      <li><a href="./app/javascript/controllers/map_controller_js.html">map_controller.js</a>
+      <li><a href="./app/javascript/controllers/pwa_install_controller_js.html">pwa_install_controller.js</a>
+      <li><a href="./app/javascript/controllers/save_plan_controller_js.html">save_plan_controller.js</a>
+      <li><a href="./app/views/destinations/_destination_json_jbuilder.html">_destination.json.jbuilder</a>
+      <li><a href="./app/views/destinations/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/destinations/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/pwa/service-worker_js.html">service-worker.js</a>
+      <li><a href="./app/views/travel_plans/_travel_plan_json_jbuilder.html">_travel_plan.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/users/_user_json_jbuilder.html">_user.json.jbuilder</a>
+      <li><a href="./app/views/users/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/users/show_json_jbuilder.html">show.json.jbuilder</a>
+    </ul></details>
+    <li><a href="./bin/docker-entrypoint.html">docker-entrypoint</a>
+    <li><a href="./config_ru.html">config.ru</a>
+    <li><a href="./config/credentials_yml_enc.html">credentials.yml.enc</a>
+    <li><details><summary>features</summary>
+    <ul class="link-list">
+      <li><a href="./features/login_logout_feature.html">login_logout.feature</a>
+      <li><a href="./features/travel_plans_feature.html">travel_plans.feature</a>
+      <li><a href="./features/user_authentication_feature.html">user_authentication.feature</a>
+    </ul></details>
+    <li><a href="./lib/tasks/cucumber_rake.html">cucumber.rake</a>
+    <li><details><summary>log</summary>
+    <ul class="link-list">
+      <li><a href="./log/development_log.html">development.log</a>
+      <li><a href="./log/test_log.html">test.log</a>
+    </ul></details>
+    <li><details><summary>public</summary>
+    <ul class="link-list">
+      <li><a href="./public/400_html.html">400.html</a>
+      <li><a href="./public/404_html.html">404.html</a>
+      <li><a href="./public/406-unsupported-browser_html.html">406-unsupported-browser.html</a>
+      <li><a href="./public/422_html.html">422.html</a>
+      <li><a href="./public/500_html.html">500.html</a>
+      <li><a href="./public/index_html_backup.html">index.html.backup</a>
+      <li><a href="./public/js/travel-planner_js.html">travel-planner.js</a>
+      <li><a href="./public/offline_html.html">offline.html</a>
+      <li><a href="./public/robots_txt.html">robots</a>
+      <li><a href="./public/tripadvisor-check_html.html">tripadvisor-check.html</a>
+    </ul></details>
+    <li><details><summary>tmp</summary>
+    <ul class="link-list">
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/rich_html.html">rich.html</a>
+      <li><a href="./tmp/local_secret_txt.html">local_secret</a>
+      <li><a href="./tmp/restart_txt.html">restart</a>
+    </ul></details>
+  </ul>
+</div>
+
+
+  <footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.14.2.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
+</nav>
+
+<main role="main" aria-label="Page LIKE_DISLIKE_FEATURE.md">
+
+<h1 id="label-Like-2FDislike+Recommendation+Feature">Like/Dislike <a href="Recommendation.html"><code>Recommendation</code></a> Feature<span><a href="#label-Like-2FDislike+Recommendation+Feature">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>This feature allows users to provide feedback on travel recommendations by liking or disliking them. The system learns from this feedback to provide better, more personalized recommendations in the future.</p>
+
+<h2 id="label-Implementation+Details">Implementation Details<span><a href="#label-Implementation+Details">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-1.+Database+Schema">1. Database Schema<span><a href="#label-1.+Database+Schema">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>Migration</strong>: <code>db/migrate/20250109000001_create_recommendation_feedbacks.rb</code></p>
+
+<p>Creates the <code>recommendation_feedbacks</code> table with: - <code>user_id</code> - Foreign key to users table - <code>destination_city</code> - The city that was recommended - <code>destination_country</code> - The country of the destination - <code>trip_type</code> - Type of trip (Solo, Couple, Family, Group) - <code>travel_style</code> - Travel style (Budget, Moderate, Luxury, etc.) - <code>budget_min</code> and <code>budget_max</code> - Budget range for the trip - <code>length_of_stay</code> - Duration in days - <code>feedback_type</code> - Either ‘like’ or ‘dislike’ - <code>reason</code> - Optional text explaining why (max 500 chars) - Unique index on <code>(user_id, destination_city, destination_country)</code> - prevents duplicate feedback</p>
+
+<h3 id="label-2.+Model+Layer">2. Model Layer<span><a href="#label-2.+Model+Layer">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File</strong>: <code>app/models/recommendation_feedback.rb</code></p>
+
+<p><strong>Validations</strong>: - Presence: user_id, destination_city, destination_country, feedback_type - Length limits: - city/country: 100 characters (prevents XSS/buffer attacks) - reason: 500 characters - Inclusion: feedback_type must be ‘like’ or ‘dislike’ - Uniqueness: One feedback per user per destination</p>
+
+<p><strong>Scopes</strong>: - <code>likes</code> - Returns all liked feedbacks - <code>dislikes</code> - Returns all disliked feedbacks - <code>recent</code> - Returns feedbacks ordered by most recent</p>
+
+<p><strong>Class Methods</strong>: - <code>user_preferences(user_id)</code> - Returns hash with: - <code>liked_destinations</code> - Array of {city, country, travel_style, trip_type, length_of_stay} - <code>disliked_destinations</code> - Same structure as liked - <code>preferred_styles</code> - Travel styles the user tends to like - <code>avoided_styles</code> - Travel styles the user tends to dislike</p>
+
+<p><strong>Association</strong>: - <code>app/models/user.rb</code> - Added <code>has_many :recommendation_feedbacks, dependent: :destroy</code></p>
+
+<h3 id="label-3.+Controller+Layer">3. Controller Layer<span><a href="#label-3.+Controller+Layer">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File</strong>: <code>app/controllers/recommendation_feedbacks_controller.rb</code></p>
+
+<p><strong>Actions</strong>:</p>
+<ol><li>
+<p><strong>create</strong> (POST /recommendation_feedbacks)</p>
+</li><li>
+<p>Accepts JSON feedback data</p>
+</li><li>
+<p>Validates and sanitizes input (strips whitespace, enforces length limits)</p>
+</li><li>
+<p>Updates existing feedback if user already rated this destination</p>
+</li><li>
+<p>Creates new feedback otherwise</p>
+</li><li>
+<p>Returns JSON: <code>{success: true/false, message: string, feedback_type: string}</code></p>
+</li><li>
+<p><strong>destroy</strong> (DELETE /recommendation_feedbacks/:id)</p>
+</li><li>
+<p>Removes feedback by ID</p>
+</li><li>
+<p>Only allows users to delete their own feedback (security)</p>
+</li><li>
+<p>Returns JSON: <code>{success: true/false, message: string}</code></p>
+</li><li>
+<p><strong>index</strong> (GET /recommendation_feedbacks)</p>
+</li><li>
+<p>Shows user's feedback history</p>
+</li><li>
+<p>Groups by liked/disliked</p>
+</li><li>
+<p>Limits to 50 most recent</p>
+</li></ol>
+
+<p><strong>Security Features</strong>: - <code>before_action :require_login</code> - Authentication required - <code>sanitize_feedback_params</code> - Strips whitespace, enforces length limits - Authorization check - Users can only manage their own feedback - Strong parameters - Whitelist only allowed fields</p>
+
+<h3 id="label-4.+Routes">4. Routes<span><a href="#label-4.+Routes">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File</strong>: <code>config/routes.rb</code></p>
+
+<pre class="ruby"><span class="ruby-identifier">resources</span> <span class="ruby-value">:recommendation_feedbacks</span>, <span class="ruby-value">only:</span> [<span class="ruby-value">:create</span>, <span class="ruby-value">:destroy</span>, <span class="ruby-value">:index</span>]
+</pre>
+
+<h3 id="label-5.+View+Layer">5. View Layer<span><a href="#label-5.+View+Layer">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-Like-2FDislike+Buttons">Like/Dislike Buttons<span><a href="#label-Like-2FDislike+Buttons">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p><strong>File</strong>: <code>app/views/travel_recommendations/_recommendations_list.html.erb</code></p>
+
+<p><strong>Features</strong>: - Button group with thumbs up/down icons - Data attributes store recommendation details (city, country, trip_type, etc.) - AJAX submission with CSRF token protection - Visual feedback: - Green (btn-success) when liked - Red (btn-danger) when disliked - Outline buttons (btn-outline) when neutral - Success/error messages display inline - Buttons disabled during submission to prevent duplicate requests</p>
+
+<p><strong>JavaScript Functions</strong>: - <code>initializeFeedbackButtons()</code> - Attaches click handlers to all like/dislike buttons - <code>submitFeedback(data, buttonElement)</code> - Sends AJAX POST request - <code>showFeedbackMessage(container, message, type)</code> - Displays auto-dismissing alerts - Uses <code>escapeHtml()</code> for XSS prevention</p>
+
+<h4 id="label-Feedback+History+View">Feedback History View<span><a href="#label-Feedback+History+View">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p><strong>File</strong>: <code>app/views/recommendation_feedbacks/index.html.erb</code></p>
+
+<p><strong>Features</strong>: - Two-column layout: Liked (green) and Disliked (red) - Each feedback shows: - <a href="Destination.html"><code>Destination</code></a> name (city, country) - Trip details (type, style, duration) - Optional reason text - Time since feedback was given - Remove button - All content sanitized with <code>sanitize()</code> helper - Bootstrap cards with color-coded headers - Empty state messages when no feedback exists</p>
+
+<h3 id="label-6.+AI+Integration">6. AI Integration<span><a href="#label-6.+AI+Integration">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>File</strong>: <code>app/Services/openai_service.rb</code></p>
+
+<p><strong>New Method</strong>: <code>build_user_feedback_context(user_id)</code></p>
+
+<p>Fetches user preferences and formats them into a prompt section:</p>
+
+<pre>📝 USER LEARNING CONTEXT - Use this to personalize recommendations:
+
+✅ DESTINATIONS THE USER LIKED (consider similar places):
+   - Paris, France (Luxury, Couple, 5 days)
+   - Rome, Italy (Cultural, Solo, 7 days)
+
+❌ DESTINATIONS THE USER DISLIKED (avoid similar places):
+   - Las Vegas, United States (Budget, Group, 3 days)
+
+⭐ PREFERRED TRAVEL STYLES: Luxury, Cultural
+⛔ AVOIDED TRAVEL STYLES: Budget
+
+🎯 IMPORTANT: Use this feedback to suggest destinations similar to what the user liked...</pre>
+
+<p><strong>Integration</strong>: - <code>build_prompt</code> method calls preferences[:user_id]) at <code>build_user_feedback_context(</code> - Context inserted at top of prompt (after greeting, before budget validation) - Controller passes <code>user_id</code> to OpenaiService: <code>preferences[:user_id] = current_user.id</code></p>
+
+<p><strong>Benefits</strong>: - AI learns user’s destination preferences - Suggests similar cities/countries to liked ones - Avoids suggesting destinations similar to disliked ones - Considers preferred travel styles - Improves recommendation relevance over time</p>
+
+<h3 id="label-7.+Security+Considerations">7. Security Considerations<span><a href="#label-7.+Security+Considerations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>✅ <strong>Input Validation</strong>: - Length limits prevent buffer overflow attacks - Whitespace stripping prevents formatting abuse - Type coercion (to_i) for numeric fields</p>
+
+<p>✅ <strong>XSS Prevention</strong>: - All output sanitized with <code>sanitize()</code> helper - JavaScript uses <code>escapeHtml()</code> for dynamic content - Data attributes instead of inline onclick handlers</p>
+
+<p>✅ <strong>CSRF Protection</strong>: - Rails authenticity tokens on all forms - AJAX requests include ‘X-CSRF-Token’ header</p>
+
+<p>✅ <strong>Authorization</strong>: - Users can only create/delete their own feedback - <code>current_user</code> association enforced in controller</p>
+
+<p>✅ <strong>SQL Injection</strong>: - ActiveRecord parameterized queries - No raw SQL with user input</p>
+
+<h3 id="label-8.+Usage+Flow">8. Usage Flow<span><a href="#label-8.+Usage+Flow">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p><strong>User generates recommendations</strong></p>
+</li><li>
+<p>Fills out travel preferences form</p>
+</li><li>
+<p>Submits and receives AI recommendations</p>
+</li><li>
+<p><strong>User provides feedback</strong></p>
+</li><li>
+<p>Clicks "Like" or "Dislike" on a recommendation card</p>
+</li><li>
+<p>Button changes color to show current state</p>
+</li><li>
+<p>Feedback saved to database</p>
+</li><li>
+<p>Success message appears</p>
+</li><li>
+<p><strong>User generates new recommendations</strong></p>
+</li><li>
+<p>System fetches user's feedback history</p>
+</li><li>
+<p>AI receives personalized context</p>
+</li><li>
+<p>AI suggests destinations similar to liked ones</p>
+</li><li>
+<p>AI avoids destinations similar to disliked ones</p>
+</li><li>
+<p><strong>User views feedback history</strong></p>
+</li><li>
+<p>Visits <code>/recommendation_feedbacks</code></p>
+</li><li>
+<p>Sees all liked/disliked destinations</p>
+</li><li>
+<p>Can remove feedback to reset preferences</p>
+</li></ol>
+
+<h3 id="label-9.+Testing+the+Feature">9. Testing the Feature<span><a href="#label-9.+Testing+the+Feature">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>Steps to verify</strong>:</p>
+<ol><li>
+<p>Run migration: <code>bash   bin/rails db:migrate </code></p>
+</li><li>
+<p>Start server and login</p>
+</li><li>
+<p>Generate travel recommendations</p>
+</li><li>
+<p>Click "Like" on one recommendation</p>
+</li><li>
+<p>Verify button turns green</p>
+</li><li>
+<p>Check database: <code>RecommendationFeedback.last</code></p>
+</li><li>
+<p>Click "Dislike" on another recommendation</p>
+</li><li>
+<p>Verify button turns red</p>
+</li><li>
+<p>Generate new recommendations with same preferences</p>
+</li><li>
+<p>AI should avoid disliked destinations</p>
+</li><li>
+<p>AI should suggest similar to liked destinations</p>
+</li><li>
+<p>Visit <code>/recommendation_feedbacks</code></p>
+</li><li>
+<p>Verify liked/disliked destinations appear</p>
+</li><li>
+<p>Test "Remove" button</p>
+</li><li>
+<p>Security tests:</p>
+</li><li>
+<p>Try submitting feedback without login (should fail)</p>
+</li><li>
+<p>Try deleting another user's feedback (should fail)</p>
+</li><li>
+<p>Try XSS in reason field (should be sanitized)</p>
+</li></ol>
+
+<h3 id="label-10.+Future+Enhancements">10. Future Enhancements<span><a href="#label-10.+Future+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p><strong>Potential improvements</strong>: - Collaborative filtering (recommend destinations liked by similar users) - Sentiment analysis on reason text - Feedback on specific aspects (hotel, activities, food) - Machine learning model for better pattern recognition - Export feedback history - Feedback analytics dashboard for users - Integration with saved travel plans</p>
+
+<h2 id="label-Migration+Instructions">Migration Instructions<span><a href="#label-Migration+Instructions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p>Ensure you’re on the <code>like-dislike-rec</code> branch</p>
+</li><li>
+<p>Run <code>bin/rails db:migrate</code></p>
+</li><li>
+<p>Restart your Rails server</p>
+</li><li>
+<p>Test the feature thoroughly</p>
+</li><li>
+<p>Commit changes: <code>git add . &amp;&amp; git commit -m &quot;Add like/dislike recommendation feature&quot;</code></p>
+</li><li>
+<p>Push to remote: <code>git push origin like-dislike-rec</code></p>
+</li><li>
+<p>Open Pull Request on GitHub</p>
+</li><li>
+<p>After review, merge into main branch</p>
+</li></ol>
+
+<h2 id="label-Files+Created-2FModified">Files Created/Modified<span><a href="#label-Files+Created-2FModified">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p><strong>Created</strong>: - <code>db/migrate/20250109000001_create_recommendation_feedbacks.rb</code> - <code>app/models/recommendation_feedback.rb</code> - <code>app/controllers/recommendation_feedbacks_controller.rb</code> - <code>app/views/recommendation_feedbacks/index.html.erb</code> - <a href="LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE.md</a> (this file)</p>
+
+<p><strong>Modified</strong>: - <code>app/models/user.rb</code> - Added <code>has_many :recommendation_feedbacks</code> - <code>config/routes.rb</code> - Added feedback routes - <code>app/views/travel_recommendations/_recommendations_list.html.erb</code> - Added like/dislike buttons - <code>app/Services/openai_service.rb</code> - Added user feedback integration - <code>app/controllers/travel_recommendations_controller.rb</code> - Pass user_id to AI service</p>
+
+<h2 id="label-Dependencies">Dependencies<span><a href="#label-Dependencies">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>Rails 8.0.3</p>
+</li><li>
+<p>Ruby 3.4.1</p>
+</li><li>
+<p>OpenAI API (GPT-4)</p>
+</li><li>
+<p>Bootstrap 5 (for UI)</p>
+</li><li>
+<p>Turbo (for AJAX)</p>
+</li></ul>
+
+<p>All dependencies are already present in the project. No additional gems required.</p>
+
+</main>
+

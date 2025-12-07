@@ -65,6 +65,8 @@ gem "thruster", require: false
 # Pagination
 gem "pagy"
 
+gem 'rdoc'
+
 # Trust and Safety Features
 gem "obscenity", "~> 1.0.2"  # Profanity filtering
 gem "rack-attack", "~> 6.7"  # Rate limiting and abuse prevention
@@ -101,7 +103,6 @@ group :test do
   gem "cucumber-rails", require: false
   gem "database_cleaner-active_record"
   gem "securerandom"
-  gem "database_cleaner-active_record"
 
   # Additional RSpec testing tools
   gem "shoulda-matchers", "~> 6.0"

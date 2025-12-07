@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Travel Planner Documentation</title>
+
+  <meta name="keywords" content="ruby,documentation,Travel Planner Documentation">
+
+
+    <meta name="description" content="Travel Planner Documentation: Travel Planner A personalized travel recommendation application built with Ruby on Rails and JavaScript. Users can create profiles with their travel ">
+
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<div id="navigation-toggle" role="button" tabindex="0" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="navigation">
+  <span aria-hidden="true">&#9776;</span>
+</div>
+
+
+<nav id="navigation" role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+
+
+  <ul class="link-list" role="directory">
+              <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-8C-8D+Travel+Planner">🌍 Travel Planner</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-MVP+Overview">MVP Overview</a>
+          <li>      <a href="#label-F0-9F-9A-80+Core+Features">🚀 Core Features</a>
+          <li>      <a href="#label-E2-9C-A8+Features">✨ Features</a>
+          <li>      <a href="#label-F0-9F-9B-A0+Technology+Stack">🛠 Technology Stack</a>
+          <li>      <a href="#label-F0-9F-93-8B+Prerequisites">📋 Prerequisites</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-9A-80+Installation+-26+Setup">🚀 Installation &amp; Setup</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+Clone+the+Repository">1. Clone the Repository</a>
+          <li>      <a href="#label-2.+Install+Dependencies">2. Install Dependencies</a>
+          <li>      <a href="#label-3.+Database+Setup">3. Database Setup</a>
+          <li>      <a href="#label-4.+Environment+Variables+Setup">4. Environment Variables Setup</a>
+          <li>      <a href="#label-5.+Start+the+Application">5. Start the Application</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-8E-AF+Usage">🎯 Usage</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-For+New+Users-3A">For New Users:</a>
+          <li>      <a href="#label-For+Existing+Users-3A">For Existing Users:</a>
+          <li>      <a href="#label-Test+Accounts-3A">Test Accounts:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-F0-9F-97-82+Project+Structure">🗂 Project Structure</a>
+          <li>      <a href="#label-F0-9F-94-90+Authentication+Flow">🔐 Authentication Flow</a>
+          <li>      <a href="#label-F0-9F-8E-A8+Styling+-26+UI">🎨 Styling &amp; UI</a>
+          <li>      <a href="#label-F0-9F-9B-A1+Security+Features">🛡 Security Features</a>
+          <li>      <a href="#label-F0-9F-A7-AA+Testing">🧪 Testing</a>
+          <li>      <a href="#label-F0-9F-9A-80+Deployment">🚀 Deployment</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-90-9B+Troubleshooting">🐛 Troubleshooting</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Common+Issues-3A">Common Issues:</a>
+          <li>      <a href="#label-Error+Messages-3A">Error Messages:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-93-9A+API+Documentation">📚 API Documentation</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-TripAdvisor+Integration">TripAdvisor Integration</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-F0-9F-91-A5+Contributing">👥 Contributing</a>
+          <li>      <a href="#label-F0-9F-91-A8-E2-80-8D-F0-9F-92-BB+Development+Team">👨‍💻 Development Team</a>
+          <li>      <a href="#label-F0-9F-93-84+License">📄 License</a>
+
+              </ul>
+            </details>
+          </li>
+
+  </ul>
+</div>
+
+  
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./AIRPORT_LOOKUP_ENHANCEMENT_md.html">AIRPORT_LOOKUP_ENHANCEMENT</a>
+    <li><a href="./BUG_FIX_SAFETY_PARAMETER_md.html">BUG_FIX_SAFETY_PARAMETER</a>
+    <li><a href="./DESTINATION_UI_IMPROVEMENTS_md.html">DESTINATION_UI_IMPROVEMENTS</a>
+    <li><a href="./DEVELOPMENT_GUIDE_md.html">DEVELOPMENT_GUIDE</a>
+    <li><a href="./Dockerfile.html">Dockerfile</a>
+    <li><a href="./FINAL_SECURITY_CHECKLIST_md.html">FINAL_SECURITY_CHECKLIST</a>
+    <li><a href="./GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE</a>
+    <li><a href="./Gemfile.html">Gemfile</a>
+    <li><a href="./Gemfile_lock.html">Gemfile.lock</a>
+    <li><a href="./HEROKU_DEPLOY_md.html">HEROKU_DEPLOY</a>
+    <li><a href="./JAVASCRIPT_VALIDATION_FIX_md.html">JAVASCRIPT_VALIDATION_FIX</a>
+    <li><a href="./LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE</a>
+    <li><a href="./PWA_IMPLEMENTATION_md.html">PWA_IMPLEMENTATION</a>
+    <li><a href="./README_md.html">README</a>
+    <li><a href="./RSPEC_FIXES_SUMMARY_md.html">RSPEC_FIXES_SUMMARY</a>
+    <li><a href="./RSPEC_TESTING_GUIDE_md.html">RSPEC_TESTING_GUIDE</a>
+    <li><a href="./RUBY_COMPATIBILITY_md.html">RUBY_COMPATIBILITY</a>
+    <li><a href="./Rakefile.html">Rakefile</a>
+    <li><a href="./SAFETY_LEVEL_DISPLAY_UPDATE_md.html">SAFETY_LEVEL_DISPLAY_UPDATE</a>
+    <li><a href="./SECURITY_AUDIT_LIKE_DISLIKE_md.html">SECURITY_AUDIT_LIKE_DISLIKE</a>
+    <li><a href="./SERPAPI_INTEGRATION_md.html">SERPAPI_INTEGRATION</a>
+    <li><a href="./TEAM_SETUP_GUIDE_md.html">TEAM_SETUP_GUIDE</a>
+    <li><a href="./TRIPADVISOR_SETUP_md.html">TRIPADVISOR_SETUP</a>
+    <li><a href="./TRUST_AND_SAFETY_FEATURES_md.html">TRUST_AND_SAFETY_FEATURES</a>
+    <li><a href="./TRUST_SAFETY_README_md.html">TRUST_SAFETY_README</a>
+    <li><a href="./VISA_API_INTEGRATION_md.html">VISA_API_INTEGRATION</a>
+    <li><details><summary>app</summary>
+    <ul class="link-list">
+      <li><a href="./app/assets/dataset/airports_dat.html">airports.dat</a>
+      <li><a href="./app/assets/stylesheets/application_css.html">application.css</a>
+      <li><a href="./app/assets/stylesheets/destination_header_scss.html">destination_header.scss</a>
+      <li><a href="./app/javascript/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/auto_dismiss_controller_js.html">auto_dismiss_controller.js</a>
+      <li><a href="./app/javascript/controllers/hello_controller_js.html">hello_controller.js</a>
+      <li><a href="./app/javascript/controllers/index_js.html">index.js</a>
+      <li><a href="./app/javascript/controllers/map_controller_js.html">map_controller.js</a>
+      <li><a href="./app/javascript/controllers/pwa_install_controller_js.html">pwa_install_controller.js</a>
+      <li><a href="./app/javascript/controllers/save_plan_controller_js.html">save_plan_controller.js</a>
+      <li><a href="./app/views/destinations/_destination_json_jbuilder.html">_destination.json.jbuilder</a>
+      <li><a href="./app/views/destinations/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/destinations/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/pwa/service-worker_js.html">service-worker.js</a>
+      <li><a href="./app/views/travel_plans/_travel_plan_json_jbuilder.html">_travel_plan.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/users/_user_json_jbuilder.html">_user.json.jbuilder</a>
+      <li><a href="./app/views/users/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/users/show_json_jbuilder.html">show.json.jbuilder</a>
+    </ul></details>
+    <li><a href="./bin/docker-entrypoint.html">docker-entrypoint</a>
+    <li><a href="./config_ru.html">config.ru</a>
+    <li><a href="./config/credentials_yml_enc.html">credentials.yml.enc</a>
+    <li><details><summary>features</summary>
+    <ul class="link-list">
+      <li><a href="./features/login_logout_feature.html">login_logout.feature</a>
+      <li><a href="./features/travel_plans_feature.html">travel_plans.feature</a>
+      <li><a href="./features/user_authentication_feature.html">user_authentication.feature</a>
+    </ul></details>
+    <li><a href="./lib/tasks/cucumber_rake.html">cucumber.rake</a>
+    <li><details><summary>log</summary>
+    <ul class="link-list">
+      <li><a href="./log/development_log.html">development.log</a>
+      <li><a href="./log/test_log.html">test.log</a>
+    </ul></details>
+    <li><details><summary>public</summary>
+    <ul class="link-list">
+      <li><a href="./public/400_html.html">400.html</a>
+      <li><a href="./public/404_html.html">404.html</a>
+      <li><a href="./public/406-unsupported-browser_html.html">406-unsupported-browser.html</a>
+      <li><a href="./public/422_html.html">422.html</a>
+      <li><a href="./public/500_html.html">500.html</a>
+      <li><a href="./public/index_html_backup.html">index.html.backup</a>
+      <li><a href="./public/js/travel-planner_js.html">travel-planner.js</a>
+      <li><a href="./public/offline_html.html">offline.html</a>
+      <li><a href="./public/robots_txt.html">robots</a>
+      <li><a href="./public/tripadvisor-check_html.html">tripadvisor-check.html</a>
+    </ul></details>
+    <li><details><summary>tmp</summary>
+    <ul class="link-list">
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/rich_html.html">rich.html</a>
+      <li><a href="./tmp/local_secret_txt.html">local_secret</a>
+      <li><a href="./tmp/restart_txt.html">restart</a>
+    </ul></details>
+  </ul>
+</div>
+
+  <div id="classindex-section" class="nav-section">
+  <h3>Class and Module Index</h3>
+
+  <ul class="link-list"><li><code><a href="./AddCityToDestinations.html">AddCityToDestinations</a></code></li><li><code><a href="./AddCurrentCountryToUsers.html">AddCurrentCountryToUsers</a></code></li><li><code><a href="./AddCurrentLocationToTravelPlans.html">AddCurrentLocationToTravelPlans</a></code></li><li><code><a href="./AddDescriptionAndDetailsToTravelPlans.html">AddDescriptionAndDetailsToTravelPlans</a></code></li><li><code><a href="./AddEmailVerificationToUsers.html">AddEmailVerificationToUsers</a></code></li><li><code><a href="./AddIndexToResetPasswordTokenToUsers.html">AddIndexToResetPasswordTokenToUsers</a></code></li><li><code><a href="./AddIndexToUsersResetPasswordToken.html">AddIndexToUsersResetPasswordToken</a></code></li><li><code><a href="./AddItineraryToTravelPlans.html">AddItineraryToTravelPlans</a></code></li><li><code><a href="./AddMissingFieldsToTravelPlans.html">AddMissingFieldsToTravelPlans</a></code></li><li><code><a href="./AddNumberOfPeopleToTravelPlans.html">AddNumberOfPeopleToTravelPlans</a></code></li><li><code><a href="./AddNumberOfTravelersToTravelPlans.html">AddNumberOfTravelersToTravelPlans</a></code></li><li><code><a href="./AddOAuthToUsers.html">AddOAuthToUsers</a></code></li><li><code><a href="./AddPasswordToUsers.html">AddPasswordToUsers</a></code></li><li><code><a href="./AddRecommendationGenerationTrackingToUsers.html">AddRecommendationGenerationTrackingToUsers</a></code></li><li><code><a href="./AddRecommendationsJsonToUsers.html">AddRecommendationsJsonToUsers</a></code></li><li><code><a href="./AddResetPasswordFieldsToUsers.html">AddResetPasswordFieldsToUsers</a></code></li><li><code><a href="./AddSubscriptionTierToUsers.html">AddSubscriptionTierToUsers</a></code></li><li><code><a href="./AddTermsAcceptedToUsers.html">AddTermsAcceptedToUsers</a></code></li><li><code><a href="./AdjustForTripPreferences.html">AdjustForTripPreferences</a></code></li><li><code><a href="./AirportLookupService.html">AirportLookupService</a></code></li><li><details><summary><code><a href="./Api.html">Api</a></code></summary><ul class="link-list"><li><details><summary><code><a href="./Api/V1.html">V1</a></code></summary><ul class="link-list"><li><code><a href="./Api/V1/BaseController.html">BaseController</a></code></li><li><code><a href="./Api/V1/DestinationsController.html">DestinationsController</a></code></li><li><code><a href="./Api/V1/TravelPlansController.html">TravelPlansController</a></code></li><li><code><a href="./Api/V1/TravelRecommendationsController.html">TravelRecommendationsController</a></code></li><li><code><a href="./Api/V1/UsersController.html">UsersController</a></code></li></ul></details></li></ul></details></li><li><code><a href="./ApplicationController.html">ApplicationController</a></code></li><li><code><a href="./ApplicationHelper.html">ApplicationHelper</a></code></li><li><code><a href="./ApplicationJob.html">ApplicationJob</a></code></li><li><code><a href="./ApplicationMailer.html">ApplicationMailer</a></code></li><li><code><a href="./ApplicationRecord.html">ApplicationRecord</a></code></li><li><code><a href="./AuthStepHelpers.html">AuthStepHelpers</a></code></li><li><code><a href="./ChangeBudgetBreakdownToJsonInTravelPlans.html">ChangeBudgetBreakdownToJsonInTravelPlans</a></code></li><li><code><a href="./ChangeCurrentCountryDefaultInUsers.html">ChangeCurrentCountryDefaultInUsers</a></code></li><li><code><a href="./ContentReport.html">ContentReport</a></code></li><li><code><a href="./ContentReportsController.html">ContentReportsController</a></code></li><li><code><a href="./CountryCodeMapper.html">CountryCodeMapper</a></code></li><li><code><a href="./CountrySafetyScore.html">CountrySafetyScore</a></code></li><li><code><a href="./CreateContentReports.html">CreateContentReports</a></code></li><li><code><a href="./CreateCountrySafetyScores.html">CreateCountrySafetyScores</a></code></li><li><code><a href="./CreateDestinations.html">CreateDestinations</a></code></li><li><code><a href="./CreateRecommendationFeedbacks.html">CreateRecommendationFeedbacks</a></code></li><li><code><a href="./CreateRecommendations.html">CreateRecommendations</a></code></li><li><code><a href="./CreateTravelPlans.html">CreateTravelPlans</a></code></li><li><code><a href="./CreateUsers.html">CreateUsers</a></code></li><li><code><a href="./Destination.html">Destination</a></code></li><li><code><a href="./DestinationsController.html">DestinationsController</a></code></li><li><code><a href="./DestinationsHelper.html">DestinationsHelper</a></code></li><li><code><a href="./ErrorsController.html">ErrorsController</a></code></li><li><code><a href="./HomeController.html">HomeController</a></code></li><li><code><a href="./HomeHelper.html">HomeHelper</a></code></li><li><code><a href="./Object.html">Object</a></code></li><li><code><a href="./OpenaiService.html">OpenaiService</a></code></li><li><code><a href="./PagesController.html">PagesController</a></code></li><li><details><summary><code><a href="./Pagy.html">Pagy</a></code></summary><ul class="link-list"><li><code><a href="./Pagy/Backend.html">Backend</a></code></li><li><code><a href="./Pagy/Frontend.html">Frontend</a></code></li></ul></details></li><li><code><a href="./PasswordResetsController.html">PasswordResetsController</a></code></li><li><code><a href="./PasswordResetsHelper.html">PasswordResetsHelper</a></code></li><li><code><a href="./ProfanityFilterable.html">ProfanityFilterable</a></code></li><li><details><summary><code><a href="./ProjectTravelPlanner.html">ProjectTravelPlanner</a></code></summary><ul class="link-list"><li><code><a href="./ProjectTravelPlanner/Application.html">Application</a></code></li></ul></details></li><li><details><summary><code><a href="./Rack.html">Rack</a></code></summary><ul class="link-list"><li><code><a href="./Rack/Attack.html">Attack</a></code></li></ul></details></li><li><code><a href="./Recommendation.html">Recommendation</a></code></li><li><code><a href="./RecommendationFeedback.html">RecommendationFeedback</a></code></li><li><code><a href="./RecommendationFeedbacksController.html">RecommendationFeedbacksController</a></code></li><li><code><a href="./SerpapiFlightService.html">SerpapiFlightService</a></code></li><li><code><a href="./SessionsController.html">SessionsController</a></code></li><li><code><a href="./SessionsHelper.html">SessionsHelper</a></code></li><li><code><a href="./TravelAdvisorService.html">TravelAdvisorService</a></code></li><li><details><summary><code><a href="./TravelPlan.html">TravelPlan</a></code></summary><ul class="link-list"><li><code><a href="./TravelPlan/ItinerarySerializer.html">ItinerarySerializer</a></code></li></ul></details></li><li><code><a href="./TravelPlanHelpers.html">TravelPlanHelpers</a></code></li><li><code><a href="./TravelPlansController.html">TravelPlansController</a></code></li><li><code><a href="./TravelPlansHelper.html">TravelPlansHelper</a></code></li><li><code><a href="./TravelRecommendationsController.html">TravelRecommendationsController</a></code></li><li><code><a href="./TravelRecommendationsHelper.html">TravelRecommendationsHelper</a></code></li><li><code><a href="./TripadvisorService.html">TripadvisorService</a></code></li><li><code><a href="./User.html">User</a></code></li><li><code><a href="./UserMailer.html">UserMailer</a></code></li><li><code><a href="./UsersController.html">UsersController</a></code></li><li><code><a href="./UsersHelper.html">UsersHelper</a></code></li><li><code><a href="./VisaService.html">VisaService</a></code></li></ul>
+</div>
+
+
+  <footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.14.2.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
+</nav>
+
+<main role="main">
+
+  
+<h1 id="label-F0-9F-8C-8D+Travel+Planner">🌍 Travel Planner<span><a href="#label-F0-9F-8C-8D+Travel+Planner">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>A personalized travel recommendation application built with Ruby on Rails and JavaScript. Users can create profiles with their travel preferences, budget, and passport country to receive AI-powered destination suggestions tailored specifically for them.</p>
+
+<p><a href="https://travel-planner-cs397-9396d2cb2102.herokuapp.com">travel-planner-cs397-9396d2cb2102.herokuapp.com</a>/</p>
+
+<h2 id="label-MVP+Overview">MVP Overview<span><a href="#label-MVP+Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>A single integrated travel platform that combines <strong>OpenAI</strong>, <strong>Google Maps/Flights</strong>, and <strong>TripAdvisor</strong> APIs to provide a <strong>feasible</strong>, <strong>safety-aware</strong>, and <strong>visa-friendly</strong> travel experience.</p>
+<hr>
+
+<h2 id="label-F0-9F-9A-80+Core+Features">🚀 Core Features<span><a href="#label-F0-9F-9A-80+Core+Features">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><strong>User Input</strong> – Collect user data such as nationality, budget, travel dates, and interests.</p>
+</li><li>
+<p><strong>Filtering</strong> – Automatically filter destinations based on <strong>visa requirements</strong>, <strong>safety</strong>, and <strong>seasonal conditions</strong>.</p>
+</li><li>
+<p><strong>AI Recommendations</strong> – Use <strong>OpenAI API</strong> with prompt engineering to generate <strong>personalized</strong>, <strong>accessible</strong> travel suggestions.</p>
+</li><li>
+<p><strong>TripAdvisor Integration</strong> – Display <strong>destination photos</strong> with descriptive alt text for accessibility, enabling users to visually explore recommended locations with <strong>7+ high-quality images</strong> per destination.</p>
+</li><li>
+<p><strong>Data Integration</strong> –</p>
+</li><li>
+<p><em>Google Maps/Flights:</em> distance, flight options, hotels</p>
+</li><li>
+<p><em>TripAdvisor API:</em> destination photos, attractions, and local activities with quality filtering</p>
+</li><li>
+<p><strong>Output</strong> – Display a list of feasible destinations with <strong>visa info</strong>, <strong>safety level</strong>, <strong>top activities</strong>, and <strong>visual previews</strong>.</p>
+</li></ul>
+
+<h2 id="label-E2-9C-A8+Features">✨ Features<span><a href="#label-E2-9C-A8+Features">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><strong>User Authentication</strong>: Secure signup/login with password encryption</p>
+</li><li>
+<p><strong>Personalized Profiles</strong>: Store travel preferences, budget range, passport country, and safety preferences</p>
+</li><li>
+<p><strong>AI-Powered Recommendations</strong>: Get destination suggestions based on your profile</p>
+</li><li>
+<p><strong>Destination Photos</strong>: Browse 7+ TripAdvisor photos with zoom functionality and accessibility features</p>
+</li><li>
+<p><strong>Destination Management</strong>: Browse and manage travel destinations</p>
+</li><li>
+<p><strong>Travel Planning</strong>: Create and manage travel plans</p>
+</li><li>
+<p><strong>Progressive Web App (PWA)</strong>: Install on mobile devices for app-like experience with offline support</p>
+</li><li>
+<p><strong>Offline Functionality</strong>: Access previously viewed content without internet connection</p>
+</li><li>
+<p><strong>Responsive Design</strong>: Beautiful, mobile-friendly interface with Bootstrap</p>
+</li><li>
+<p><strong>Accessibility</strong>: Alternative text for images, keyboard navigation, and screen reader support</p>
+</li><li>
+<p><strong>API Support</strong>: RESTful API endpoints for all resources</p>
+</li></ul>
+
+<h2 id="label-F0-9F-9B-A0+Technology+Stack">🛠 Technology Stack<span><a href="#label-F0-9F-9B-A0+Technology+Stack">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><strong>Backend</strong>: Ruby on Rails 8.0.3</p>
+</li><li>
+<p><strong>Frontend</strong>: HTML, CSS, JavaScript, Bootstrap 5.3</p>
+</li><li>
+<p><strong>Database</strong>: SQLite (development), PostgreSQL (production ready)</p>
+</li><li>
+<p><strong>Authentication</strong>: bcrypt for secure password hashing</p>
+</li><li>
+<p><strong>External APIs</strong>:</p>
+</li><li>
+<p><strong>OpenAI</strong>: AI-powered travel recommendations</p>
+</li><li>
+<p><strong>TripAdvisor Content API</strong>: <a href="Destination.html"><code>Destination</code></a> photos and attraction information</p>
+</li><li>
+<p><strong>Google Maps/Flights</strong>: Location and travel data (planned)</p>
+</li><li>
+<p><strong>Styling</strong>: Bootstrap 5 with custom CSS gradients</p>
+</li><li>
+<p><strong>API</strong>: RESTful JSON APIs with jbuilder</p>
+</li></ul>
+
+<h2 id="label-F0-9F-93-8B+Prerequisites">📋 Prerequisites<span><a href="#label-F0-9F-93-8B+Prerequisites">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Before running this application, make sure you have the following installed:</p>
+<ul><li>
+<p><strong>Ruby</strong>: Version 3.4.x (tested with 3.4.6)</p>
+</li><li>
+<p><strong>Rails</strong>: Version 8.0.3 or higher</p>
+</li><li>
+<p><strong>Bundler</strong>: For managing Ruby gems</p>
+</li><li>
+<p><strong>Node.js</strong>: For asset compilation (if needed)</p>
+</li><li>
+<p><strong>Git</strong>: For version control</p>
+</li><li>
+<p><strong>API Keys</strong>:</p>
+</li><li>
+<p>TripAdvisor API key (for destination photos)</p>
+</li><li>
+<p>OpenAI API key (for AI recommendations)</p>
+</li></ul>
+
+<h2 id="label-F0-9F-9A-80+Installation+-26+Setup">🚀 Installation &amp; Setup<span><a href="#label-F0-9F-9A-80+Installation+-26+Setup">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-1.+Clone+the+Repository">1. Clone the Repository<span><a href="#label-1.+Clone+the+Repository">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre>git clone https://github.com/NU-CS-Software-Studio-Fall-25/project-travel-planner.git
+cd project-travel-planner</pre>
+
+<h3 id="label-2.+Install+Dependencies">2. Install Dependencies<span><a href="#label-2.+Install+Dependencies">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Install Ruby gems</span>
+<span class="ruby-identifier">bundle</span> <span class="ruby-identifier">install</span>
+
+<span class="ruby-comment"># If you encounter any gem conflicts, try:</span>
+<span class="ruby-identifier">bundle</span> <span class="ruby-identifier">update</span>
+</pre>
+
+<h3 id="label-3.+Database+Setup">3. Database Setup<span><a href="#label-3.+Database+Setup">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Create the database</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">create</span>
+
+<span class="ruby-comment"># Run migrations</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">migrate</span>
+
+<span class="ruby-comment"># Seed the database with sample data</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">seed</span>
+</pre>
+
+<h3 id="label-4.+Environment+Variables+Setup">4. Environment Variables Setup<span><a href="#label-4.+Environment+Variables+Setup">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Create a <code>.env</code> file in the root directory with your API keys:</p>
+
+<pre class="ruby"><span class="ruby-comment"># .env</span>
+<span class="ruby-constant">TRIPADVISOR_API_KEY</span>=<span class="ruby-identifier">your_tripadvisor_api_key_here</span>
+<span class="ruby-constant">OPENAI_API_KEY</span>=<span class="ruby-identifier">your_openai_api_key_here</span>
+</pre>
+
+<p><strong>TripAdvisor API Setup:</strong> 1. Sign up at <a href="https://www.tripadvisor.com/developers">TripAdvisor Content API</a> 2. Create a new API project and get your API key 3. Configure API restrictions: - <strong>For local development</strong>: Add IP addresses <code>127.0.0.1/32</code> and your public IP - <strong>For Heroku production</strong>: Add HTTP referrer <code>travel-planner-cs397-9396d2cb2102.herokuapp.com/*</code></p>
+
+<h3 id="label-5.+Start+the+Application">5. Start the Application<span><a href="#label-5.+Start+the+Application">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Start the Rails server</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-identifier">server</span>
+
+<span class="ruby-comment"># Or use the shorthand</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-identifier">s</span>
+</pre>
+
+<p>The application will be available at <code>http://localhost:3000</code></p>
+
+<h2 id="label-F0-9F-8E-AF+Usage">🎯 Usage<span><a href="#label-F0-9F-8E-AF+Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-For+New+Users-3A">For New Users:<span><a href="#label-For+New+Users-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p>Visit <code>http://localhost:3000</code> - you’ll see the landing page</p>
+</li><li>
+<p>Click “Create Account” or “Sign Up”</p>
+</li><li>
+<p>Fill out your travel profile including:</p>
+</li><li>
+<p>Name and email</p>
+</li><li>
+<p>Password (minimum 6 characters)</p>
+</li><li>
+<p>Passport country</p>
+</li><li>
+<p>Budget range (min/max)</p>
+</li><li>
+<p>Preferred travel season</p>
+</li><li>
+<p>Safety preference (1-10 scale)</p>
+</li><li>
+<p>After signup, you’ll be redirected to your profile page</p>
+</li><li>
+<p>Click “🚀 Get Travel Recommendations” to start planning!</p>
+</li></ol>
+
+<h3 id="label-For+Existing+Users-3A">For Existing Users:<span><a href="#label-For+Existing+Users-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p>Visit <code>http://localhost:3000</code></p>
+</li><li>
+<p>Click “Login” and enter your credentials</p>
+</li><li>
+<p>You’ll be redirected to your profile page (your personal hub)</p>
+</li></ol>
+
+<h3 id="label-Test+Accounts-3A">Test Accounts:<span><a href="#label-Test+Accounts-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The seed data includes these test accounts (password: <code>password123</code>): - <code>alex@example.com</code> - <code>maria@example.com</code> - <code>john@example.com</code></p>
+
+<h2 id="label-F0-9F-97-82+Project+Structure">🗂 Project Structure<span><a href="#label-F0-9F-97-82+Project+Structure">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<pre>app/
+├── controllers/          # Request handling and business logic
+│   ├── application_controller.rb    # Authentication helpers
+│   ├── sessions_controller.rb       # Login/logout
+│   ├── users_controller.rb          # User management
+│   ├── home_controller.rb           # Landing page
+│   ├── travel_recommendations_controller.rb  # AI recommendations &amp; TripAdvisor integration
+│   └── api/v1/                      # API endpoints
+├── models/               # Data models and validations
+│   ├── user.rb                      # User authentication &amp; preferences
+│   ├── destination.rb               # Travel destinations
+│   ├── travel_plan.rb               # User travel plans
+│   └── recommendation.rb            # Travel recommendations
+├── Services/             # External API integrations
+│   ├── openai_service.rb            # OpenAI API wrapper
+│   └── tripadvisor_service.rb       # TripAdvisor API wrapper
+├── views/                # HTML templates
+│   ├── layouts/application.html.erb # Main layout with navigation
+│   ├── users/                       # User profile pages
+│   ├── sessions/                    # Login forms
+│   ├── travel_recommendations/      # Recommendation pages with photos
+│   └── home/                        # Landing page
+public/
+└── index.html            # Static landing page (alternative entry point)
+config/
+├── routes.rb             # URL routing
+└── database.yml          # Database configuration
+db/
+├── migrate/              # Database migrations
+└── seeds.rb              # Sample data</pre>
+
+<h2 id="label-F0-9F-94-90+Authentication+Flow">🔐 Authentication Flow<span><a href="#label-F0-9F-94-90+Authentication+Flow">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p><strong>Landing Page</strong> (<code>/</code>) - Static page or Rails home</p>
+</li><li>
+<p><strong>Signup</strong> (<code>/signup</code>) - <a href="User.html"><code>User</code></a> registration with travel preferences</p>
+</li><li>
+<p><strong>Login</strong> (<code>/login</code>) - <a href="User.html"><code>User</code></a> authentication</p>
+</li><li>
+<p><strong>Profile</strong> (<code>/users/:id</code>) - User’s personal hub after login</p>
+</li><li>
+<p><strong>Logout</strong> - Destroys session, returns to landing page</p>
+</li></ol>
+
+<h2 id="label-F0-9F-8E-A8+Styling+-26+UI">🎨 Styling &amp; UI<span><a href="#label-F0-9F-8E-A8+Styling+-26+UI">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><strong>Bootstrap 5.3</strong>: Responsive grid system and components</p>
+</li><li>
+<p><strong>Custom CSS</strong>: Beautiful gradients and hover effects</p>
+</li><li>
+<p><strong>Color Scheme</strong>: Purple/blue gradients with green accents</p>
+</li><li>
+<p><strong>Mobile-First</strong>: Responsive design that works on all devices</p>
+</li></ul>
+
+<h2 id="label-F0-9F-9B-A1+Security+Features">🛡 Security Features<span><a href="#label-F0-9F-9B-A1+Security+Features">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p><strong>Password Encryption</strong>: Using bcrypt for secure password hashing</p>
+</li><li>
+<p><strong>Session Management</strong>: Rails session-based authentication</p>
+</li><li>
+<p><strong>CSRF Protection</strong>: Cross-site request forgery protection enabled</p>
+</li><li>
+<p><strong>User Authorization</strong>: Users can only access/edit their own profiles</p>
+</li><li>
+<p><strong>Input Validation</strong>: Comprehensive model validations</p>
+</li></ul>
+
+<h2 id="label-F0-9F-A7-AA+Testing">🧪 Testing<span><a href="#label-F0-9F-A7-AA+Testing">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<pre class="ruby"><span class="ruby-comment"># Run the test suite</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-identifier">test</span>
+
+<span class="ruby-comment"># For specific test files</span>
+<span class="ruby-identifier">rails</span> <span class="ruby-identifier">test</span> <span class="ruby-identifier">test</span><span class="ruby-operator">/</span><span class="ruby-identifier">models</span><span class="ruby-operator">/</span><span class="ruby-identifier">user_test</span>.<span class="ruby-identifier">rb</span>
+</pre>
+
+<h2 id="label-F0-9F-9A-80+Deployment">🚀 Deployment<span><a href="#label-F0-9F-9A-80+Deployment">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The application is configured for deployment on platforms like Heroku:</p>
+
+<pre class="ruby"><span class="ruby-comment"># For Heroku deployment</span>
+<span class="ruby-identifier">git</span> <span class="ruby-identifier">push</span> <span class="ruby-identifier">heroku</span> <span class="ruby-identifier">main</span>
+<span class="ruby-identifier">heroku</span> <span class="ruby-identifier">run</span> <span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">migrate</span>
+<span class="ruby-identifier">heroku</span> <span class="ruby-identifier">run</span> <span class="ruby-identifier">rails</span> <span class="ruby-value">db:</span><span class="ruby-identifier">seed</span>
+</pre>
+
+<h2 id="label-F0-9F-90-9B+Troubleshooting">🐛 Troubleshooting<span><a href="#label-F0-9F-90-9B+Troubleshooting">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Common+Issues-3A">Common Issues:<span><a href="#label-Common+Issues-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p><strong>Gem conflicts</strong>: Run <code>bundle update</code> or delete <a href="Gemfile_lock.html">Gemfile.lock</a> and run <code>bundle install</code></p>
+</li><li>
+<p><strong>Database issues</strong>: Try <code>rails db:reset</code> to recreate and reseed</p>
+</li><li>
+<p><strong>Port conflicts</strong>: Use <code>rails s -p 3001</code> to run on a different port</p>
+</li><li>
+<p><strong>Asset issues</strong>: Run <code>rails assets:precompile</code> if needed</p>
+</li></ol>
+
+<h3 id="label-Error+Messages-3A">Error Messages:<span><a href="#label-Error+Messages-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><strong>“Password can’t be blank”</strong>: Make sure you’re using the web form at <code>/signup</code>, not the API</p>
+</li><li>
+<p><strong>“Email already exists”</strong>: Use a different email or login with existing account</p>
+</li></ul>
+
+<h2 id="label-F0-9F-93-9A+API+Documentation">📚 API Documentation<span><a href="#label-F0-9F-93-9A+API+Documentation">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The application provides RESTful API endpoints:</p>
+<ul><li>
+<p><code>GET /api/v1/users</code> - List all users</p>
+</li><li>
+<p><code>POST /api/v1/users</code> - Create new user (include password fields)</p>
+</li><li>
+<p><code>GET /api/v1/destinations</code> - List destinations</p>
+</li><li>
+<p><code>POST /api/v1/travel_recommendations</code> - Get recommendations</p>
+</li><li>
+<p><code>GET /travel_recommendations/fetch_photos</code> - Get TripAdvisor photos for a destination</p>
+</li></ul>
+
+<h3 id="label-TripAdvisor+Integration">TripAdvisor Integration<span><a href="#label-TripAdvisor+Integration">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The application uses TripAdvisor’s Content API to enhance destination recommendations with: - <strong>7+ high-quality photos</strong> per destination - <strong>Smart ad filtering</strong> to show only user-contributed photos - <strong>Quality scoring</strong> that prioritizes blessed/featured photos - <strong>Multi-source collection</strong> from city landmarks and attractions - <strong>Accessibility features</strong> including alt text, keyboard navigation, and zoom modal - <strong>SessionStorage caching</strong> for persistent photo galleries across page navigation</p>
+
+<p><strong>Features:</strong> - Click any photo to zoom with full-screen modal - Gold star badges indicate high-quality, featured photos - Direct links to TripAdvisor for additional information - Refresh button to clear cache and reload photos</p>
+
+<h2 id="label-F0-9F-91-A5+Contributing">👥 Contributing<span><a href="#label-F0-9F-91-A5+Contributing">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ol><li>
+<p>Fork the repository</p>
+</li><li>
+<p>Create a feature branch (<code>git checkout -b feature/amazing-feature</code>)</p>
+</li><li>
+<p>Commit your changes (<code>git commit -m &#39;Add amazing feature&#39;</code>)</p>
+</li><li>
+<p>Push to the branch (<code>git push origin feature/amazing-feature</code>)</p>
+</li><li>
+<p>Open a Pull Request</p>
+</li></ol>
+
+<h2 id="label-F0-9F-91-A8-E2-80-8D-F0-9F-92-BB+Development+Team">👨‍💻 Development Team<span><a href="#label-F0-9F-91-A8-E2-80-8D-F0-9F-92-BB+Development+Team">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Built by: <strong>Sirui Chen, Ailin Chu, Jerome Bizimana, Rohun Gargya</strong></p>
+
+<h2 id="label-F0-9F-93-84+License">📄 License<span><a href="#label-F0-9F-93-84+License">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>This project is part of the Northwestern University CS Software Studio course (Fall 2025).</p>
+<hr>
+
+<p><strong>Happy Traveling! ✈️🌍</strong></p>
+
+</main>
+

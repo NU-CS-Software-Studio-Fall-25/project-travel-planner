@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>VISA_API_INTEGRATION - Travel Planner Documentation</title>
+
+  <meta name="keywords" content="ruby,documentation,VISA_API_INTEGRATION">
+  <meta name="description" content="VISA_API_INTEGRATION: Visa API Integration - Implementation Summary ## 📋 Overview Successfully integrated Travel Buddy Visa Requirements API to provide **real, accurate, ">
+
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
+</script>
+
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
+
+<link href="./css/fonts.css" rel="stylesheet">
+<link href="./css/rdoc.css" rel="stylesheet">
+
+
+<body id="top" role="document" class="file">
+<div id="navigation-toggle" role="button" tabindex="0" aria-label="Toggle sidebar" aria-expanded="true" aria-controls="navigation">
+  <span aria-hidden="true">&#9776;</span>
+</div>
+
+
+<nav id="navigation" role="navigation">
+  <div id="project-navigation">
+    <div id="home-section" role="region" title="Quick navigation" class="nav-section">
+  <h2>
+    <a href="./index.html" rel="home">Home</a>
+  </h2>
+
+  <div id="table-of-contents-navigation">
+    <a href="./table_of_contents.html#pages">Pages</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </div>
+</div>
+
+    <div id="search-section" role="search" class="project-section initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <div id="search-field-wrapper">
+      <input id="search-field" role="combobox" aria-label="Search"
+             aria-autocomplete="list" aria-controls="search-results"
+             type="text" name="search" placeholder="Search (/) for a class, method, ..." spellcheck="false"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </div>
+
+    <ul id="search-results" aria-label="Search Results"
+        aria-busy="false" aria-expanded="false"
+        aria-atomic="false" class="initially-hidden"></ul>
+  </form>
+</div>
+
+  </div>
+
+  
+<div class="nav-section">
+  <h3>Table of Contents</h3>
+
+
+
+  <ul class="link-list" role="directory">
+              <li>
+            <details open>
+              <summary>      <a href="#label-Visa+API+Integration+-+Implementation+Summary">Visa API Integration - Implementation Summary</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-F0-9F-93-8B+Overview">📋 Overview</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-8E-AF+What+Changed">🎯 What Changed</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Architecture-3A+Method+B+-28Recommended-29"><strong>Architecture: Method B (Recommended)</strong></a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-93-81+Files+Created">📁 Files Created</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+app-2FServices-2Fcountry_code_mapper.rb">1. <strong><code>app/Services/country_code_mapper.rb</code></strong></a>
+          <li>      <a href="#label-2.+app-2FServices-2Fvisa_service.rb">2. <strong><code>app/Services/visa_service.rb</code></strong></a>
+          <li>      <a href="#label-3.+test_visa_integration.rb">3. <strong><code>test_visa_integration.rb</code></strong></a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-94-A7+Files+Modified">🔧 Files Modified</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-1.+.env">1. <strong><code>.env</code></strong></a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-2.+app-2FServices-2Fopenai_service.rb">2. <strong><code>app/Services/openai_service.rb</code></strong></a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Changes+in+get_recommendations+method-3A">Changes in <code>get_recommendations</code> method:</a>
+          <li>      <a href="#label-Changes+in+get_full_travel_plan+method-3A">Changes in <code>get_full_travel_plan</code> method:</a>
+          <li>      <a href="#label-Changes+in+build_full_plan_prompt+method-3A">Changes in <code>build_full_plan_prompt</code> method:</a>
+          <li>      <a href="#label-New+helper+methods+added-3A">New helper methods added:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-3.+app-2Fviews-2Ftravel_recommendations-2F_recommendations_list.html.erb">3. <strong><code>app/views/travel_recommendations/_recommendations_list.html.erb</code></strong></a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Enhanced+visa+display+section-3A">Enhanced visa display section:</a>
+
+              </ul>
+            </details>
+          </li>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-F0-9F-94-91+API+Information">🔑 API Information</a>
+          <li>      <a href="#label-F0-9F-93-8A+Data+Flow">📊 Data Flow</a>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-8E-A8+UI+Enhancements">🎨 UI Enhancements</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Before-3A">Before:</a>
+          <li>      <a href="#label-After-3A">After:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-A7-AA+Testing">🧪 Testing</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Run+the+test+script-3A">Run the test script:</a>
+          <li>      <a href="#label-Expected+output-3A">Expected output:</a>
+          <li>      <a href="#label-Manual+testing-3A">Manual testing:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-9A-80+Features+Implemented">🚀 Features Implemented</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-E2-9C-85+Phase+1+-28MVP-29+-+Completed">✅ Phase 1 (MVP) - Completed</a>
+          <li>      <a href="#label-F0-9F-94-9C+Phase+2+-28Future+Enhancements-29">🔜 Phase 2 (Future Enhancements)</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-E2-9A-A0-EF-B8-8F+Important+Notes">⚠️ Important Notes</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-API+Quota+Management">API Quota Management</a>
+          <li>      <a href="#label-Error+Handling">Error Handling</a>
+          <li>      <a href="#label-Country+Code+Coverage">Country Code Coverage</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-93-9D+Usage+Examples">📝 Usage Examples</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Example+1-3A+China+-E2-86-92+Japan">Example 1: China → Japan</a>
+          <li>      <a href="#label-Example+2-3A+US+-E2-86-92+Japan">Example 2: US → Japan</a>
+          <li>      <a href="#label-Example+3-3A+China+-E2-86-92+Indonesia">Example 3: China → Indonesia</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-8E-AF+Benefits">🎯 Benefits</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-For+Users-3A">For Users:</a>
+          <li>      <a href="#label-For+Developers-3A">For Developers:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-94-8D+Debugging">🔍 Debugging</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Enable+detailed+logging-3A">Enable detailed logging:</a>
+          <li>      <a href="#label-Check+API+responses-3A">Check API responses:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details open>
+              <summary>      <a href="#label-F0-9F-93-9E+Support">📞 Support</a>
+</summary>
+              <ul class="link-list" role="directory">
+                          <li>      <a href="#label-Issues+with+API-3A">Issues with API:</a>
+          <li>      <a href="#label-Missing+country+codes-3A">Missing country codes:</a>
+
+              </ul>
+            </details>
+          </li>
+          <li>      <a href="#label-E2-9C-85+Success+Criteria+Met">✅ Success Criteria Met</a>
+
+              </ul>
+            </details>
+          </li>
+
+  </ul>
+</div>
+
+  
+<div id="fileindex-section" class="nav-section">
+  <h3>Pages</h3>
+
+  <ul class="link-list">
+    <li><a href="./AIRPORT_LOOKUP_ENHANCEMENT_md.html">AIRPORT_LOOKUP_ENHANCEMENT</a>
+    <li><a href="./BUG_FIX_SAFETY_PARAMETER_md.html">BUG_FIX_SAFETY_PARAMETER</a>
+    <li><a href="./DESTINATION_UI_IMPROVEMENTS_md.html">DESTINATION_UI_IMPROVEMENTS</a>
+    <li><a href="./DEVELOPMENT_GUIDE_md.html">DEVELOPMENT_GUIDE</a>
+    <li><a href="./Dockerfile.html">Dockerfile</a>
+    <li><a href="./FINAL_SECURITY_CHECKLIST_md.html">FINAL_SECURITY_CHECKLIST</a>
+    <li><a href="./GPI_INTEGRATION_COMPLETE_md.html">GPI_INTEGRATION_COMPLETE</a>
+    <li><a href="./Gemfile.html">Gemfile</a>
+    <li><a href="./Gemfile_lock.html">Gemfile.lock</a>
+    <li><a href="./HEROKU_DEPLOY_md.html">HEROKU_DEPLOY</a>
+    <li><a href="./JAVASCRIPT_VALIDATION_FIX_md.html">JAVASCRIPT_VALIDATION_FIX</a>
+    <li><a href="./LIKE_DISLIKE_FEATURE_md.html">LIKE_DISLIKE_FEATURE</a>
+    <li><a href="./PWA_IMPLEMENTATION_md.html">PWA_IMPLEMENTATION</a>
+    <li><a href="./README_md.html">README</a>
+    <li><a href="./RSPEC_FIXES_SUMMARY_md.html">RSPEC_FIXES_SUMMARY</a>
+    <li><a href="./RSPEC_TESTING_GUIDE_md.html">RSPEC_TESTING_GUIDE</a>
+    <li><a href="./RUBY_COMPATIBILITY_md.html">RUBY_COMPATIBILITY</a>
+    <li><a href="./Rakefile.html">Rakefile</a>
+    <li><a href="./SAFETY_LEVEL_DISPLAY_UPDATE_md.html">SAFETY_LEVEL_DISPLAY_UPDATE</a>
+    <li><a href="./SECURITY_AUDIT_LIKE_DISLIKE_md.html">SECURITY_AUDIT_LIKE_DISLIKE</a>
+    <li><a href="./SERPAPI_INTEGRATION_md.html">SERPAPI_INTEGRATION</a>
+    <li><a href="./TEAM_SETUP_GUIDE_md.html">TEAM_SETUP_GUIDE</a>
+    <li><a href="./TRIPADVISOR_SETUP_md.html">TRIPADVISOR_SETUP</a>
+    <li><a href="./TRUST_AND_SAFETY_FEATURES_md.html">TRUST_AND_SAFETY_FEATURES</a>
+    <li><a href="./TRUST_SAFETY_README_md.html">TRUST_SAFETY_README</a>
+    <li><a href="./VISA_API_INTEGRATION_md.html">VISA_API_INTEGRATION</a>
+    <li><details><summary>app</summary>
+    <ul class="link-list">
+      <li><a href="./app/assets/dataset/airports_dat.html">airports.dat</a>
+      <li><a href="./app/assets/stylesheets/application_css.html">application.css</a>
+      <li><a href="./app/assets/stylesheets/destination_header_scss.html">destination_header.scss</a>
+      <li><a href="./app/javascript/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/application_js.html">application.js</a>
+      <li><a href="./app/javascript/controllers/auto_dismiss_controller_js.html">auto_dismiss_controller.js</a>
+      <li><a href="./app/javascript/controllers/hello_controller_js.html">hello_controller.js</a>
+      <li><a href="./app/javascript/controllers/index_js.html">index.js</a>
+      <li><a href="./app/javascript/controllers/map_controller_js.html">map_controller.js</a>
+      <li><a href="./app/javascript/controllers/pwa_install_controller_js.html">pwa_install_controller.js</a>
+      <li><a href="./app/javascript/controllers/save_plan_controller_js.html">save_plan_controller.js</a>
+      <li><a href="./app/views/destinations/_destination_json_jbuilder.html">_destination.json.jbuilder</a>
+      <li><a href="./app/views/destinations/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/destinations/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/pwa/service-worker_js.html">service-worker.js</a>
+      <li><a href="./app/views/travel_plans/_travel_plan_json_jbuilder.html">_travel_plan.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/travel_plans/show_json_jbuilder.html">show.json.jbuilder</a>
+      <li><a href="./app/views/users/_user_json_jbuilder.html">_user.json.jbuilder</a>
+      <li><a href="./app/views/users/index_json_jbuilder.html">index.json.jbuilder</a>
+      <li><a href="./app/views/users/show_json_jbuilder.html">show.json.jbuilder</a>
+    </ul></details>
+    <li><a href="./bin/docker-entrypoint.html">docker-entrypoint</a>
+    <li><a href="./config_ru.html">config.ru</a>
+    <li><a href="./config/credentials_yml_enc.html">credentials.yml.enc</a>
+    <li><details><summary>features</summary>
+    <ul class="link-list">
+      <li><a href="./features/login_logout_feature.html">login_logout.feature</a>
+      <li><a href="./features/travel_plans_feature.html">travel_plans.feature</a>
+      <li><a href="./features/user_authentication_feature.html">user_authentication.feature</a>
+    </ul></details>
+    <li><a href="./lib/tasks/cucumber_rake.html">cucumber.rake</a>
+    <li><details><summary>log</summary>
+    <ul class="link-list">
+      <li><a href="./log/development_log.html">development.log</a>
+      <li><a href="./log/test_log.html">test.log</a>
+    </ul></details>
+    <li><details><summary>public</summary>
+    <ul class="link-list">
+      <li><a href="./public/400_html.html">400.html</a>
+      <li><a href="./public/404_html.html">404.html</a>
+      <li><a href="./public/406-unsupported-browser_html.html">406-unsupported-browser.html</a>
+      <li><a href="./public/422_html.html">422.html</a>
+      <li><a href="./public/500_html.html">500.html</a>
+      <li><a href="./public/index_html_backup.html">index.html.backup</a>
+      <li><a href="./public/js/travel-planner_js.html">travel-planner.js</a>
+      <li><a href="./public/offline_html.html">offline.html</a>
+      <li><a href="./public/robots_txt.html">robots</a>
+      <li><a href="./public/tripadvisor-check_html.html">tripadvisor-check.html</a>
+    </ul></details>
+    <li><details><summary>tmp</summary>
+    <ul class="link-list">
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977770_8960772_f01ea09/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764977952_0724654_88b215e/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1764978131_9619157_8b50fa3/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039455_3308675_81a514b/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765039587_144924_54f5afe/rich_html.html">rich.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/plain_html.html">plain.html</a>
+      <li><a href="./tmp/letter_opener/1765040662_3113976_be7e2c5/rich_html.html">rich.html</a>
+      <li><a href="./tmp/local_secret_txt.html">local_secret</a>
+      <li><a href="./tmp/restart_txt.html">restart</a>
+    </ul></details>
+  </ul>
+</div>
+
+
+  <footer id="validator-badges" role="contentinfo">
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.14.2.
+  <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
+</footer>
+
+</nav>
+
+<main role="main" aria-label="Page VISA_API_INTEGRATION.md">
+
+<h1 id="label-Visa+API+Integration+-+Implementation+Summary">Visa API Integration - Implementation Summary<span><a href="#label-Visa+API+Integration+-+Implementation+Summary">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<h2 id="label-F0-9F-93-8B+Overview">📋 Overview<span><a href="#label-F0-9F-93-8B+Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Successfully integrated Travel Buddy Visa Requirements API to provide <strong>real, accurate, and detailed visa information</strong> for international travel recommendations.</p>
+<hr>
+
+<h2 id="label-F0-9F-8E-AF+What+Changed">🎯 What Changed<span><a href="#label-F0-9F-8E-AF+What+Changed">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Architecture-3A+Method+B+-28Recommended-29"><strong>Architecture: Method B (Recommended)</strong><span><a href="#label-Architecture-3A+Method+B+-28Recommended-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>We implemented the <strong>OpenAI First → Visa API</strong> approach:</p>
+
+<pre class="ruby"><span class="ruby-constant">User</span> <span class="ruby-constant">Input</span> <span class="ruby-identifier">→</span> <span class="ruby-constant">OpenAI</span> <span class="ruby-constant">Recommends</span> <span class="ruby-constant">Destination</span> <span class="ruby-identifier">→</span> <span class="ruby-constant">Query</span> <span class="ruby-constant">Visa</span> <span class="ruby-constant">API</span> <span class="ruby-identifier">→</span> <span class="ruby-constant">Display</span> <span class="ruby-constant">Real</span> <span class="ruby-constant">Visa</span> <span class="ruby-constant">Info</span>
+</pre>
+
+<p>This approach: - ✅ More economical (only queries visa for recommended destinations) - ✅ Provides specific, actionable visa information - ✅ Seamlessly integrates with existing flight price validation logic</p>
+<hr>
+
+<h2 id="label-F0-9F-93-81+Files+Created">📁 Files Created<span><a href="#label-F0-9F-93-81+Files+Created">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-1.+app-2FServices-2Fcountry_code_mapper.rb">1. <strong><code>app/Services/country_code_mapper.rb</code></strong><span><a href="#label-1.+app-2FServices-2Fcountry_code_mapper.rb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Converts country names to ISO Alpha-2 codes (e.g., “China” → “CN”)</p>
+</li><li>
+<p>Supports 120+ countries</p>
+</li><li>
+<p>Case-insensitive matching</p>
+</li></ul>
+
+<h3 id="label-2.+app-2FServices-2Fvisa_service.rb">2. <strong><code>app/Services/visa_service.rb</code></strong><span><a href="#label-2.+app-2FServices-2Fvisa_service.rb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Calls Travel Buddy Visa Requirements API via RapidAPI</p>
+</li><li>
+<p>Handles authentication, error handling, and rate limiting</p>
+</li><li>
+<p>Returns structured visa data with:</p>
+</li><li>
+<p>Primary visa requirement (status, duration, color)</p>
+</li><li>
+<p>Alternative options (eVisa, visa on arrival)</p>
+</li><li>
+<p>Mandatory registration requirements</p>
+</li><li>
+<p>Passport validity requirements</p>
+</li><li>
+<p>Exception rules</p>
+</li></ul>
+
+<h3 id="label-3.+test_visa_integration.rb">3. <strong><code>test_visa_integration.rb</code></strong><span><a href="#label-3.+test_visa_integration.rb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Test script to verify the integration</p>
+</li><li>
+<p>Tests country code mapping</p>
+</li><li>
+<p>Tests visa API calls for various scenarios</p>
+</li></ul>
+<hr>
+
+<h2 id="label-F0-9F-94-A7+Files+Modified">🔧 Files Modified<span><a href="#label-F0-9F-94-A7+Files+Modified">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-1.+.env">1. <strong><code>.env</code></strong><span><a href="#label-1.+.env">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Added:</p>
+
+<pre>RAPIDAPI_KEY=6672fee1ebmshe08a425c6f71306p17d417jsnf1fbbc461ca1</pre>
+
+<h3 id="label-2.+app-2FServices-2Fopenai_service.rb">2. <strong><code>app/Services/openai_service.rb</code></strong><span><a href="#label-2.+app-2FServices-2Fopenai_service.rb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-Changes+in+get_recommendations+method-3A">Changes in <code>get_recommendations</code> method:<span><a href="#label-Changes+in+get_recommendations+method-3A">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<pre class="ruby"><span class="ruby-comment"># Step 2: Get visa information (NEW)</span>
+<span class="ruby-identifier">visa_result</span> = <span class="ruby-identifier">get_visa_info</span>(<span class="ruby-identifier">destination_country</span>)
+
+<span class="ruby-comment"># Step 5: Pass visa_result to full plan generation</span>
+<span class="ruby-identifier">full_plan</span> = <span class="ruby-identifier">get_full_travel_plan</span>(<span class="ruby-identifier">destination_city</span>, <span class="ruby-identifier">destination_country</span>, <span class="ruby-identifier">flight_result</span>, <span class="ruby-identifier">visa_result</span>)
+</pre>
+
+<h4 id="label-Changes+in+get_full_travel_plan+method-3A">Changes in <code>get_full_travel_plan</code> method:<span><a href="#label-Changes+in+get_full_travel_plan+method-3A">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p>Added <code>visa_result</code> parameter</p>
+</li><li>
+<p>Injects structured <code>visa_data</code> into recommendations</p>
+</li></ul>
+
+<h4 id="label-Changes+in+build_full_plan_prompt+method-3A">Changes in <code>build_full_plan_prompt</code> method:<span><a href="#label-Changes+in+build_full_plan_prompt+method-3A">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p>Added <code>visa_result</code> parameter</p>
+</li><li>
+<p>Calls <code>build_visa_info_section</code> to inject verified visa information into GPT prompt</p>
+</li></ul>
+
+<h4 id="label-New+helper+methods+added-3A">New helper methods added:<span><a href="#label-New+helper+methods+added-3A">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p><code>get_visa_info(destination_country)</code> - Fetches visa data from API</p>
+</li><li>
+<p><code>build_visa_info_section(visa_result)</code> - Formats visa data for GPT prompt</p>
+</li><li>
+<p><code>visa_color_to_description(color)</code> - Converts color codes to readable descriptions</p>
+</li></ul>
+
+<h3 id="label-3.+app-2Fviews-2Ftravel_recommendations-2F_recommendations_list.html.erb">3. <strong><code>app/views/travel_recommendations/_recommendations_list.html.erb</code></strong><span><a href="#label-3.+app-2Fviews-2Ftravel_recommendations-2F_recommendations_list.html.erb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-Enhanced+visa+display+section-3A">Enhanced visa display section:<span><a href="#label-Enhanced+visa+display+section-3A">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p><strong>Color-coded badges</strong> based on visa difficulty:</p>
+</li><li>
+<p>🟢 Green = Visa-free</p>
+</li><li>
+<p>🔵 Blue = Visa on arrival / eVisa</p>
+</li><li>
+<p>🟡 Yellow = eTA / Registration required</p>
+</li><li>
+<p>🔴 Red = Visa required in advance</p>
+</li><li>
+<p><strong>Detailed information</strong>:</p>
+</li><li>
+<p>Primary visa status and duration</p>
+</li><li>
+<p>Alternative visa options with apply links</p>
+</li><li>
+<p>Mandatory registration warnings (e.g., e-Arrival)</p>
+</li><li>
+<p>Passport validity requirements</p>
+</li><li>
+<p>Exception rules (e.g., visa waivers)</p>
+</li><li>
+<p><strong>Fallback</strong>: If <code>visa_data</code> not available, shows old <code>visa_info</code> field</p>
+</li></ul>
+<hr>
+
+<h2 id="label-F0-9F-94-91+API+Information">🔑 API Information<span><a href="#label-F0-9F-94-91+API+Information">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<table role="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>API</strong></td>
+<td>Travel Buddy Visa Requirements API</td>
+</tr>
+<tr>
+<td><strong>Platform</strong></td>
+<td>RapidAPI</td>
+</tr>
+<tr>
+<td><strong>Endpoint</strong></td>
+<td><code>https://visa-requirement.p.rapidapi.com/v2/visa/check</code></td>
+</tr>
+<tr>
+<td><strong>Plan</strong></td>
+<td>Free Tier</td>
+</tr>
+<tr>
+<td><strong>Quota</strong></td>
+<td>120 requests/month</td>
+</tr>
+<tr>
+<td><strong>API Key</strong></td>
+<td>Stored in <code>.env</code> as <code>RAPIDAPI_KEY</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+
+<h2 id="label-F0-9F-93-8A+Data+Flow">📊 Data Flow<span><a href="#label-F0-9F-93-8A+Data+Flow">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<pre>1. User submits travel preferences
+   ↓
+2. OpenAI recommends destination (e.g., &quot;Tokyo, Japan&quot;)
+   ↓
+3. VisaService queries API: &quot;CN&quot; → &quot;JP&quot;
+   ↓
+4. API returns structured visa data:
+   {
+     visa_status: &quot;Visa required&quot;,
+     visa_duration: &quot;15-90 days&quot;,
+     visa_color: &quot;red&quot;,
+     passport_validity: &quot;Valid for duration of stay&quot;
+   }
+   ↓
+5. Visa data injected into GPT prompt:
+   &quot;VERIFIED VISA INFORMATION:
+    - Status: Visa required
+    - Maximum Stay: 15-90 days
+    - Difficulty Level: Difficult (Visa required in advance)&quot;
+   ↓
+6. OpenAI generates travel plan using real visa data
+   ↓
+7. Recommendation displayed with visa_data:
+   - Visa badge: [Visa required]
+   - Duration: Up to 90 days
+   - Passport: Valid for duration of stay</pre>
+<hr>
+
+<h2 id="label-F0-9F-8E-A8+UI+Enhancements">🎨 UI Enhancements<span><a href="#label-F0-9F-8E-A8+UI+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Before-3A">Before:<span><a href="#label-Before-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre>Visa Info: Visa requirements for China citizens</pre>
+
+<h3 id="label-After-3A">After:<span><a href="#label-After-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre>Visa Requirement:
+[Visa required] 🔴 Up to 90 days
+
+Alternative: eVisa ↗ Apply
+
+⚠️ Required: e-Arrival - Complete here ↗
+
+✓ Passport must be valid: Valid for the duration of stay</pre>
+<hr>
+
+<h2 id="label-F0-9F-A7-AA+Testing">🧪 Testing<span><a href="#label-F0-9F-A7-AA+Testing">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Run+the+test+script-3A">Run the test script:<span><a href="#label-Run+the+test+script-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">ruby</span> <span class="ruby-identifier">test_visa_integration</span>.<span class="ruby-identifier">rb</span>
+</pre>
+
+<h3 id="label-Expected+output-3A">Expected output:<span><a href="#label-Expected+output-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre>Test 1: Country Code Mapper
+  United States  =&gt; US
+  China         =&gt; CN
+  Japan         =&gt; JP
+  
+Test 2: Visa Service API Calls
+  Case 1: China → Japan
+  ✅ Success!
+     Status: Visa required
+     Duration: 15-90 days
+     Color: red</pre>
+
+<h3 id="label-Manual+testing-3A">Manual testing:<span><a href="#label-Manual+testing-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ol><li>
+<p>Start Rails server: <code>rails server</code></p>
+</li><li>
+<p>Visit: <a href="http://localhost:3000/travel_recommendations">localhost:3000/travel_recommendations</a></p>
+</li><li>
+<p>Fill in form:</p>
+</li><li>
+<p>Passport Country: <strong>China</strong></p>
+</li><li>
+<p>Trip Scope: <strong>International</strong></p>
+</li><li>
+<p>Other preferences as desired</p>
+</li><li>
+<p>Submit and check recommendation</p>
+</li><li>
+<p>Verify visa information appears with badges and details</p>
+</li></ol>
+<hr>
+
+<h2 id="label-F0-9F-9A-80+Features+Implemented">🚀 Features Implemented<span><a href="#label-F0-9F-9A-80+Features+Implemented">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-E2-9C-85+Phase+1+-28MVP-29+-+Completed">✅ Phase 1 (MVP) - Completed<span><a href="#label-E2-9C-85+Phase+1+-28MVP-29+-+Completed">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>[x] Environment variable configuration</p>
+</li><li>
+<p>[x] Country code mapping service</p>
+</li><li>
+<p>[x] Visa API service with error handling</p>
+</li><li>
+<p>[x] Integration with OpenAI service</p>
+</li><li>
+<p>[x] Enhanced GPT prompts with real visa data</p>
+</li><li>
+<p>[x] UI enhancements with color-coded badges</p>
+</li><li>
+<p>[x] Alternative visa options display</p>
+</li><li>
+<p>[x] Mandatory registration warnings</p>
+</li><li>
+<p>[x] Passport validity requirements</p>
+</li><li>
+<p>[x] Exception rules display</p>
+</li></ul>
+
+<h3 id="label-F0-9F-94-9C+Phase+2+-28Future+Enhancements-29">🔜 Phase 2 (Future Enhancements)<span><a href="#label-F0-9F-94-9C+Phase+2+-28Future+Enhancements-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>[ ] Database caching (30-day expiry)</p>
+</li><li>
+<p>[ ] <a href="User.html"><code>User</code></a> preference: visa_free_only filter</p>
+</li><li>
+<p>[ ] Visa cost estimation</p>
+</li><li>
+<p>[ ] Visa processing time tracking</p>
+</li><li>
+<p>[ ] Multiple passport support</p>
+</li><li>
+<p>[ ] Visa application checklist generator</p>
+</li></ul>
+<hr>
+
+<h2 id="label-E2-9A-A0-EF-B8-8F+Important+Notes">⚠️ Important Notes<span><a href="#label-E2-9A-A0-EF-B8-8F+Important+Notes">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-API+Quota+Management">API Quota Management<span><a href="#label-API+Quota+Management">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><strong>Free tier</strong>: 120 requests/month</p>
+</li><li>
+<p><strong>Current usage</strong>: ~1 request per international recommendation</p>
+</li><li>
+<p><strong>Estimated capacity</strong>: 120 international trip recommendations/month</p>
+</li><li>
+<p><strong>Recommendation</strong>: Monitor usage, implement caching in Phase 2</p>
+</li></ul>
+
+<h3 id="label-Error+Handling">Error Handling<span><a href="#label-Error+Handling">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The system gracefully handles: - Invalid country names → fallback to “Check visa requirements” - API failures → fallback to basic visa message - Missing data → uses available fields only - Domestic travel → skips visa check entirely</p>
+
+<h3 id="label-Country+Code+Coverage">Country Code Coverage<span><a href="#label-Country+Code+Coverage">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p><strong>Supported</strong>: 120+ major countries</p>
+</li><li>
+<p><strong>Missing country handling</strong>: Logs warning, returns nil</p>
+</li><li>
+<p><strong>To add more</strong>: Edit <code>country_code_mapper.rb</code> COUNTRY_CODES hash</p>
+</li></ul>
+<hr>
+
+<h2 id="label-F0-9F-93-9D+Usage+Examples">📝 Usage Examples<span><a href="#label-F0-9F-93-9D+Usage+Examples">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Example+1-3A+China+-E2-86-92+Japan">Example 1: China → Japan<span><a href="#label-Example+1-3A+China+-E2-86-92+Japan">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">visa_service</span> = <span class="ruby-constant">VisaService</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;China&quot;</span>, <span class="ruby-string">&quot;Japan&quot;</span>)
+<span class="ruby-identifier">result</span> = <span class="ruby-identifier">visa_service</span>.<span class="ruby-identifier">get_visa_requirements</span>
+
+<span class="ruby-comment"># Returns:</span>
+{
+  <span class="ruby-value">success:</span> <span class="ruby-keyword">true</span>,
+  <span class="ruby-value">visa_status:</span> <span class="ruby-string">&quot;Visa required&quot;</span>,
+  <span class="ruby-value">visa_duration:</span> <span class="ruby-string">&quot;15-90 days&quot;</span>,
+  <span class="ruby-value">visa_color:</span> <span class="ruby-string">&quot;red&quot;</span>,
+  <span class="ruby-value">passport_validity:</span> <span class="ruby-string">&quot;Valid for the duration of stay&quot;</span>
+}
+</pre>
+
+<h3 id="label-Example+2-3A+US+-E2-86-92+Japan">Example 2: US → Japan<span><a href="#label-Example+2-3A+US+-E2-86-92+Japan">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">visa_service</span> = <span class="ruby-constant">VisaService</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;United States&quot;</span>, <span class="ruby-string">&quot;Japan&quot;</span>)
+<span class="ruby-identifier">result</span> = <span class="ruby-identifier">visa_service</span>.<span class="ruby-identifier">get_visa_requirements</span>
+
+<span class="ruby-comment"># Returns:</span>
+{
+  <span class="ruby-value">success:</span> <span class="ruby-keyword">true</span>,
+  <span class="ruby-value">visa_status:</span> <span class="ruby-string">&quot;Visa-free&quot;</span>,
+  <span class="ruby-value">visa_duration:</span> <span class="ruby-string">&quot;90 days&quot;</span>,
+  <span class="ruby-value">visa_color:</span> <span class="ruby-string">&quot;green&quot;</span>
+}
+</pre>
+
+<h3 id="label-Example+3-3A+China+-E2-86-92+Indonesia">Example 3: China → Indonesia<span><a href="#label-Example+3-3A+China+-E2-86-92+Indonesia">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">visa_service</span> = <span class="ruby-constant">VisaService</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;China&quot;</span>, <span class="ruby-string">&quot;Indonesia&quot;</span>)
+<span class="ruby-identifier">result</span> = <span class="ruby-identifier">visa_service</span>.<span class="ruby-identifier">get_visa_requirements</span>
+
+<span class="ruby-comment"># Returns:</span>
+{
+  <span class="ruby-value">success:</span> <span class="ruby-keyword">true</span>,
+  <span class="ruby-value">visa_status:</span> <span class="ruby-string">&quot;Visa on arrival&quot;</span>,
+  <span class="ruby-value">visa_duration:</span> <span class="ruby-string">&quot;30 days&quot;</span>,
+  <span class="ruby-value">visa_color:</span> <span class="ruby-string">&quot;blue&quot;</span>,
+  <span class="ruby-value">alternative_visa:</span> <span class="ruby-string">&quot;eVisa&quot;</span>,
+  <span class="ruby-value">alternative_duration:</span> <span class="ruby-string">&quot;30 days&quot;</span>,
+  <span class="ruby-value">alternative_link:</span> <span class="ruby-string">&quot;https://...&quot;</span>,
+  <span class="ruby-value">mandatory_registration:</span> <span class="ruby-string">&quot;e-Arrival&quot;</span>,
+  <span class="ruby-value">registration_link:</span> <span class="ruby-string">&quot;https://...&quot;</span>
+}
+</pre>
+<hr>
+
+<h2 id="label-F0-9F-8E-AF+Benefits">🎯 Benefits<span><a href="#label-F0-9F-8E-AF+Benefits">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-For+Users-3A">For Users:<span><a href="#label-For+Users-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>✅ <strong>Accurate</strong>: Real visa data from official sources</p>
+</li><li>
+<p>✅ <strong>Specific</strong>: Exact duration, cost, requirements</p>
+</li><li>
+<p>✅ <strong>Actionable</strong>: Direct links to application portals</p>
+</li><li>
+<p>✅ <strong>Comprehensive</strong>: Includes alternatives and exceptions</p>
+</li></ul>
+
+<h3 id="label-For+Developers-3A">For Developers:<span><a href="#label-For+Developers-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>✅ <strong>Maintainable</strong>: Clean service-oriented architecture</p>
+</li><li>
+<p>✅ <strong>Extensible</strong>: Easy to add caching, filters, etc.</p>
+</li><li>
+<p>✅ <strong>Testable</strong>: Isolated services with clear interfaces</p>
+</li><li>
+<p>✅ <strong>Economical</strong>: Smart API usage (only query when needed)</p>
+</li></ul>
+<hr>
+
+<h2 id="label-F0-9F-94-8D+Debugging">🔍 Debugging<span><a href="#label-F0-9F-94-8D+Debugging">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Enable+detailed+logging-3A">Enable detailed logging:<span><a href="#label-Enable+detailed+logging-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Rails logs will show:</p>
+
+<pre>🔍 Calling Visa API: CN → JP
+✅ Visa API Success: CN → JP
+✅ Visa info retrieved: Visa required</pre>
+
+<h3 id="label-Check+API+responses-3A">Check API responses:<span><a href="#label-Check+API+responses-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># In Rails console</span>
+<span class="ruby-identifier">visa_service</span> = <span class="ruby-constant">VisaService</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;China&quot;</span>, <span class="ruby-string">&quot;Japan&quot;</span>)
+<span class="ruby-identifier">result</span> = <span class="ruby-identifier">visa_service</span>.<span class="ruby-identifier">get_visa_requirements</span>
+<span class="ruby-identifier">pp</span> <span class="ruby-identifier">result</span>
+</pre>
+<hr>
+
+<h2 id="label-F0-9F-93-9E+Support">📞 Support<span><a href="#label-F0-9F-93-9E+Support">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h3 id="label-Issues+with+API-3A">Issues with API:<span><a href="#label-Issues+with+API-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Check <code>.env</code> for correct <code>RAPIDAPI_KEY</code></p>
+</li><li>
+<p>Verify API quota: <a href="https://rapidapi.com/TravelBuddyAI/api/visa-requirement">rapidapi.com/TravelBuddyAI/api/visa-requirement</a></p>
+</li><li>
+<p>Check logs for error messages</p>
+</li></ul>
+
+<h3 id="label-Missing+country+codes-3A">Missing country codes:<span><a href="#label-Missing+country+codes-3A">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Add to <code>country_code_mapper.rb</code></p>
+</li><li>
+<p>Refer to: <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">en.wikipedia.org/wiki/ISO_3166-1_alpha-2</a></p>
+</li></ul>
+<hr>
+
+<h2 id="label-E2-9C-85+Success+Criteria+Met">✅ Success Criteria Met<span><a href="#label-E2-9C-85+Success+Criteria+Met">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<ul><li>
+<p>[x] Visa API successfully called for international trips</p>
+</li><li>
+<p>[x] Real visa data injected into GPT prompts</p>
+</li><li>
+<p>[x] Detailed visa information displayed in UI</p>
+</li><li>
+<p>[x] Color-coded badges for easy recognition</p>
+</li><li>
+<p>[x] Alternative options and warnings shown</p>
+</li><li>
+<p>[x] Graceful error handling</p>
+</li><li>
+<p>[x] No breaking changes to existing functionality</p>
+</li></ul>
+<hr>
+
+<p><strong>Implementation Date</strong>: November 18, 2025<br> <strong>Status</strong>: ✅ Complete (Phase 1 MVP)<br> <strong>Next</strong>: Test with real users, gather feedback, implement Phase 2 caching</p>
+
+</main>
+
