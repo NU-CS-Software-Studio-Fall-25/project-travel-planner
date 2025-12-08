@@ -68,6 +68,10 @@
 
     function initLogin() {
         const form = document.getElementById("login-form");
+        
+        // Exit early if form doesn't exist (not on login page)
+        if (!form) return;
+        
         const emailField = document.getElementById("login-email-field");
         const passwordField = document.getElementById("login-password-field");
         const submitBtn = document.getElementById("login-submit-btn");
@@ -91,45 +95,49 @@
         }
 
         // Toggle password visibility with same eye plus diagonal line for "visible" state
-        toggleBtn.addEventListener("click", () => {
-            const currentlyVisible = toggleBtn.getAttribute("data-visible") === "true";
-            if (currentlyVisible) {
-                // hide password
-                passwordField.type = "password";
-                toggleBtn.setAttribute("aria-pressed", "false");
-                toggleBtn.setAttribute("title", "Show password");
-                toggleBtn.setAttribute("data-visible", "false");
-                eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>';
-            } else {
-                // show password
-                passwordField.type = "text";
-                toggleBtn.setAttribute("aria-pressed", "true");
-                toggleBtn.setAttribute("title", "Hide password");
-                toggleBtn.setAttribute("data-visible", "true");
-                eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />';
-            }
-            passwordField.focus();
-        });
+        if (toggleBtn && passwordField && eyeIcon) {
+            toggleBtn.addEventListener("click", () => {
+                const currentlyVisible = toggleBtn.getAttribute("data-visible") === "true";
+                if (currentlyVisible) {
+                    // hide password
+                    passwordField.type = "password";
+                    toggleBtn.setAttribute("aria-pressed", "false");
+                    toggleBtn.setAttribute("title", "Show password");
+                    toggleBtn.setAttribute("data-visible", "false");
+                    eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>';
+                } else {
+                    // show password
+                    passwordField.type = "text";
+                    toggleBtn.setAttribute("aria-pressed", "true");
+                    toggleBtn.setAttribute("title", "Hide password");
+                    toggleBtn.setAttribute("data-visible", "true");
+                    eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />';
+                }
+                passwordField.focus();
+            });
+        }
 
         // On submit: validate but do not show inline errors or validation classes
-        form.addEventListener("submit", (e) => {
-            let isValid = true;
+        if (form && emailField && passwordField && submitBtn) {
+            form.addEventListener("submit", (e) => {
+                let isValid = true;
 
-            const emailError = validateEmail(emailField.value);
-            if (emailError) isValid = false;
+                const emailError = validateEmail(emailField.value);
+                if (emailError) isValid = false;
 
-            const passwordError = validatePassword(passwordField.value);
-            if (passwordError) isValid = false;
+                const passwordError = validatePassword(passwordField.value);
+                if (passwordError) isValid = false;
 
-            if (!isValid) {
-                e.preventDefault();
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = "Please fix errors above";
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                }, 3000);
-            }
-        });
+                if (!isValid) {
+                    e.preventDefault();
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = "Please fix errors above";
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                    }, 3000);
+                }
+            });
+        }
     }
     document.addEventListener("turbo:load", initLogin);
 </script>

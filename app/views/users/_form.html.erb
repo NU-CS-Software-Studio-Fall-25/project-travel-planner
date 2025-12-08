@@ -382,6 +382,10 @@
     function initUserForm() {
         // DOM elements
         const form = document.getElementById("user-form");
+        
+        // Exit early if form doesn't exist (not on user form page)
+        if (!form) return;
+        
         const nameField = document.getElementById("name-field");
         const emailField = document.getElementById("email-field");
         const countryField = document.getElementById("country-field");
@@ -629,35 +633,43 @@
         }
 
         // Validation on blur for name and email
-        nameField.addEventListener("blur", () => {
-            const error = validateName(nameField.value);
-            if (error) {
-                showError(errors.name, error, nameField);
-            } else {
-                hideError(errors.name, nameField);
-            }
-        });
+        if (nameField) {
+            nameField.addEventListener("blur", () => {
+                const error = validateName(nameField.value);
+                if (error) {
+                    showError(errors.name, error, nameField);
+                } else {
+                    hideError(errors.name, nameField);
+                }
+            });
+        }
 
-        emailField.addEventListener("blur", () => {
-            const error = validateEmail(emailField.value);
-            if (error) {
-                showError(errors.email, error, emailField);
-            } else {
-                hideError(errors.email, emailField);
-            }
-        });
+        if (emailField) {
+            emailField.addEventListener("blur", () => {
+                const error = validateEmail(emailField.value);
+                if (error) {
+                    showError(errors.email, error, emailField);
+                } else {
+                    hideError(errors.email, emailField);
+                }
+            });
+        }
 
         // Validation on blur for country
-        countryField.addEventListener("change", () => {
-            const error = validateCountry(countryField.value);
-            if (error) {
-                showError(errors.country, error, countryField);
-            } else {
-                hideError(errors.country, countryField);
-            }
-        });
+        if (countryField) {
+            countryField.addEventListener("change", () => {
+                const error = validateCountry(countryField.value);
+                if (error) {
+                    showError(errors.country, error, countryField);
+                } else {
+                    hideError(errors.country, countryField);
+                }
+            });
+        }
 
-        promoField.addEventListener("input", updateTierAvailability);
+        if (promoField) {
+            promoField.addEventListener("input", updateTierAvailability);
+        }
 
         tierRadios.forEach(radio => {
             radio.addEventListener("change", () => {
@@ -716,29 +728,36 @@
         }
 
         // Form submit validation
-        form.addEventListener("submit", (e) => {
-            let isValid = true;
+        if (form) {
+            form.addEventListener("submit", (e) => {
+                let isValid = true;
 
-            // Name
-            const nameError = validateName(nameField.value);
-            if (nameError) {
-                showError(errors.name, nameError, nameField);
-                isValid = false;
-            }
+                // Name
+                if (nameField) {
+                    const nameError = validateName(nameField.value);
+                    if (nameError) {
+                        showError(errors.name, nameError, nameField);
+                        isValid = false;
+                    }
+                }
 
-            // Email
-            const emailError = validateEmail(emailField.value);
-            if (emailError) {
-                showError(errors.email, emailError, emailField);
-                isValid = false;
-            }
+                // Email
+                if (emailField) {
+                    const emailError = validateEmail(emailField.value);
+                    if (emailError) {
+                        showError(errors.email, emailError, emailField);
+                        isValid = false;
+                    }
+                }
 
-            // Country
-            const countryError = validateCountry(countryField.value);
-            if (countryError) {
-                showError(errors.country, countryError, countryField);
-                isValid = false;
-            }
+                // Country
+                if (countryField) {
+                    const countryError = validateCountry(countryField.value);
+                    if (countryError) {
+                        showError(errors.country, countryError, countryField);
+                        isValid = false;
+                    }
+                }
 
             // Tier and Promo
             const tierError = validateTier();
@@ -767,19 +786,22 @@
                 }
             }
 
-            if (!isValid) {
-                e.preventDefault();
-                submitBtn.textContent = "Please fix errors above";
-                setTimeout(() => {
-                    submitBtn.textContent = isNewRecord ? "Create Account" : "Update Profile";
-                }, 3000);
-            }
-        });
+                if (!isValid) {
+                    e.preventDefault();
+                    if (submitBtn) {
+                        submitBtn.textContent = "Please fix errors above";
+                        setTimeout(() => {
+                            submitBtn.textContent = isNewRecord ? "Create Account" : "Update Profile";
+                        }, 3000);
+                    }
+                }
+            });
+        }
 
         // Initial validation
         updateTierAvailability();
-        [nameField, emailField].forEach(field => {
-            if (field.value) {
+        [nameField, emailField].filter(f => f).forEach(field => {
+            if (field && field.value) {
                 const validator = field.id === "name-field" ? validateName :
                     validateEmail;
                 const error = validator(field.value);
@@ -792,7 +814,7 @@
                 }
             }
         });
-        if (countryField.value) {
+        if (countryField && countryField.value) {
             hideError(errors.country, countryField);
         }
         if (initialTier) {
