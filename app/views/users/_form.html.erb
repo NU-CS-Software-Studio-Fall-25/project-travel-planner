@@ -278,6 +278,48 @@
     <div class="invalid-feedback" id="country-error"></div>
   </div>
 
+  <% if user.new_record? %>
+    <div class="mb-3">
+      <%= form.label :password, class: "form-label" %>
+      <div class="input-group">
+        <%= form.password_field :password,
+                                class: "form-control",
+                                placeholder: "Create a password (min 7 chars; include upper, lower, digit & special @#$%&!*)",
+                                required: true,
+                                id: "password-field",
+                                maxlength: 75,
+                                'aria-describedby': "toggle-password-btn" %>
+        <button type="button" class="btn btn-outline-secondary" id="toggle-password-btn" aria-pressed="false" title="Show password" data-visible="false">
+          <svg id="password-eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      <div class="invalid-feedback" id="password-error"></div>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
+      <div class="input-group">
+        <%= form.password_field :password_confirmation,
+                                class: "form-control",
+                                placeholder: "Confirm your password",
+                                required: true,
+                                id: "password-confirm-field",
+                                maxlength: 75,
+                                'aria-describedby': "toggle-password-confirm-btn" %>
+        <button type="button" class="btn btn-outline-secondary" id="toggle-password-confirm-btn" aria-pressed="false" title="Show password" data-visible="false">
+          <svg id="password-confirm-eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      <div class="invalid-feedback" id="password-confirm-error"></div>
+    </div>
+  <% end %>
+
   <div class="mb-3">
     <%= form.label :promo_code, "Promo Code", class: "form-label fw-semibold" %>
     <%= form.password_field :promo_code,
@@ -324,46 +366,6 @@
   </div>
 
   <% if user.new_record? %>
-    <div class="mb-3">
-      <%= form.label :password, class: "form-label" %>
-      <div class="input-group">
-        <%= form.password_field :password,
-                                class: "form-control",
-                                placeholder: "Create a password (min 7 chars; include upper, lower, digit & special @#$%&!*)",
-                                required: true,
-                                id: "password-field",
-                                maxlength: 75,
-                                'aria-describedby': "toggle-password-btn" %>
-        <button type="button" class="btn btn-outline-secondary" id="toggle-password-btn" aria-pressed="false" title="Show password" data-visible="false">
-          <svg id="password-eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
-            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
-          </svg>
-        </button>
-      </div>
-      <div class="invalid-feedback" id="password-error"></div>
-    </div>
-
-    <div class="mb-3">
-      <%= form.label :password_confirmation, "Confirm Password", class: "form-label" %>
-      <div class="input-group">
-        <%= form.password_field :password_confirmation,
-                                class: "form-control",
-                                placeholder: "Confirm your password",
-                                required: true,
-                                id: "password-confirm-field",
-                                maxlength: 75,
-                                'aria-describedby': "toggle-password-confirm-btn" %>
-        <button type="button" class="btn btn-outline-secondary" id="toggle-password-confirm-btn" aria-pressed="false" title="Show password" data-visible="false">
-          <svg id="password-confirm-eye-icon" style="width:20px;height:20px;" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
-            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
-          </svg>
-        </button>
-      </div>
-      <div class="invalid-feedback" id="password-confirm-error"></div>
-    </div>
-
     <div class="mb-3 form-check">
       <%= form.check_box :terms_accepted, class: "form-check-input", required: true, id: "terms-accepted-field" %>
       <%= form.label :terms_accepted, class: "form-check-label" do %>
@@ -581,56 +583,48 @@
             iconElement.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />'
         }
 
-        // Attach toggle listeners only if buttons and fields exist
-        if (togglePwBtn && passwordField) {
+        // Remove any existing event listeners by cloning and replacing buttons
+        function setupPasswordToggle(toggleBtn, passwordField, eyeIcon) {
+            if (!toggleBtn || !passwordField || !eyeIcon) return;
+            
+            // Clone button to remove all existing event listeners
+            const newToggleBtn = toggleBtn.cloneNode(true);
+            toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+            
+            // Get fresh reference to the eye icon after cloning
+            const newEyeIcon = newToggleBtn.querySelector('svg');
+            
             // Ensure data-visible is initialized
-            if (!togglePwBtn.hasAttribute("data-visible")) {
-                togglePwBtn.setAttribute("data-visible", "false");
+            if (!newToggleBtn.hasAttribute("data-visible")) {
+                newToggleBtn.setAttribute("data-visible", "false");
             }
             
-            togglePwBtn.addEventListener("click", () => {
-                const currentlyVisible = togglePwBtn.getAttribute("data-visible") === "true";
+            // Add single click event listener
+            newToggleBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const currentlyVisible = newToggleBtn.getAttribute("data-visible") === "true";
                 if (currentlyVisible) {
                     passwordField.type = "password";
-                    togglePwBtn.setAttribute("aria-pressed", "false");
-                    togglePwBtn.setAttribute("title", "Show password");
-                    togglePwBtn.setAttribute("data-visible", "false");
-                    setEyeOpen(pwEyeIcon);
+                    newToggleBtn.setAttribute("aria-pressed", "false");
+                    newToggleBtn.setAttribute("title", "Show password");
+                    newToggleBtn.setAttribute("data-visible", "false");
+                    setEyeOpen(newEyeIcon);
                 } else {
                     passwordField.type = "text";
-                    togglePwBtn.setAttribute("aria-pressed", "true");
-                    togglePwBtn.setAttribute("title", "Hide password");
-                    togglePwBtn.setAttribute("data-visible", "true");
-                    setEyeWithSlash(pwEyeIcon);
+                    newToggleBtn.setAttribute("aria-pressed", "true");
+                    newToggleBtn.setAttribute("title", "Hide password");
+                    newToggleBtn.setAttribute("data-visible", "true");
+                    setEyeWithSlash(newEyeIcon);
                 }
                 passwordField.focus();
-            });
+            }, { once: false });
         }
-
-        if (togglePwConfirmBtn && passwordConfirmField) {
-            // Ensure data-visible is initialized
-            if (!togglePwConfirmBtn.hasAttribute("data-visible")) {
-                togglePwConfirmBtn.setAttribute("data-visible", "false");
-            }
-            
-            togglePwConfirmBtn.addEventListener("click", () => {
-                const currentlyVisible = togglePwConfirmBtn.getAttribute("data-visible") === "true";
-                if (currentlyVisible) {
-                    passwordConfirmField.type = "password";
-                    togglePwConfirmBtn.setAttribute("aria-pressed", "false");
-                    togglePwConfirmBtn.setAttribute("title", "Show password");
-                    togglePwConfirmBtn.setAttribute("data-visible", "false");
-                    setEyeOpen(pwConfirmEyeIcon);
-                } else {
-                    passwordConfirmField.type = "text";
-                    togglePwConfirmBtn.setAttribute("aria-pressed", "true");
-                    togglePwConfirmBtn.setAttribute("title", "Hide password");
-                    togglePwConfirmBtn.setAttribute("data-visible", "true");
-                    setEyeWithSlash(pwConfirmEyeIcon);
-                }
-                passwordConfirmField.focus();
-            });
-        }
+        
+        // Setup both password toggles
+        setupPasswordToggle(togglePwBtn, passwordField, pwEyeIcon);
+        setupPasswordToggle(togglePwConfirmBtn, passwordConfirmField, pwConfirmEyeIcon);
 
         // Validation on blur for name and email
         if (nameField) {
@@ -833,7 +827,15 @@
             }
         }
     }
+    
+    // Initialize on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initUserForm);
+    } else {
+        initUserForm();
+    }
+    
+    // Re-initialize on Turbo navigation
     document.addEventListener("turbo:load", initUserForm);
-    document.addEventListener("turbolinks:load", initUserForm);
-    document.addEventListener("DOMContentLoaded", initUserForm);
+    document.addEventListener("turbo:render", initUserForm);
 </script>

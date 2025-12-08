@@ -10,27 +10,55 @@ export default class extends Controller {
       return
     }
 
+    // Store bound event handlers for proper cleanup
+    this.handleBeforeInstallPrompt = this.handleBeforeInstallPrompt.bind(this)
+    this.handleAppInstalled = this.handleAppInstalled.bind(this)
+
     // Listen for beforeinstallprompt event
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault()
-      // Stash the event so it can be triggered later
-      this.deferredPrompt = e
-      // Show install banner
-      this.showInstallBanner()
-    })
+    window.addEventListener('beforeinstallprompt', this.handleBeforeInstallPrompt)
 
     // Check if app was successfully installed
-    window.addEventListener('appinstalled', () => {
-      console.log('PWA installed successfully!')
-      this.hideInstallBanner()
-      this.deferredPrompt = null
-    })
+    window.addEventListener('appinstalled', this.handleAppInstalled)
+    
+    // If prompt was already captured, show banner
+    if (window.deferredPrompt) {
+      this.deferredPrompt = window.deferredPrompt
+      this.showInstallBanner()
+    }
+  }
+  
+  disconnect() {
+    // Clean up event listeners when controller disconnects
+    window.removeEventListener('beforeinstallprompt', this.handleBeforeInstallPrompt)
+    window.removeEventListener('appinstalled', this.handleAppInstalled)
+    this.hideInstallBanner()
+  }
+  
+  handleBeforeInstallPrompt(e) {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault()
+    // Stash the event so it can be triggered later (globally and on instance)
+    this.deferredPrompt = e
+    window.deferredPrompt = e
+    // Show install banner
+    this.showInstallBanner()
+  }
+  
+  handleAppInstalled() {
+    console.log('PWA installed successfully!')
+    this.hideInstallBanner()
+    this.deferredPrompt = null
+    window.deferredPrompt = null
   }
 
   showInstallBanner() {
     // Check if user previously dismissed the banner
     if (localStorage.getItem('pwa-install-dismissed') === 'true') {
+      return
+    }
+    
+    // Don't create duplicate banners
+    if (this.bannerElement && document.body.contains(this.bannerElement)) {
       return
     }
 
@@ -47,19 +75,30 @@ export default class extends Controller {
           </div>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-light btn-sm" data-action="click->pwa-install#install">Install</button>
-          <button class="btn btn-outline-light btn-sm" data-action="click->pwa-install#dismiss">Not now</button>
+          <button class="btn btn-light btn-sm pwa-install-btn">Install</button>
+          <button class="btn btn-outline-light btn-sm pwa-dismiss-btn">Not now</button>
         </div>
       </div>
     `
-    banner.dataset.controller = 'pwa-install'
     document.body.appendChild(banner)
     this.bannerElement = banner
+    
+    // Add event listeners directly to buttons
+    const installBtn = banner.querySelector('.pwa-install-btn')
+    const dismissBtn = banner.querySelector('.pwa-dismiss-btn')
+    
+    if (installBtn) {
+      installBtn.addEventListener('click', (e) => this.install(e))
+    }
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', (e) => this.dismiss(e))
+    }
   }
 
   hideInstallBanner() {
-    if (this.bannerElement) {
+    if (this.bannerElement && document.body.contains(this.bannerElement)) {
       this.bannerElement.remove()
+      this.bannerElement = null
     }
   }
 

@@ -94,27 +94,42 @@
             return null;
         }
 
-        // Toggle password visibility with same eye plus diagonal line for "visible" state
+        // Toggle password visibility - clone button to remove old event listeners
         if (toggleBtn && passwordField && eyeIcon) {
-            toggleBtn.addEventListener("click", () => {
-                const currentlyVisible = toggleBtn.getAttribute("data-visible") === "true";
+            // Clone button to remove all existing event listeners
+            const newToggleBtn = toggleBtn.cloneNode(true);
+            toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+            
+            // Get fresh reference to the eye icon after cloning
+            const newEyeIcon = newToggleBtn.querySelector('svg');
+            
+            // Ensure data-visible is initialized
+            if (!newToggleBtn.hasAttribute("data-visible")) {
+                newToggleBtn.setAttribute("data-visible", "false");
+            }
+            
+            newToggleBtn.addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const currentlyVisible = newToggleBtn.getAttribute("data-visible") === "true";
                 if (currentlyVisible) {
                     // hide password
                     passwordField.type = "password";
-                    toggleBtn.setAttribute("aria-pressed", "false");
-                    toggleBtn.setAttribute("title", "Show password");
-                    toggleBtn.setAttribute("data-visible", "false");
-                    eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>';
+                    newToggleBtn.setAttribute("aria-pressed", "false");
+                    newToggleBtn.setAttribute("title", "Show password");
+                    newToggleBtn.setAttribute("data-visible", "false");
+                    newEyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>';
                 } else {
                     // show password
                     passwordField.type = "text";
-                    toggleBtn.setAttribute("aria-pressed", "true");
-                    toggleBtn.setAttribute("title", "Hide password");
-                    toggleBtn.setAttribute("data-visible", "true");
-                    eyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />';
+                    newToggleBtn.setAttribute("aria-pressed", "true");
+                    newToggleBtn.setAttribute("title", "Hide password");
+                    newToggleBtn.setAttribute("data-visible", "true");
+                    newEyeIcon.innerHTML = '<path fill="currentColor" d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />';
                 }
                 passwordField.focus();
-            });
+            }, { once: false });
         }
 
         // On submit: validate but do not show inline errors or validation classes
@@ -139,5 +154,15 @@
             });
         }
     }
+    
+    // Initialize on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLogin);
+    } else {
+        initLogin();
+    }
+    
+    // Re-initialize on Turbo navigation
     document.addEventListener("turbo:load", initLogin);
+    document.addEventListener("turbo:render", initLogin);
 </script>
