@@ -94,27 +94,50 @@ class TripadvisorService
 
       # Get photos from different locations (excluding hotels/restaurants and previously seen)
       if data["data"]&.any?
+        Rails.logger.info "API returned #{data['data'].length} locations for search: #{search_query}"
+        
         locations = data["data"].select do |loc|
           location_id = loc["location_id"]
           name = loc["name"].to_s.downcase
+          address = loc["address_obj"]&.dig("address_string").to_s.downcase || ""
+          
+          # Get the base city name (before any comma)
+          base_city_name = destination_city.split(',').first.strip.downcase
 
           # Skip if we've already processed this location
           next false if seen_location_ids.include?(location_id)
 
-          # Skip hotels, restaurants, and the city itself
-          !name.include?("hotel") &&
-          !name.include?("restaurant") &&
-          !name.include?("hostel") &&
-          !name.match?(/\b(#{destination_city.split(',').first})\b/i) # Skip if it's just the city name
+          # Skip hotels, restaurants, and hostels
+          next false if name.include?("hotel") || name.include?("restaurant") || name.include?("hostel")
+          
+          # Skip if it's just the city name itself (but allow attractions WITH the city name)
+          next false if name == base_city_name || name == "#{base_city_name}, #{destination_country.downcase}"
+          
+          # IMPORTANT: Verify the location is actually in the target city/country
+          # Check if the address or location data contains the destination city or country
+          location_matches = (
+            address.include?(base_city_name) ||
+            address.include?(destination_country.downcase) ||
+            name.include?(base_city_name) # Allow attractions that reference the city name
+          )
+          
+          # If we have address data, require it to match. If no address, be lenient.
+          if address.present? && address.length > 5
+            location_matches
+          else
+            # No address data - accept the location (API search should be accurate)
+            true
+          end
         end.take(5) # Increased from 3 to 5
 
-        Rails.logger.info "Found #{locations.length} unique locations for photos"
+        Rails.logger.info "Found #{locations.length} unique locations for photos from #{data['data']&.length || 0} total results"
 
         locations.each do |location|
           location_id = location["location_id"]
           seen_location_ids.add(location_id)
-
-          Rails.logger.info "Fetching photos from: #{location['name']} (ID: #{location_id})"
+          
+          address = location["address_obj"]&.dig("address_string") || "No address"
+          Rails.logger.info "Fetching photos from: #{location['name']} (ID: #{location_id}) - Address: #{address}"
 
           # Get 3 photos from each location (increased from 2)
           photos = get_photos(location_id, 3)
@@ -159,26 +182,39 @@ class TripadvisorService
     # Get the first location from search results that is NOT a tour/activity
     # Filter out tours, activities, and services - we only want actual places
     if data["data"]&.any?
+      base_city_name = destination_city.split(',').first.strip.downcase
+      
       # Filter results to find actual destinations (not tours/activities)
       actual_locations = data["data"].reject do |loc|
         name = loc["name"].to_s.downcase
+        address = loc["address_obj"]&.dig("address_string").to_s.downcase || ""
+        
         # Skip if it's clearly a tour, activity, transfer, or service
-        name.include?("tour") ||
-        name.include?("transfer") ||
-        name.include?("activity") ||
-        name.include?("shuttle") ||
-        name.include?("service") ||
-        name.include?("trip") ||
-        name.include?("from ") ||  # "Tour from Calgary"
-        name.include?(" to ")      # "Transfer to Airport"
+        next true if name.include?("tour") ||
+                    name.include?("transfer") ||
+                    name.include?("activity") ||
+                    name.include?("shuttle") ||
+                    name.include?("service") ||
+                    name.include?("trip") ||
+                    name.include?("from ") ||  # "Tour from Calgary"
+                    name.include?(" to ")      # "Transfer to Airport"
+        
+        # If we have address data, verify it matches the destination
+        if address.present? && address.length > 5
+          # Skip if address doesn't contain the city or country name
+          !(address.include?(base_city_name) || address.include?(destination_country.downcase))
+        else
+          false # Keep locations without address data
+        end
       end
 
-      Rails.logger.info "Filtered out #{data['data'].length - actual_locations.length} tours/activities"
+      Rails.logger.info "Filtered out #{data['data'].length - actual_locations.length} tours/activities/wrong-locations"
       Rails.logger.info "Found #{actual_locations.length} actual locations"
 
       if actual_locations.any?
         location_id = actual_locations.first["location_id"]
-        Rails.logger.info "Selected location ID: #{location_id} (#{actual_locations.first['name']})"
+        address = actual_locations.first["address_obj"]&.dig("address_string") || "No address"
+        Rails.logger.info "Selected location ID: #{location_id} (#{actual_locations.first['name']}) - Address: #{address}"
         return location_id
       else
         # If all results were tours, just use the first one anyway

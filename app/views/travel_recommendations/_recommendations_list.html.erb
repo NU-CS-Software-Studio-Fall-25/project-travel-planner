@@ -585,9 +585,12 @@
 </div>
 
 <script>
+  // Cache version - increment this to invalidate all caches after bug fixes
+  const CACHE_VERSION = 'v2';
+  
   // Cache for storing fetched images in sessionStorage
   function getCacheKey(city, country) {
-    return `tripadvisor_${city}_${country}`.replace(/[^a-zA-Z0-9_]/g, '_');
+    return `tripadvisor_${CACHE_VERSION}_${city}_${country}`.replace(/[^a-zA-Z0-9_]/g, '_');
   }
 
   function loadTripAdvisorImages(index, destinationCity, destinationCountry) {
