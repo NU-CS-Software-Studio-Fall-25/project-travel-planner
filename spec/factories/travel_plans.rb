@@ -2,7 +2,7 @@
 FactoryBot.define do
   factory :travel_plan do
     name { "Trip to #{Faker::Address.city}" }
-    description { Faker::Lorem.paragraph }
+    description { "Planning an exciting adventure to explore new places and experience different cultures." }
     start_date { 1.month.from_now }
     end_date { 1.month.from_now + 7.days }
     status { 'planned' }
