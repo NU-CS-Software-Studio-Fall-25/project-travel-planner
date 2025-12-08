@@ -245,10 +245,10 @@ class TravelPlansController < ApplicationController
   def index
     # Separate plans into future and past based on end_date
     all_plans = current_user.travel_plans.order(created_at: :desc)
-    
+
     @future_plans = all_plans.where("end_date >= ?", Date.today).or(all_plans.where(end_date: nil))
     @past_plans = all_plans.where("end_date < ?", Date.today)
-    
+
     # Keep pagination for backward compatibility if needed
     @pagy, @travel_plans = pagy(all_plans, items: 10)
   end
